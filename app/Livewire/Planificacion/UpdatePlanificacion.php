@@ -27,6 +27,9 @@ class UpdatePlanificacion extends Component
     public $docente_nombre;
     public $docente_apellido;
     public $cedula;
+    public $nombre_unidad_curricular;
+    public $nombre_seccion;
+    public $nombre_lapso;
 
     // Datos editables que vienen del formulario
     public $bibliografias = [];
@@ -85,6 +88,9 @@ class UpdatePlanificacion extends Component
         $this->id_unidad_curricular = $planificacion['id_unidad_curricular'];
         $this->lapso_fecha_inicio = $planificacion['lapso_fecha_inicio'];
         $this->lapso_fecha_fin = $planificacion['lapso_fecha_fin'];
+        $this->nombre_unidad_curricular = $planificacion['nombre_unidad_curricular'];
+        $this->nombre_seccion = $planificacion['nombre_seccion'];
+        $this->nombre_lapso = $planificacion['nombre_lapso'];
 
         // Cargar contenidos disponibles filtrados por unidad
         $this->loadContenidosUnidad();

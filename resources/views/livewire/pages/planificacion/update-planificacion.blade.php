@@ -74,7 +74,7 @@
 
                 @if (session()->has('message'))
                     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4
-                                                                                                                         dark:bg-green-700 dark:border-green-800 dark:text-green-100"
+                                                                                                                                 dark:bg-green-700 dark:border-green-800 dark:text-green-100"
                         role="alert">
                         <span class="block sm:inline">{{ session('message') }}</span>
                     </div>
@@ -82,21 +82,30 @@
 
                 @if (session()->has('error'))
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4
-                                                                                                                         dark:bg-red-700 dark:border-red-800 dark:text-red-100"
+                                                                                                                                 dark:bg-red-700 dark:border-red-800 dark:text-red-100"
                         role="alert">
                         <span class="block sm:inline">{{ session('error') }}</span>
                     </div>
                 @endif
 
-                {{-- Mostrar el nombre del docente de forma compacta --}}
-                <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900 rounded-lg flex justify-between items-center">
-                    <p class="text-sm text-blue-800 dark:text-blue-200">
-                        <strong>Docente:</strong> {{ $docente_nombre }} {{ $docente_apellido }} - C.I: {{ $cedula }}
-                    </p>
-                    <span
-                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-                        Planificación #{{ $planificacionId }}
-                    </span>
+                {{-- Header / Información General --}}
+                <div class="flex justify-between items-start border-b pb-4 mb-4 dark:border-gray-700">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+                            {{ $nombre_unidad_curricular }}
+                        </h3>
+                        <div class="flex flex-col gap-1 mt-1">
+                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Docente: {{ $docente_nombre }} {{ $docente_apellido }} - C.I: {{ $cedula }}
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                Sección: {{ $nombre_seccion }}
+                            </p>
+                            <p class="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                                Periodo: {{ $nombre_lapso }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Sección de Cortes -->
@@ -127,7 +136,7 @@
 
                             <!-- Cabecera del Accordion -->
                             <button type="button" @click="openCorte = openCorte === {{ $index }} ? null : {{ $index }}"
-                                class="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                class="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                                 <div class="flex items-center gap-3">
                                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
                                         Corte {{ $corte['corte'] }}
@@ -377,19 +386,15 @@
                                                             </td>
                                                             <td class="px-4 py-3">
                                                                 <x-select :options="$evaluacionesDisponibles"
-                                                                    valueField="id_evaluacion"
-                                                                    textField="nombre_evaluacion"
+                                                                    valueField="id_evaluacion" textField="nombre_evaluacion"
                                                                     wire:model.live.debounce.250ms="cortes.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.evaluacion_id"
-                                                                    placeholder="Seleccione"
-                                                                    class="w-full text-xs" />
+                                                                    placeholder="Seleccione" class="w-full text-xs" />
                                                             </td>
                                                             <td class="px-4 py-3">
                                                                 <x-select :options="$tecnicasDisponibles"
-                                                                    valueField="id_tecnica"
-                                                                    textField="nombre_tecnica"
+                                                                    valueField="id_tecnica" textField="nombre_tecnica"
                                                                     wire:model.live.debounce.250ms="cortes.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.tecnica_id"
-                                                                    placeholder="Seleccione"
-                                                                    class="w-full text-xs" />
+                                                                    placeholder="Seleccione" class="w-full text-xs" />
                                                             </td>
                                                             <td class="px-4 py-3">
                                                                 <input type="number" step="0.5" min="1" max="25"
@@ -397,12 +402,10 @@
                                                                     class="w-16 bg-transparent border-0 focus:ring-0 p-0 text-gray-700 dark:text-gray-300 text-xs font-bold">
                                                             </td>
                                                             <td class="px-4 py-3">
-                                                                <x-select :options="$formasParticipacion"
-                                                                    valueField="id"
+                                                                <x-select :options="$formasParticipacion" valueField="id"
                                                                     textField="nombre"
                                                                     wire:model.live.debounce.250ms="cortes.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.forma_participacion"
-                                                                    placeholder="Seleccione"
-                                                                    class="w-full text-xs" />
+                                                                    placeholder="Seleccione" class="w-full text-xs" />
                                                             </td>
                                                             <td class="px-4 py-3 text-right">
                                                                 @if (count($corte['evaluaciones']) > 1)
