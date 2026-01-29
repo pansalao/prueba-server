@@ -75,10 +75,10 @@ Route::view('profile', 'profile')
     ->name('profile');
 
 Route::middleware(['auth', 'role:1'])->group(function () {
-    Route::get('pnf/list', ListPnf::class)->name('pnf/listar');
-    Route::get('pnf/create', CreatePnf::class)->name('pnf/crear');
-    Route::get('pnf/update/{id}', UpdatePnf::class)->name('pnf/update');
-    Route::get('pnf/show/{id}', ShowPnf::class)->name('pnf/show');
+    //Route::get('pnf/list', ListPnf::class)->name('pnf/listar');
+    //Route::get('pnf/create', CreatePnf::class)->name('pnf/crear');
+    //Route::get('pnf/update/{id}', UpdatePnf::class)->name('pnf/update');
+    //Route::get('pnf/show/{id}', ShowPnf::class)->name('pnf/show');
 
     Route::get('contenido/list', ListContenido::class)->name('contenido/listar');
     Route::get('contenido/create', CreateContenido::class)->name('contenido/crear');
@@ -90,8 +90,8 @@ Route::middleware(['auth', 'role:1'])->group(function () {
     Route::get('tema/update/{id}', UpdateTema::class)->name('tema/update');
     Route::get('tema/show/{id}', ShowTema::class)->name('tema/show');
 
-    Route::get('usuarios/create', CreateUsuario::class)->name('usuarios/crear');
-    Route::get('usuarios/list', ListUsuario::class)->name('usuarios/listar');
+    //Route::get('usuarios/create', CreateUsuario::class)->name('usuarios/crear');
+    //Route::get('usuarios/list', ListUsuario::class)->name('usuarios/listar');
 
     Route::get('planificacion/list', ListPlanificacion::class)->name('planificacion/listar');
 
@@ -149,7 +149,7 @@ Route::middleware(['auth', 'role:1|2'])->group(function () {
 
     Route::get('planificacion/update/{planificacionId}', \App\Livewire\Planificacion\UpdatePlanificacion::class)->name('planificaciones.update');
     Route::get('planificacion/show/{planificacionId}', \App\Livewire\Planificacion\ShowPlanificacion::class)->name('planificacion/show');
-    
+
     // Rutas para Reportes PDF (Abrir en pestaña)
     Route::get('planificacion/reporte-general', [\App\Http\Controllers\ReportePlanificacionController::class, 'reporteGeneral'])->name('planificacion.reporte.general');
     Route::get('planificacion/reporte-detalle/{id}', [\App\Http\Controllers\ReportePlanificacionController::class, 'reporteDetalle'])->name('planificacion.reporte.detalle');
