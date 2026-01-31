@@ -54,12 +54,12 @@ class PlanificacionEditRepo
             }
 
 
-            // --- SINCRONIZACIÓN DE CORTES (tabla 'corte') ---
-            $oldActiveCortes = DB::table('corte')
+            // --- SINCRONIZACIÓN DE UNIDADES (tabla 'unidad') ---
+            $oldActiveCortes = DB::table('unidad')
                 ->where('id_planificacion', $planificacionId)
                 ->whereIn('estatus', ['1', '2', '3']) // Activos, Pendientes o Rechazados
                 ->get()
-                ->keyBy('id_corte');
+                ->keyBy('id_unidad');
 
             $newCortes = collect($data['cortes']);
             $processedOldCorteIds = [];
@@ -70,7 +70,7 @@ class PlanificacionEditRepo
 
                 // Buscar orden existente por número
                 foreach ($oldActiveCortes as $oldCorte) {
-                    if ($oldCorte->numero_corte == $corteNumero && $oldCorte->estatus != '3') {
+                    if ($oldCorte->numero_unidad == $corteNumero && $oldCorte->estatus != '3') {
                         $foundOldCorte = $oldCorte;
                         break;
                     }
@@ -78,41 +78,41 @@ class PlanificacionEditRepo
 
                 // Si no encontramos uno activo (ej. estaba rechazado, o no existía), buscamos por ID si viniere, pero aquí nos basamos en numero
                 if (!$foundOldCorte) {
-                    // Buscar corte rechazado para reactivar/actualizar
-                    $foundOldCorte = DB::table('corte')
+                    // Buscar unidad rechazada para reactivar/actualizar
+                    $foundOldCorte = DB::table('unidad')
                         ->where('id_planificacion', $planificacionId)
-                        ->where('numero_corte', $corteNumero)
+                        ->where('numero_unidad', $corteNumero)
                         ->first();
                 }
 
                 // NUEVO: Si el corte está Aprobado (1) o Pendiente (2), no lo tocamos.
                 // Solo guardamos su ID para no borrarlo al final.
                 if ($foundOldCorte && in_array($foundOldCorte->estatus, ['1', '2'])) {
-                    $processedOldCorteIds[] = $foundOldCorte->id_corte;
+                    $processedOldCorteIds[] = $foundOldCorte->id_unidad;
                     continue;
                 }
 
                 $corteId = null;
                 if ($foundOldCorte) {
-                    $corteId = $foundOldCorte->id_corte;
+                    $corteId = $foundOldCorte->id_unidad;
                     $processedOldCorteIds[] = $corteId;
 
                     // Actualizar estatus si estaba rechazado o eliminado
-                    DB::table('corte')
-                        ->where('id_corte', $corteId)
+                    DB::table('unidad')
+                        ->where('id_unidad', $corteId)
                         ->update([
                             'estatus' => '2', // Reactivar a pendiente/guardado
                         ]);
 
                     // Invalidar motivos de rechazo previos
                     DB::table('motivo_rechazo')
-                        ->where('id_corte', $corteId)
+                        ->where('id_unidad', $corteId)
                         ->where('estatus', '1')
                         ->update(['estatus' => '2']);
                 } else {
-                    $corteId = DB::table('corte')->insertGetId([
+                    $corteId = DB::table('unidad')->insertGetId([
                         'id_planificacion' => $planificacionId,
-                        'numero_corte' => $corteNumero,
+                        'numero_unidad' => $corteNumero,
                         'estatus' => '2',
                         'fecha_creacion' => now(),
                     ]);
@@ -147,12 +147,12 @@ class PlanificacionEditRepo
                 $this->syncTemasCorte($corteId, $corteData['contenidos']);
             }
 
-            // Cortes antiguos que no están en la nueva data (marcar eliminados?)
-            // En este caso, si el usuario quita un corte de la UI (aunque no se permite borrar cortes usualmente, solo vaciar), lo marcamos inactivo
+            // Unidades antiguas que no están en la nueva data (marcar eliminados?)
+            // En este caso, si el usuario quita una unidad de la UI (aunque no se permite borrar cortes usualmente, solo vaciar), lo marcamos inactivo
             foreach ($oldActiveCortes as $oldCorteId => $oldCorteData) {
                 if (!in_array($oldCorteId, $processedOldCorteIds)) {
-                    DB::table('corte')
-                        ->where('id_corte', $oldCorteId)
+                    DB::table('unidad')
+                        ->where('id_unidad', $oldCorteId)
                         ->update(['estatus' => '2']); // 2 = Eliminado/Inactivo
                 }
             }
@@ -178,7 +178,7 @@ class PlanificacionEditRepo
     {
         // Obtener IDs actuales activos
         $currentIds = DB::table($tableName)
-            ->where('id_corte', $corteId)
+            ->where('id_unidad', $corteId)
             ->where('estatus', '1')
             ->pluck($foreignIdColumn)
             ->toArray();
@@ -189,7 +189,7 @@ class PlanificacionEditRepo
         $toDeactivate = array_diff($currentIds, $newIds);
         if (!empty($toDeactivate)) {
             DB::table($tableName)
-                ->where('id_corte', $corteId)
+                ->where('id_unidad', $corteId)
                 ->whereIn($foreignIdColumn, $toDeactivate)
                 ->update(['estatus' => '2']);
         }
@@ -215,12 +215,12 @@ class PlanificacionEditRepo
             // En este caso, asumimos unicidad por item ID en el corte.
 
             $existing = DB::table($tableName)
-                ->where('id_corte', $corteId)
+                ->where('id_unidad', $corteId)
                 ->where($foreignIdColumn, $itemId)
                 ->first();
 
             $insertData = [
-                'id_corte' => $corteId,
+                'id_unidad' => $corteId,
                 $foreignIdColumn => $itemId,
                 'estatus' => '1',
             ];
@@ -235,7 +235,7 @@ class PlanificacionEditRepo
                 // Siempre actualizamos los datos adicionales por si cambiaron (ej. ponderación)
                 // y reactivamos si estaba inactivo '2'.
                 DB::table($tableName)
-                    ->where('id_corte', $corteId)
+                    ->where('id_unidad', $corteId)
                     ->where($foreignIdColumn, $itemId)
                     ->update($insertData);
             } else {
@@ -249,7 +249,7 @@ class PlanificacionEditRepo
     {
         // 1. Obtener temas actuales (detalle_tema)
         $currentTemasIds = DB::table('detalle_tema')
-            ->where('id_corte', $corteId)
+            ->where('id_unidad', $corteId)
             ->where('estatus', '1')
             ->pluck('id_tema')
             ->toArray();
@@ -260,7 +260,7 @@ class PlanificacionEditRepo
         $toDeactivate = array_diff($currentTemasIds, $newTemasIds);
         if (!empty($toDeactivate)) {
             DB::table('detalle_tema')
-                ->where('id_corte', $corteId)
+                ->where('id_unidad', $corteId)
                 ->whereIn('id_tema', $toDeactivate)
                 ->update(['estatus' => '2']);
         }
@@ -271,7 +271,7 @@ class PlanificacionEditRepo
                 continue;
 
             $existing = DB::table('detalle_tema')
-                ->where('id_corte', $corteId)
+                ->where('id_unidad', $corteId)
                 ->where('id_tema', $temaId)
                 ->first();
 
@@ -286,7 +286,7 @@ class PlanificacionEditRepo
                 }
             } else {
                 $detalleTemaId = DB::table('detalle_tema')->insertGetId([
-                    'id_corte' => $corteId,
+                    'id_unidad' => $corteId,
                     'id_tema' => $temaId,
                     'estatus' => '1',
                     'fecha_creacion' => now(),

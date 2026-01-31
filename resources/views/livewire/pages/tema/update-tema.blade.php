@@ -15,20 +15,31 @@
                 <form wire:submit.prevent="save" class="w-full space-y-6" novalidate>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Unidad Curricular -->
+                        <div class="w-full">
+                            <x-input-label for="unidad" :value="__('Unidad Curricular')" />
+                            <x-select id="unidad" wire:model.live="form.id_unidad_curricular"
+                                :options="$unidadesCurriculares" valueField="id" textField="nombre"
+                                placeholder="Selecciona una unidad" class="w-full mt-1"
+                                errorField="form.id_unidad_curricular" required />
+                        </div>
+
+                        <!-- Corte -->
+                        <div class="w-full">
+                            <x-input-label for="corte" :value="__('Corte (Unidad)')" />
+                            <x-select id="corte" wire:model.live="form.unidad_tema" :options="$cortes" valueField="id"
+                                textField="nombre" placeholder="Selecciona un corte" class="w-full mt-1"
+                                errorField="form.unidad_tema" required />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
                         <!-- Título -->
                         <div class="w-full">
                             <x-input-label for="titulo" :value="__('Título del Tema')" />
                             <x-text-input id="titulo" wire:model.live="form.titulo_tema" class="w-full mt-1" type="text"
                                 placeholder="Ej: Tema 1: Hardware y Software" required />
                             <x-input-error :messages="$errors->first('form.titulo_tema')" class="mt-2" />
-                        </div>
-
-                        <!-- Contenido -->
-                        <div class="w-full">
-                            <x-input-label for="contenido" :value="__('Contenido Asociado')" />
-                            <x-select id="contenido" wire:model.live="form.id_contenido" :options="$contenidos"
-                                valueField="id" textField="nombre" placeholder="Selecciona un contenido"
-                                class="w-full mt-1" errorField="form.id_contenido" required />
                         </div>
                     </div>
 

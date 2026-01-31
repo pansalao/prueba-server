@@ -8,35 +8,33 @@ use Livewire\Attributes\Validate;
 class UpdateContenidoForm extends Form
 {
     public $id;
-
-    #[Validate('required|exists:unidad_curricular,id_unidad_curricular')]
-    public $id_unidad_curricular;
-
-    #[Validate('required|string|max:255')]
+    public $id_tema;
     public $titulo_contenido;
-
-    #[Validate('nullable|string')]
     public $descripcion_contenido;
 
-    #[Validate('required|in:1,2,3,4')]
-    public $corte_contenido;
+    protected function rules()
+    {
+        return [
+            'id_tema' => 'required|exists:tema,id_tema',
+            'titulo_contenido' => 'required|string|max:255',
+            'descripcion_contenido' => 'nullable|string',
+        ];
+    }
 
     public function setContenido($contenido)
     {
         $this->id = $contenido->id;
-        $this->id_unidad_curricular = $contenido->id_unidad_curricular;
+        $this->id_tema = $contenido->id_tema;
         $this->titulo_contenido = $contenido->titulo_contenido;
         $this->descripcion_contenido = $contenido->descripcion_contenido;
-        $this->corte_contenido = $contenido->corte_contenido;
     }
 
     public function values()
     {
         return [
-            'id_unidad_curricular' => $this->id_unidad_curricular,
+            'id_tema' => $this->id_tema,
             'titulo_contenido' => $this->titulo_contenido,
             'descripcion_contenido' => $this->descripcion_contenido,
-            'corte_contenido' => $this->corte_contenido,
         ];
     }
 }

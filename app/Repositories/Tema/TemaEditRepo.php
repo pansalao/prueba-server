@@ -13,7 +13,8 @@ class TemaEditRepo
             ->where('id_tema', $id)
             ->select(
                 'id_tema as id',
-                'id_contenido',
+                'id_unidad_curricular',
+                'unidad_tema',
                 'titulo_tema',
                 'descripcion_tema'
             )
@@ -25,7 +26,8 @@ class TemaEditRepo
         return DB::table('tema')
             ->where('id_tema', $id)
             ->update([
-                'id_contenido' => $data['id_contenido'],
+                'id_unidad_curricular' => $data['id_unidad_curricular'],
+                'unidad_tema' => $data['unidad_tema'],
                 'titulo_tema' => $data['titulo_tema'],
                 'descripcion_tema' => $data['descripcion_tema'] ?? null,
                 'fecha_actualizacion' => Carbon::now(),

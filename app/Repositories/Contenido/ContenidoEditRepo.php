@@ -13,10 +13,10 @@ class ContenidoEditRepo
             ->where('id_contenido', $id)
             ->select(
                 'id_contenido as id',
-                'id_unidad_curricular',
+                'id_tema', // Now selecting the correct foreign key
                 'titulo_contenido',
-                'descripcion_contenido',
-                'corte_contenido'
+                'descripcion_contenido'
+                // 'corte_contenido' removed
             )
             ->first();
     }
@@ -26,10 +26,9 @@ class ContenidoEditRepo
         return DB::table('contenido')
             ->where('id_contenido', $id)
             ->update([
-                'id_unidad_curricular' => $data['id_unidad_curricular'],
+                'id_tema' => $data['id_tema'], // Updating relationship to Tema
                 'titulo_contenido' => $data['titulo_contenido'],
                 'descripcion_contenido' => $data['descripcion_contenido'] ?? null,
-                'corte_contenido' => $data['corte_contenido'],
                 'fecha_actualizacion' => Carbon::now(),
             ]);
     }

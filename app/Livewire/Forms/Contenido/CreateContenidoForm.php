@@ -7,15 +7,14 @@ use Livewire\Form;
 
 class CreateContenidoForm extends Form
 {
-    public $id_unidad_curricular = '';
+    public $id_tema = '';
     public $titulo_contenido = '';
     public $descripcion_contenido = '';
-    public $corte_contenido = '';
 
     protected function rules()
     {
         return [
-            'id_unidad_curricular' => 'required|exists:unidad_curricular,id_unidad_curricular',
+            'id_tema' => 'required|exists:tema,id_tema',
             'titulo_contenido' => [
                 'required',
                 'string',
@@ -25,15 +24,14 @@ class CreateContenidoForm extends Form
                 Rule::unique('contenido', 'titulo_contenido')
             ],
             'descripcion_contenido' => 'nullable|string|max:500',
-            'corte_contenido' => 'required|in:1,2,3,4',
         ];
     }
 
     protected function messages()
     {
         return [
-            'id_unidad_curricular.required' => 'Debe seleccionar una unidad curricular.',
-            'id_unidad_curricular.exists' => 'La unidad curricular seleccionada no es válida.',
+            'id_tema.required' => 'Debe seleccionar un tema.',
+            'id_tema.exists' => 'El tema seleccionado no es válido.',
             'titulo_contenido.required' => 'El título del contenido es obligatorio.',
             'titulo_contenido.string' => 'El título debe ser texto.',
             'titulo_contenido.min' => 'El título debe tener al menos 3 caracteres.',
@@ -42,18 +40,15 @@ class CreateContenidoForm extends Form
             'titulo_contenido.unique' => 'Ya existe un contenido con este título.',
             'descripcion_contenido.string' => 'La descripción debe ser texto.',
             'descripcion_contenido.max' => 'La descripción no debe exceder los 500 caracteres.',
-            'corte_contenido.required' => 'Debe seleccionar un corte.',
-            'corte_contenido.in' => 'El corte seleccionado no es válido.',
         ];
     }
 
     public function values()
     {
         return [
-            'id_unidad_curricular' => $this->id_unidad_curricular,
+            'id_tema' => $this->id_tema,
             'titulo_contenido' => $this->titulo_contenido,
             'descripcion_contenido' => $this->descripcion_contenido,
-            'corte_contenido' => $this->corte_contenido,
         ];
     }
 }

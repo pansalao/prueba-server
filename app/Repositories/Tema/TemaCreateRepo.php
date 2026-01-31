@@ -7,10 +7,10 @@ use Carbon\Carbon;
 
 class TemaCreateRepo
 {
-    public function select_contenidos()
+    public function select_unidades_curriculares()
     {
-        return DB::table('contenido')
-            ->select('id_contenido as id', 'titulo_contenido as nombre')
+        return DB::table('unidad_curricular')
+            ->select('id_unidad_curricular as id', 'nombre_unidad_curricular as nombre')
             ->where('estatus', '1')
             ->get();
     }
@@ -18,9 +18,10 @@ class TemaCreateRepo
     public function crear(array $data)
     {
         return DB::table('tema')->insertGetId([
-            'id_contenido' => $data['id_contenido'],
+            'id_unidad_curricular' => $data['id_unidad_curricular'],
             'titulo_tema' => $data['titulo_tema'],
             'descripcion_tema' => $data['descripcion_tema'] ?? null,
+            'unidad_tema' => $data['unidad_tema'],
             'fecha_creacion' => Carbon::now(),
             'fecha_actualizacion' => null,
             'estatus' => '1',

@@ -10,7 +10,7 @@ use Livewire\Component;
 class UpdateContenido extends Component
 {
     public UpdateContenidoForm $form;
-    public $unidades = [];
+    public $temas = [];
 
     protected $contenidoRepo;
     protected $contenidoEditRepo;
@@ -29,7 +29,7 @@ class UpdateContenido extends Component
         }
 
         $this->form->setContenido($contenido);
-        $this->unidades = $this->contenidoRepo->select_unidades_curriculares();
+        $this->temas = $this->contenidoRepo->select_temas();
     }
 
     public function save()

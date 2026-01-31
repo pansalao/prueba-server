@@ -9,7 +9,8 @@ use Livewire\Component;
 class CreateTema extends Component
 {
     public CreateTemaForm $form;
-    public $contenidos = [];
+    public $unidadesCurriculares = [];
+    public $cortes = [];
 
     protected $temaRepo;
 
@@ -20,7 +21,13 @@ class CreateTema extends Component
 
     public function mount()
     {
-        $this->contenidos = $this->temaRepo->select_contenidos();
+        $this->unidadesCurriculares = $this->temaRepo->select_unidades_curriculares();
+        $this->cortes = [
+            (object) ['id' => '1', 'nombre' => 'Corte 1'],
+            (object) ['id' => '2', 'nombre' => 'Corte 2'],
+            (object) ['id' => '3', 'nombre' => 'Corte 3'],
+            (object) ['id' => '4', 'nombre' => 'Corte 4'],
+        ];
     }
 
     public function updated($propertyName)
@@ -37,7 +44,7 @@ class CreateTema extends Component
             $this->form->reset();
             session()->flash('message', 'Tema creado correctamente.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error inténtelo de nuevo.');
+            session()->flash('error', 'Error: ' . $e->getMessage());
         }
     }
 

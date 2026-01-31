@@ -18,19 +18,22 @@
                                 <div>
                                     <x-input-label value="Título del Contenido:" />
                                     <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">
-                                        {{ $contenido->titulo_contenido }}</p>
+                                        {{ $contenido->titulo_contenido }}
+                                    </p>
                                 </div>
 
                                 <div>
                                     <x-input-label value="Unidad Curricular:" />
                                     <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">
-                                        {{ $contenido->nombre_unidad_curricular }}</p>
+                                        {{ $contenido->nombre_unidad_curricular }}
+                                    </p>
                                 </div>
 
                                 <div>
-                                    <x-input-label value="Corte:" />
-                                    <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">Corte
-                                        {{ $contenido->corte_contenido }}</p>
+                                    <x-input-label value="Unidad (Corte):" />
+                                    <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">Unidad
+                                        {{ $contenido->corte_contenido }}
+                                    </p>
                                 </div>
 
                                 <div>

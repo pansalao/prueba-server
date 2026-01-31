@@ -20,8 +20,7 @@
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Título</th>
-                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Unidad
-                                Curricular</th>
+                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Tema</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Corte</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                                 Estatus</th>
@@ -36,7 +35,7 @@
                                     class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td class="px-4 py-4 text-gray-900 dark:text-white">{{ $contenido->titulo_contenido }}</td>
                                     <td class="px-4 py-4 text-gray-900 dark:text-white">
-                                        {{ $contenido->nombre_unidad_curricular }}
+                                        {{ $contenido->titulo_tema }}
                                     </td>
                                     <td class="px-4 py-4 text-gray-900 dark:text-white text-center">
                                         <span

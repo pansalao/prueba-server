@@ -52,19 +52,39 @@ class PlanificacionCreateRepo
         return $this->select_tabla('bibliografia', 'id_bibliografia', 'nombre_bibliografia', [['estatus', '1']]);
     }
 
-    public function select_contenidos($idUnidadCurricular = null)
+    public function select_temas_por_unidad($idUnidadCurricular = null)
     {
-        $query = DB::table('tema as t')
-            ->join('contenido as c', 't.id_contenido', '=', 'c.id_contenido')
-            ->where('t.estatus', '1')
-            ->where('c.estatus', '1');
+        $query = DB::table('tema')
+            ->where('estatus', '1');
 
         if ($idUnidadCurricular) {
-            $query->where('c.id_unidad_curricular', $idUnidadCurricular);
+            $query->where('id_unidad_curricular', $idUnidadCurricular);
         }
 
-        return $query->select('t.id_tema as id_contenido', 't.titulo_tema as titulo_contenido', 't.descripcion_tema as descripcion_contenido')
-            ->orderBy('t.id_tema')
+        return $query->select('id_tema', 'titulo_tema', 'unidad_tema')
+            ->orderBy('id_tema')
+            ->get();
+    }
+
+    public function select_contenidos($idUnidadCurricular = null)
+    {
+        $query = DB::table('contenido as c')
+            ->join('tema as t', 'c.id_tema', '=', 't.id_tema')
+            ->where('c.estatus', '1')
+            ->where('t.estatus', '1');
+
+        if ($idUnidadCurricular) {
+            $query->where('t.id_unidad_curricular', $idUnidadCurricular);
+        }
+
+        return $query->select(
+            'c.id_contenido',
+            'c.titulo_contenido',
+            'c.descripcion_contenido',
+            'c.id_tema',
+            't.unidad_tema'
+        )
+            ->orderBy('c.id_contenido')
             ->get();
     }
 

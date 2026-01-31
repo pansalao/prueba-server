@@ -9,16 +9,17 @@ class TemaIndexRepo
     public function listar($busqueda = '', $paginacion = 5)
     {
         return DB::table('tema as t')
-            ->join('contenido as c', 't.id_contenido', '=', 'c.id_contenido')
+            ->join('unidad_curricular as uc', 't.id_unidad_curricular', '=', 'uc.id_unidad_curricular')
             ->select(
                 't.id_tema',
                 't.titulo_tema',
-                'c.titulo_contenido',
+                'uc.nombre_unidad_curricular',
                 't.estatus'
             )
+            ->addSelect('uc.nombre_unidad_curricular')
             ->when($busqueda, function ($query, $busqueda) {
                 return $query->where('t.titulo_tema', 'LIKE', '%' . $busqueda . '%')
-                    ->orWhere('c.titulo_contenido', 'LIKE', '%' . $busqueda . '%');
+                    ->orWhere('uc.nombre_unidad_curricular', 'LIKE', '%' . $busqueda . '%');
             })
             ->orderBy('t.fecha_creacion', 'desc')
             ->paginate($paginacion);

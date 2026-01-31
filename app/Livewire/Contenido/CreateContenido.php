@@ -9,7 +9,7 @@ use Livewire\Component;
 class CreateContenido extends Component
 {
     public CreateContenidoForm $form;
-    public $unidades = [];
+    public $temas = [];
 
     protected $contenidoRepo;
 
@@ -20,7 +20,7 @@ class CreateContenido extends Component
 
     public function mount()
     {
-        $this->unidades = $this->contenidoRepo->select_unidades_curriculares();
+        $this->temas = $this->contenidoRepo->select_temas();
     }
 
     public function updated($propertyName)

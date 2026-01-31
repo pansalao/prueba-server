@@ -10,7 +10,8 @@ use Livewire\Component;
 class UpdateTema extends Component
 {
     public UpdateTemaForm $form;
-    public $contenidos = [];
+    public $unidadesCurriculares = [];
+    public $cortes = [];
 
     protected $temaRepo;
     protected $temaEditRepo;
@@ -29,7 +30,13 @@ class UpdateTema extends Component
         }
 
         $this->form->setTema($tema);
-        $this->contenidos = $this->temaRepo->select_contenidos();
+        $this->unidadesCurriculares = $this->temaRepo->select_unidades_curriculares();
+        $this->cortes = [
+            (object) ['id' => '1', 'nombre' => 'Corte 1'],
+            (object) ['id' => '2', 'nombre' => 'Corte 2'],
+            (object) ['id' => '3', 'nombre' => 'Corte 3'],
+            (object) ['id' => '4', 'nombre' => 'Corte 4'],
+        ];
     }
 
     public function save()
