@@ -3,3 +3,177 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply font-sans;
+    }
+
+    /* Adopting SOGAT visual style from css.note */
+    input:not([type="password"]):not([type="email"]),
+    textarea,
+    select {
+        @apply uppercase;
+    }
+
+    input[name="txtUrl"],
+    input[type="email"],
+    .sin_decoracion {
+        @apply normal-case;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        @apply border-sogat-red ring-sogat-red !important;
+        box-shadow: 0 0 3px theme('colors.gray.400');
+    }
+
+    fieldset {
+        @apply border-2 border-sogat-red rounded-xl p-4;
+    }
+
+    legend {
+        @apply font-bold italic px-2;
+    }
+
+    /* Card style for modules */
+    .sogat-card {
+        @apply p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg border-2 border-sogat-red transition-all duration-300;
+    }
+
+    /* Table container style */
+    .sogat-table-container {
+        @apply relative overflow-x-auto shadow-md sm:rounded-lg border-2 border-sogat-red transition-all duration-300;
+    }
+}
+
+@layer components {
+    .btn-sogat {
+        @apply bg-sogat-blue text-white px-4 py-2 border-none transition-colors duration-200;
+        height: 30px;
+        /* As defined in css.note */
+    }
+
+    .btn-sogat:hover {
+        @apply bg-blue-700;
+    }
+
+    /* Header from SOGAT - Now truly responsive to theme */
+    .sogat-header {
+        @apply bg-sogat-blue-light text-sogat-blue border-b border-sogat-border-gray transition-all duration-300;
+    }
+
+    .dark .sogat-header {
+        background: linear-gradient(#1a1c21, #0f1114, #0f1114);
+        @apply text-white border-gray-700;
+    }
+
+    /* SOGAT Tables style from reference image */
+    .sogat-table {
+        @apply w-full border-collapse border border-gray-400 text-[12px];
+    }
+
+    .sogat-table th {
+        @apply bg-sogat-teal-dark border border-gray-400 p-1 font-bold text-gray-800 text-center;
+    }
+
+    .sogat-table td {
+        @apply border border-gray-400 p-1 text-gray-800 text-center;
+    }
+
+    .sogat-table tr:nth-child(even) {
+        @apply bg-[#f9f9f9];
+    }
+
+    .sogat-table tr:hover {
+        @apply bg-sogat-blue text-white cursor-pointer transition-colors duration-200;
+    }
+
+    .sogat-table tr:hover td {
+        @apply text-white;
+    }
+
+    /* SideBar Menu style from exact reference properties */
+    .sogat-sidebar-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin: 0;
+        padding: 5px 10px;
+        background-color: #CCCCCC;
+        color: #000000;
+        font-family: 'Verdana', sans-serif;
+        font-size: 14px;
+        font-weight: bold;
+        border-bottom: 1px solid #ffffff;
+        transition: all 0.2s ease;
+    }
+
+    .dark .sogat-sidebar-item {
+        background-color: #374151;
+        @apply text-gray-100 border-gray-800;
+    }
+
+    .sogat-sidebar-item:hover {
+        background-color: #bbbbbb;
+        @apply text-black underline;
+    }
+
+    .dark .sogat-sidebar-item:hover {
+        background-color: #4b5563;
+        @apply text-white underline;
+    }
+
+    /* Sub-menu title items (headers like 'Indicadores') */
+    .sogat-sidebar-subitem {
+        @apply flex items-center w-full transition-all;
+        padding: 5px 10px 5px 20px;
+        background-color: #f5f5f5;
+        color: #006699;
+        font-family: 'Verdana', sans-serif;
+        font-size: 13px;
+        font-weight: bold;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .dark .sogat-sidebar-subitem {
+        background-color: #1f2937;
+        color: #60a5fa;
+        @apply border-gray-700;
+    }
+
+    .sogat-sidebar-subitem:hover {
+        @apply underline;
+    }
+
+    /* Final links inside submenus */
+    .sogat-sidebar-link {
+        display: block;
+        width: 100%;
+        padding: 2px 10px;
+        /* Aligned with parent padding */
+        background-color: #EFEFEF;
+        color: #006699;
+        font-family: 'Verdana', sans-serif;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .dark .sogat-sidebar-link {
+        background-color: #111827;
+        color: #93c5fd;
+    }
+
+    .sogat-sidebar-link:hover {
+        background-color: #e5e7eb;
+        text-decoration: underline;
+    }
+
+    /* Separator line under logos */
+    .sogat-hr {
+        height: 6px;
+        background: linear-gradient(to right, #000 70%, #A00 30%);
+        @apply w-full my-4 border-none shadow-sm;
+    }
+}

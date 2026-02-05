@@ -21,8 +21,8 @@ new class extends Component {
             <div class="flex">
                 {{-- NUEVO: Botón Hamburger para la Sidebar (integrado en la navegación) --}}
                 {{-- Visible en pantallas pequeñas o cuando la sidebar está oculta, oculto en lg: si la sidebar es siempre visible --}}
-                <div class="flex items-center me-2"> {{-- `lg:hidden` para ocultarlo en pantallas grandes si la sidebar es fija --}}
-                    <button @click="Livewire.dispatch('open-sidebar')" aria-label="Abrir menú"
+                <div class="flex items-center me-2 lg:hidden"> {{-- `lg:hidden` para ocultarlo en pantallas grandes si la sidebar es fija --}}
+                    <button @click="Livewire.dispatch('toggle-sidebar')" aria-label="Abrir menú"
                         class="p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
                         <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -32,42 +32,7 @@ new class extends Component {
                 </div>
             </div>
 
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                {{-- Botón de Modo Oscuro (ya lo habías movido aquí) --}}
-                <div class="me-4">
-                    <livewire:dark-mode-toggle />
-                </div>
-
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                            <div x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name"
-                                x-on:profile-updated.window="name = $event.detail.name"></div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile')" wire:navigate>
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <button wire:click="logout" class="w-full text-start">
-                            <x-dropdown-link>
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </button>
-                    </x-slot>
-                </x-dropdown>
+            <div class="hidden sm:flex sm:items-center sm:ms-6 space-x-4">
             </div>
 
             {{-- Puedes mantenerlo si quieres un menú responsivo para los enlaces de navegación,

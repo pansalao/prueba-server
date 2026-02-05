@@ -10,7 +10,7 @@
             <x-table.alert-message type="success" :message="session('message')" />
             <x-table.alert-message type="error" :message="session('error')" />
 
-            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <div class="sogat-table-container">
                 <div
                     class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between p-4 bg-white dark:bg-gray-800">
                     <x-table.search-input model="busqueda" placeholder="Buscar por lapso o semana..."

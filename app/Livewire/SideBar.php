@@ -3,12 +3,22 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Actions\Logout;
 use Livewire\Component;
-use Livewire\Attributes\On; // Importante para Livewire 3
+use Livewire\Attributes\On;
 
 class SideBar extends Component
 {
-    public bool $isOpen = false; // Inicialmente cerrado para probar el botón de abrir
+    public bool $isOpen = false;
+
+    /**
+     * Cierra la sesión del usuario.
+     */
+    public function logout(Logout $logout): void
+    {
+        $logout();
+        $this->redirect('/', navigate: true);
+    }
 
     /**
      * Escucha el evento 'open-sidebar' para abrir el sidebar desde el exterior.
@@ -24,8 +34,8 @@ class SideBar extends Component
 
     /**
      * Alterna el estado del sidebar (abierto/cerrado).
-     * Usado por el botón de cierre DENTRO del sidebar.
      */
+    #[On('toggle-sidebar')]
     public function toggle() // Renombrado de toggleSidebar para evitar confusión con el evento
     {
         $this->isOpen = !$this->isOpen;

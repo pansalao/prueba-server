@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <div class="sogat-table-container">
         <!-- Controles -->
         <div
             class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between p-4 bg-white dark:bg-gray-800">

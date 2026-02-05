@@ -68,7 +68,7 @@
         </h2>
     </x-slot>
 
-    <div class="p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
+    <div class="sogat-card">
         <form wire:submit.prevent="savePlanificacion">
             <div class="space-y-4">
 
@@ -486,7 +486,7 @@
                         </div>
                     @endforeach
 
-                    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-6">
+                    <div class="sogat-card mb-6">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Bibliografía</h3>
                             <div class="flex flex-wrap gap-2 self-start sm:self-auto">

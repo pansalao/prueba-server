@@ -10,7 +10,7 @@
             <x-table.alert-message type="success" :message="session('message')" />
             <x-table.alert-message type="error" :message="session('error')" />
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+            <div class="sogat-card">
                 <form wire:submit.prevent="guardar" class="w-full space-y-6" novalidate>
                     <div class="flex flex-col gap-4 w-full md:flex-row">
                         <!-- Nombre -->

@@ -17,7 +17,21 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sogat: ['Verdana', 'sans-serif'],
             },
+            colors: {
+                sogat: {
+                    blue: '#0072C6',
+                    'blue-light': '#E0ECF8',
+                    'dark-gray': '#31353E',
+                    'medium-gray': '#42464E',
+                    'border-gray': '#DADADA',
+                    'gray-bg': '#F2F2F2',
+                    'teal-light': '#C3E0E4',
+                    'teal-dark': '#8FC4CB',
+                    red: '#A00',
+                }
+            }
         },
     },
 
