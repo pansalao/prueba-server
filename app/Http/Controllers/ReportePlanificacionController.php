@@ -53,7 +53,7 @@ class ReportePlanificacionController extends Controller
 
         $pdf = Pdf::loadView('livewire.pages.planificacion.pdf-show-planificacion', [
             'planificacion' => $planificacion
-        ])->setPaper('a4', 'portrait');
+        ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('planificacion_' . $id . '.pdf');
     }

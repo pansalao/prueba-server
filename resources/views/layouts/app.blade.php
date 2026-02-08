@@ -64,15 +64,20 @@
 
             {{-- Alpine.js wrapper para el estado de la sidebar --}}
             <div x-data="{ alpineSidebarOpen: false }"
-                class="flex flex-1"
+                class="flex flex-1 relative overflow-hidden"
                 @sidebar-state-changed.window="alpineSidebarOpen = $event.detail.isOpen">
                 
-                {{-- SideBar --}}
-                <livewire:side-bar />
+                {{-- SideBar wrapper --}}
+                <div class="z-40">
+                    <livewire:side-bar />
+                </div>
 
                 {{-- Área de Contenido Principal --}}
-                <div id="main-content-wrapper" class="flex-1 transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 min-h-[600px]"
-                    :class="{ 'ml-[234px]': alpineSidebarOpen && window.innerWidth < 1024, 'ml-0': !alpineSidebarOpen && window.innerWidth < 1024 }">
+                <div id="main-content-wrapper" class="flex-1 min-w-0 transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 min-h-[600px] relative z-0"
+                    :class="{ 
+                        'ml-[234px] lg:ml-0': alpineSidebarOpen, 
+                        'ml-0': !alpineSidebarOpen 
+                    }">
 
                     <livewire:notificaciones />
 
@@ -88,6 +93,19 @@
                     <!-- Contenido de la Página ($slot) -->
                     <main class="p-4 sm:p-8 {{ isset($header) ? 'pt-0' : '' }}">
                         {{ $slot }}
+
+                        @php
+                            $formRoutes = ['*/crear', '*/update', '*/editar', 'planificaciones.update', 'register', 'profile', 'password.confirm', 'password.request', 'password.reset'];
+                            $showMandatoryNote = request()->routeIs($formRoutes);
+                        @endphp
+
+                        @if ($showMandatoryNote)
+                            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
+                                <div class="text-sm text-gray-700 dark:text-gray-300">
+                                    Los campos con <span class="text-red-500 font-bold">*</span> son obligatorios
+                                </div>
+                            </div>
+                        @endif
                     </main>
                 </div>
             </div>
@@ -100,6 +118,7 @@
             </footer>
         </div>
     </div>
+
     @livewireScripts
     @livewire('livewire-ui-modal')
 </body>

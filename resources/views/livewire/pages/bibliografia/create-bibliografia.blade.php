@@ -16,7 +16,7 @@
                 <div class="w-full">
                     <x-input-label for="nombre" :value="__('Nombre de la Bibliografía / Referencia')" />
                     <x-text-input id="nombre" wire:model.live="form.nombre" class="w-full" type="text"
-                        placeholder="Ej: Chiavenato, I. (2019). Introducción a la Teoría General de la Administración." />
+                        placeholder="Ej: Chiavenato, I. (2019). Introducción a la Teoría General de la Administración." required />
                     <x-input-error :messages="$errors->first('form.nombre')" class="mt-2" />
                 </div>
             </div>

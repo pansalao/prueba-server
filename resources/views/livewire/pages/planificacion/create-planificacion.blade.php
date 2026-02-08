@@ -133,7 +133,7 @@
                         <div class="flex gap-2">
                             @foreach ($unidades as $idx => $u)
                                 <button type="button" @click="openUnidad = {{ $idx }}"
-                                    :class="openUnidad === {{ $idx }} ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+                                    :class="openUnidad === {{ $idx }} ? 'bg-[#767676] text-white' : 'bg-[#f0f0f0] text-black border border-[#767676]'"
                                     class="w-8 h-8 rounded-full flex items-center justify-center font-bold transition-all duration-200 text-sm shadow-sm">
                                     {{ $idx + 1 }}
                                 </button>
@@ -197,7 +197,7 @@
                                                 Objetivos de la unidad
                                             </h4>
                                             <button type="button" wire:click="addItem({{ $index }}, 'objetivos')"
-                                                class="inline-flex items-center gap-1 text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm">
+                                                class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm">
                                                 <span class="material-icons text-sm">add</span>
                                                 AÑADIR OBJETIVO
                                             </button>
@@ -209,7 +209,7 @@
                                                     <div class="flex-grow">
                                                         <x-text-input placeholder="Escriba el objetivo de la unidad..."
                                                             wire:model.live.debounce.500ms="unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.nombre_objetivo"
-                                                            class="w-full text-sm" />
+                                                            class="w-full text-sm" required />
                                                         @error("unidades.$index.objetivos.$objetivoIndex.nombre_objetivo")
                                                             <p class="mt-1 text-[11px] text-red-600">{{ $message }}</p>
                                                         @enderror
@@ -234,7 +234,7 @@
                                                 Temática general
                                             </h4>
                                             <button type="button" wire:click="addItem({{ $index }}, 'contenidos')"
-                                                class="inline-flex items-center gap-1 text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm">
+                                                class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm">
                                                 <span class="material-icons text-sm">add</span>
                                                 AÑADIR CONTENIDO
                                             </button>
@@ -264,7 +264,7 @@
                                                             <x-select :options="$temasUnidad" valueField="id_tema"
                                                                 textField="titulo_tema"
                                                                 wire:model.live.debounce.250ms="unidades.{{ $index }}.contenidos.{{ $contenidoIndex }}.tema_id"
-                                                                placeholder="Seleccione un tema" class="text-sm w-full" />
+                                                                placeholder="Seleccione un tema" class="text-sm w-full" required />
                                                         </div>
 
                                                         {{-- Calcular contenidos filtrados --}}
@@ -279,7 +279,7 @@
                                                                 textField="titulo_contenido"
                                                                 wire:model.live.debounce.250ms="unidades.{{ $index }}.contenidos.{{ $contenidoIndex }}.contenido_id"
                                                                 placeholder="Seleccione un contenido" class="text-sm w-full"
-                                                                :disabled="empty($selectedTemaId)" />
+                                                                :disabled="empty($selectedTemaId)" required />
                                                         </div>
                                                     </div>
 
@@ -291,7 +291,7 @@
                                                                 de Logro</label>
                                                             <button type="button"
                                                                 wire:click="addItem({{ $index }}, 'indicadores_logros', {{ $contenidoIndex }})"
-                                                                class="text-blue-600 dark:text-blue-400 hover:underline text-[10px] font-bold uppercase flex items-center gap-1">
+                                                                class="text-black dark:text-gray-300 hover:underline text-[10px] font-bold uppercase flex items-center gap-1">
                                                                 <span class="material-icons text-xs">add_circle</span> AÑADIR
                                                             </button>
                                                         </div>
@@ -305,7 +305,7 @@
                                                                             textField="nombre_indicador_logro"
                                                                             wire:model.live.debounce.250ms="unidades.{{ $index }}.contenidos.{{ $contenidoIndex }}.indicadores_logros.{{ $indicadorIndex }}.indicador_id"
                                                                             placeholder="Seleccione un indicador"
-                                                                             class="text-sm w-full" />
+                                                                             class="text-sm w-full" required />
                                                                      </div>
                                                                      @if (count($contenido['indicadores_logros']) > 1)
                                                                          <button type="button"
@@ -336,7 +336,7 @@
                                                     Recursos
                                                 </h4>
                                                 <button type="button" wire:click="addItem({{ $index }}, 'recursos')"
-                                                    class="text-blue-600 dark:text-blue-400 hover:underline text-[10px] font-bold uppercase flex items-center gap-1">
+                                                    class="text-black dark:text-gray-300 hover:underline text-[10px] font-bold uppercase flex items-center gap-1">
                                                     <span class="material-icons text-xs">add_circle</span> AÑADIR
                                                 </button>
                                             </div>
@@ -347,7 +347,7 @@
                                                             <x-select :options="$recursosMaestros" valueField="id_recurso"
                                                                 textField="nombre_recurso"
                                                                 wire:model.live.debounce.250ms="unidades.{{ $index }}.recursos.{{ $recursoIndex }}.recurso_id"
-                                                                 placeholder="Seleccione un recurso" class="text-sm w-full" />
+                                                                 placeholder="Seleccione un recurso" class="text-sm w-full" required />
                                                         </div>
                                                         @if (count($unidad['recursos']) > 1)
                                                             <button type="button"
@@ -368,7 +368,7 @@
                                                     Estrategias
                                                 </h4>
                                                 <button type="button" wire:click="addItem({{ $index }}, 'estrategias')"
-                                                    class="text-blue-600 dark:text-blue-400 hover:underline text-[10px] font-bold uppercase flex items-center gap-1">
+                                                    class="text-black dark:text-gray-300 hover:underline text-[10px] font-bold uppercase flex items-center gap-1">
                                                     <span class="material-icons text-xs">add_circle</span> AÑADIR
                                                 </button>
                                             </div>
@@ -381,7 +381,7 @@
                                                                 textField="nombre_estrategia_pedagogica"
                                                                 wire:model.live.debounce.250ms="unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.estrategia_id"
                                                                 placeholder="Seleccione una estrategia"
-                                                                 class="text-sm w-full" />
+                                                                 class="text-sm w-full" required />
                                                         </div>
                                                         @if (count($unidad['estrategias']) > 1)
                                                             <button type="button"
@@ -404,57 +404,57 @@
                                                 Plan de Evaluación
                                             </h4>
                                             <button type="button" wire:click="addItem({{ $index }}, 'evaluaciones')"
-                                                class="inline-flex items-center gap-1 text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm">
+                                                class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm">
                                                 <span class="material-icons text-sm">add</span>
                                                 AÑADIR EVALUACIÓN
                                             </button>
                                         </div>
 
-                                        <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700">
-                                            <table class="w-full text-xs text-left">
+                                        <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                                            <table class="w-full text-xs text-left table-fixed min-w-[850px]">
                                                 <thead
                                                     class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 uppercase font-bold">
                                                     <tr>
-                                                        <th class="px-4 py-3">Fecha</th>
-                                                        <th class="px-4 py-3">Evaluación</th>
-                                                        <th class="px-4 py-3">Técnica</th>
-                                                        <th class="px-4 py-3">Pond. (%)</th>
-                                                        <th class="px-4 py-3">Participación</th>
-                                                        <th class="px-4 py-3"></th>
+                                                        <th class="px-2 py-3" width="20%">Fecha</th>
+                                                        <th class="px-2 py-3" width="22%">Evaluación</th>
+                                                        <th class="px-2 py-3" width="22%">Técnica</th>
+                                                        <th class="px-2 py-3" width="10%">Pond. (%)</th>
+                                                        <th class="px-2 py-3" width="21%">Participación</th>
+                                                        <th class="px-2 py-3" width="5%"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                                                     @foreach ($unidad['evaluaciones'] as $evaluacionIndex => $evaluacion)
                                                         <tr>
-                                                            <td class="px-4 py-3">
+                                                            <td class="px-2 py-3">
                                                                 <x-text-input type="date"
                                                                     wire:model.live.debounce.250ms="unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.fecha_evaluacion"
-                                                                    class="w-full text-xs" />
+                                                                    class="w-full text-xs" required />
                                                             </td>
-                                                            <td class="px-4 py-3">
+                                                            <td class="px-2 py-3">
                                                                 <x-select :options="$evaluaciones" valueField="id_evaluacion"
                                                                     textField="nombre_evaluacion"
                                                                     wire:model.live.debounce.250ms="unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.evaluacion_id"
-                                                                    placeholder="Seleccione" class="text-xs" />
+                                                                    placeholder="Seleccione" class="text-xs" required />
                                                             </td>
-                                                            <td class="px-4 py-3">
+                                                            <td class="px-2 py-3">
                                                                 <x-select :options="$tecnicas" valueField="id_tecnica"
                                                                     textField="nombre_tecnica"
                                                                     wire:model.live.debounce.250ms="unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.tecnica_id"
-                                                                    placeholder="Seleccione" class="text-xs" />
+                                                                    placeholder="Seleccione" class="text-xs" required />
                                                             </td>
-                                                            <td class="px-4 py-3">
+                                                            <td class="px-2 py-3 text-center">
                                                                 <input type="number" step="0.5" min="1" max="25"
                                                                     wire:model.live.debounce.250ms="unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.ponderacion"
-                                                                    class="w-16 bg-transparent border-0 focus:ring-0 p-0 text-gray-700 dark:text-gray-300 text-xs font-bold">
+                                                                    class="w-16 bg-transparent border-0 focus:ring-0 p-0 text-gray-700 dark:text-gray-300 text-xs font-bold text-center">
                                                             </td>
-                                                            <td class="px-4 py-3">
+                                                            <td class="px-2 py-3">
                                                                 <x-select :options="$formasParticipacion" valueField="id"
                                                                     textField="nombre"
                                                                     wire:model.live.debounce.250ms="unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.forma_participacion"
-                                                                    placeholder="Seleccione" class="text-xs" />
+                                                                    placeholder="Seleccione" class="text-xs" required />
                                                             </td>
-                                                            <td class="px-4 py-3 text-right">
+                                                            <td class="px-2 py-3 text-right">
                                                                 @if (count($unidad['evaluaciones']) > 1)
                                                                     <button type="button"
                                                                         wire:click="removeItem({{ $index }}, 'evaluaciones', {{ $evaluacionIndex }})"
@@ -476,7 +476,7 @@
                                         <div>
                                             @if ($index > 0)
                                                 <button type="button" @click="openUnidad = {{ $index - 1 }}"
-                                                    class="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all">
+                                                    class="inline-flex items-center gap-2 px-6 py-2 bg-[#f0f0f0] border border-[#767676] text-black rounded-lg text-sm font-bold shadow-sm hover:bg-gray-200 transition-all">
                                                     <span class="material-icons text-sm">arrow_back</span> Unidad Anterior
                                                 </button>
                                             @endif
@@ -484,7 +484,7 @@
                                         <div>
                                             @if ($index < count($unidades) - 1)
                                                 <button type="button" @click="openUnidad = {{ $index + 1 }}"
-                                                    class="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all">
+                                                    class="inline-flex items-center gap-2 px-6 py-2 bg-[#f0f0f0] border border-[#767676] text-black rounded-lg text-sm font-bold shadow-sm hover:bg-gray-200 transition-all">
                                                     Siguiente Unidad <span class="material-icons text-sm">arrow_forward</span>
                                                 </button>
                                             @else
@@ -503,7 +503,7 @@
                             <div class="flex flex-wrap gap-2 self-start sm:self-auto">
 
                                 <button type="button" wire:click="addItem(null, 'bibliografias')"
-                                    class="inline-flex items-center gap-1 text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm">
+                                    class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm">
                                     <span class="material-icons text-sm">add</span>
                                     AÑADIR BIBLIOGRAFÍA
                                 </button>
@@ -513,7 +513,7 @@
                         @foreach ($bibliografias as $biblioIndex => $bibliografia)
                             <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
                                 <div class="flex-grow min-w-0">
-                                    <x-select label="Seleccionar Bibliografía" :options="$bibliografiasMaestras"
+                                    <x-select label="Seleccionar Bibliografía" required :options="$bibliografiasMaestras"
                                         valueField="id_bibliografia" textField="nombre_bibliografia"
                                         wire:model.live.debounce.250ms="bibliografias.{{ $biblioIndex }}.bibliografia_id" />
                                 </div>
@@ -530,7 +530,7 @@
                     <!-- Botón de Guardar -->
                     <div class="flex justify-end">
                         <button type="submit"
-                            class="inline-flex items-center px-5 py-2.5 bg-blue-600 dark:bg-blue-600 border border-transparent rounded-lg font-medium text-sm text-white uppercase tracking-widest hover:bg-blue-700 dark:hover:bg-blue-700 focus:outline-none transition ease-in-out duration-150 disabled:bg-blue-800 dark:disabled:bg-blue-800 disabled:opacity-75 disabled:cursor-not-allowed">
+                            class="inline-flex font-semibold items-center px-5 py-2.5 bg-[#f0f0f0] border border-[#767676] rounded-lg font-medium text-sm text-black uppercase tracking-widest hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150 disabled:bg-gray-300 disabled:opacity-75 disabled:cursor-not-allowed">
                             <i class="fas fa-save mr-2"></i> GUARDAR PLANIFICACIÓN
                         </button>
                     </div>

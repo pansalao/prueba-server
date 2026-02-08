@@ -21,9 +21,9 @@
                 <div class="flex justify-center">
                     <a href="{{ route('planificacion.reporte.general', ['search' => $this->search]) }}" 
                         target="_blank"
-                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2"
+                        class="inline-flex font-bold items-center px-4 py-2 bg-[#f0f0f0] border border-[#767676] rounded-lg text-sm text-black uppercase tracking-widest hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150 shadow-sm gap-2"
                         title="Ver reporte general en PDF (Nueva pestaña)">
-                        <span class="material-icons text-white text-xl">picture_as_pdf</span>
+                        <span class="material-icons text-black text-xl">picture_as_pdf</span>
                         Reporte PDF
                     </a>
                 </div>
@@ -78,7 +78,7 @@
                                     <div class="flex items-center justify-end space-x-4">
                                         <!-- Ver -->
                                         <a href="{{ route('planificacion/show', $planificacion->planificacion_id) }}"
-                                            class="flex items-center gap-1 bg-blue-50 text-blue-600 text-xs font-medium px-2.5 py-0.5 rounded hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800">
+                                            class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
                                             </svg>
@@ -86,7 +86,7 @@
                                         </a>
                                         <!-- Editar -->
                                         <a href="{{ route('planificaciones.update', $planificacion->planificacion_id) }}"
-                                            class="flex items-center gap-1 bg-yellow-600 text-white text-xs font-medium px-2.5 py-0.5 rounded hover:bg-yellow-700 dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
+                                            class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                                                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                             </svg>
@@ -150,14 +150,14 @@
 
                         <div class="flex justify-end space-x-4 mt-3">
                             <a href="{{ route('planificacion/show', $planificacion->planificacion_id) }}"
-                                class="flex items-center gap-1 bg-blue-50 text-blue-600 text-xs font-medium px-2.5 py-0.5 rounded hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800">
+                                class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
                                 </svg>
                                 Ver
                             </a>
                             <a href="{{ route('planificaciones.update', $planificacion->planificacion_id) }}"
-                                class="flex items-center gap-1 bg-yellow-600 text-white text-xs font-medium px-2.5 py-0.5 rounded hover:bg-yellow-700 dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
+                                class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                 </svg>

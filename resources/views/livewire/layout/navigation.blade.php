@@ -62,7 +62,7 @@ new class extends Component {
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
             {{-- Botón de Modo Oscuro en el menú responsivo --}}
             <div class="px-4 py-2">
-                <livewire:dark-mode-toggle />
+                {{-- <livewire:dark-mode-toggle /> --}}
             </div>
 
             <div class="px-4">

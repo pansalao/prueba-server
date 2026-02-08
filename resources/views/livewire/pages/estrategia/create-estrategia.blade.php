@@ -16,7 +16,7 @@
                 <div class="w-full">
                     <x-input-label for="nombre" :value="__('Nombre de la Estrategia')" />
                     <x-text-input id="nombre" wire:model.live="form.nombre" class="w-full" type="text"
-                        placeholder="Ej: Aprendizaje basado en proyectos, etc." />
+                        placeholder="Ej: Aprendizaje basado en proyectos, etc." required />
                     <x-input-error :messages="$errors->first('form.nombre')" class="mt-2" />
                 </div>
             </div>

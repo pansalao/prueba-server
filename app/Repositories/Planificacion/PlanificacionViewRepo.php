@@ -16,6 +16,8 @@ class PlanificacionViewRepo
             ->join('detalle_profesor_asignado as dpa', 'p.id_profesor_asignado', '=', 'dpa.id_detalle_profesor_asignado')
             ->join('users as u', 'dpa.id_users', '=', 'u.id')
             ->join('unidad_curricular as uc', 'dpa.id_unidad_curricular', '=', 'uc.id_unidad_curricular')
+            ->join('malla_academica as ma', 'uc.id_malla_academica', '=', 'ma.id_malla_academica')
+            ->join('pnf as pnf', 'ma.id_pnf', '=', 'pnf.id_pnf')
             ->join('seccion as s', 'dpa.id_seccion', '=', 's.id_seccion')
             ->join('lapso_academico as la', 's.id_lapso_academico', '=', 'la.id_lapso_academico')
             ->select(
@@ -28,6 +30,12 @@ class PlanificacionViewRepo
                 'u.telefono',
                 'uc.id_unidad_curricular',
                 'uc.nombre_unidad_curricular',
+                'uc.unidades_credito_unidad_curricular',
+                'uc.trayecto_unidad_curricular',
+                'uc.duracion_unidad_curricular',
+                'uc.horas_semanales_unidad_curricular',
+                'uc.proposito_unidad_curricular',
+                'pnf.nombre_pnf',
                 's.nombre_seccion',
                 'la.nombre_lapso_academico as nombre_lapso',
                 'la.fecha_inicio_lapso_academico as lapso_fecha_inicio',

@@ -209,7 +209,7 @@
                                 @endif
                             </span>
                         </div>
-                        <livewire:dark-mode-toggle />
+                         <livewire:dark-mode-toggle />
                     </div>
                 </div>
             @endcan

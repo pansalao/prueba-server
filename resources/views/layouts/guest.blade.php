@@ -30,6 +30,10 @@
 
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-[0px_0px_15px_#000000] overflow-hidden sm:rounded-[15px] border-t-4 border-sogat-blue">
                 {{ $slot }}
+
+                <div class="mt-4 text-sm text-gray-700 dark:text-gray-300">
+                    Los campos con <span class="text-red-500 font-bold">*</span> son obligatorios
+                </div>
             </div>
         </div>
     </body>

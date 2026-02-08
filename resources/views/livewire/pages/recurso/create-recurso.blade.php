@@ -16,7 +16,7 @@
                 <div class="w-full">
                     <x-input-label for="nombre" :value="__('Nombre del Recurso')" />
                     <x-text-input id="nombre" wire:model.live="form.nombre" class="w-full" type="text"
-                        placeholder="Ej: Proyector, Marcadores, etc." />
+                        placeholder="Ej: Proyector, Marcadores, etc." required />
                     <x-input-error :messages="$errors->first('form.nombre')" class="mt-2" />
                 </div>
             </div>

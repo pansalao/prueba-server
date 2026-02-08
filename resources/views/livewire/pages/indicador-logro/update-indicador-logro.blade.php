@@ -17,7 +17,7 @@
                         <div class="w-full">
                             <x-input-label for="nombre" :value="__('Nombre del Indicador')" />
                             <x-text-input id="nombre" wire:model.live="form.nombre_indicador_logro" class="w-full mt-1"
-                                type="text" placeholder="Ej: Demuestra dominio de los conceptos básicos..." />
+                                type="text" placeholder="Ej: Demuestra dominio de los conceptos básicos..." required />
                             <x-input-error :messages="$errors->first('form.nombre_indicador_logro')" class="mt-2" />
                         </div>
                     </div>

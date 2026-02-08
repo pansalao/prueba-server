@@ -11,25 +11,27 @@
                 <div class="w-full">
                     <x-input-label for="descripcion" :value="__('Descripción del Evento')" />
                     <x-text-input id="descripcion" wire:model.live="form.descripcion_evento" class="w-full" type="text"
-                        placeholder="Ej: Congreso Nacional" />
+                        placeholder="Ej: Congreso Nacional" required />
                     <x-input-error :messages="$errors->first('form.descripcion_evento')" class="mt-2" />
                 </div>
 
                 <div class="w-full">
                     <x-input-label for="fecha" :value="__('Fecha del Evento')" />
-                    <x-text-input id="fecha" wire:model.live="form.fecha_evento" class="w-full" type="date" />
+                    <x-text-input id="fecha" wire:model.live="form.fecha_evento" class="w-full" type="date" required />
                     <x-input-error :messages="$errors->first('form.fecha_evento')" class="mt-2" />
                 </div>
 
                 <div class="w-full">
-                    <x-input-label for="tipo" :value="__('Tipo de Evento')" />
-                    <select id="tipo" wire:model.live="form.tipo_evento"
-                        class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                        <option value="">Seleccione...</option>
-                        <option value="1">Tipo 1</option>
-                        <option value="2">Tipo 2</option>
-                        <option value="3">Tipo 3</option>
-                    </select>
+                    @php
+                        $tiposEvento = collect([
+                            (object) ['id' => '1', 'nombre' => 'Tipo 1'],
+                            (object) ['id' => '2', 'nombre' => 'Tipo 2'],
+                            (object) ['id' => '3', 'nombre' => 'Tipo 3'],
+                        ]);
+                    @endphp
+                    <x-select id="tipo" wire:model.live="form.tipo_evento" label="Tipo de Evento"
+                        :options="$tiposEvento" valueField="id" textField="nombre" placeholder="Seleccione..."
+                        required />
                     <x-input-error :messages="$errors->first('form.tipo_evento')" class="mt-2" />
                 </div>
             </div>

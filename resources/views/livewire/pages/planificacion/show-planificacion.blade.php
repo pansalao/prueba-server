@@ -39,9 +39,9 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <a href="{{ route('planificacion.reporte.detalle', $planificacionId) }}" target="_blank"
-                            class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1.5 px-3 rounded shadow transition-all duration-200"
+                            class="flex items-center gap-2 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-bold py-1.5 px-3 rounded shadow transition-all duration-200 hover:bg-gray-200"
                             title="Ver Plan de Curso en PDF (Nueva pestaña)">
-                            <span class="material-icons text-white text-base">picture_as_pdf</span>
+                            <span class="material-icons text-black text-base">picture_as_pdf</span>
                             PDF
                         </a>
                         <span class="px-3 py-1 rounded-full text-sm font-semibold
@@ -64,7 +64,7 @@
                             @if (!empty($planificacion->cortes))
                                 @foreach ($planificacion->cortes as $idx => $c)
                                     <button type="button" @click="openCorte = {{ $idx }}"
-                                        :class="openCorte === {{ $idx }} ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+                                        :class="openCorte === {{ $idx }} ? 'bg-[#767676] text-white' : 'bg-[#f0f0f0] text-black border border-[#767676]'"
                                         class="w-8 h-8 rounded-full flex items-center justify-center font-bold transition-all duration-200 text-sm shadow-sm">
                                         {{ $idx + 1 }}
                                     </button>
@@ -215,12 +215,12 @@
                                                 @if (($corte->estatus ?? 0) != 3 && empty($mostrarMotivoRechazoCorte[$corte->detalle_id]))
                                                     <div class="flex justify-end gap-2">
                                                         <button wire:click="mostrarTextareaMotivo({{ $corte->detalle_id }})"
-                                                            class="inline-flex items-center gap-1 text-xs bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-red-700 transition-colors shadow-sm uppercase">
+                                                            class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                                             Rechazar corte
                                                         </button>
                                                         @if (($corte->estatus ?? 0) != 1)
                                                             <button wire:click="aprobarCorte({{ $corte->detalle_id }})"
-                                                                class="inline-flex items-center gap-1 text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm uppercase">
+                                                                class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                                                 Aceptar corte
                                                             </button>
                                                         @endif
@@ -236,11 +236,11 @@
                                                             class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"></textarea>
                                                         <div class="flex justify-end space-x-2">
                                                             <button wire:click="ocultarTextareaMotivo({{ $corte->detalle_id }})"
-                                                                class="inline-flex items-center gap-1 text-xs bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-red-700 transition-colors shadow-sm uppercase">
+                                                                class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                                                 Cancelar
                                                             </button>
                                                             <button wire:click="confirmarRechazoCorte({{ $corte->detalle_id }})"
-                                                                class="inline-flex items-center gap-1 text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm uppercase">
+                                                                class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                                                 Aceptar
                                                             </button>
                                                         </div>
@@ -267,7 +267,7 @@
                                                 @if (Gate::allows('is-coordinador'))
                                                     <div class="flex justify-end mt-2">
                                                         <button wire:click="eliminarMotivoRechazo({{ $corte->detalle_id }})"
-                                                            class="inline-flex items-center gap-1 text-xs bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-red-700 transition-colors shadow-sm uppercase">
+                                                            class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                             </svg>
@@ -304,8 +304,8 @@
                     {{-- Footer con Botones de Acción --}}
                     <div class="mt-8 flex justify-end space-x-3 pt-4 border-t dark:border-gray-700">
                         <button wire:click="cerrar"
-                            class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded shadow transition-all duration-200 uppercase">
-                            <span class="material-icons text-white text-base">arrow_back</span>
+                            class="inline-flex font-bold items-center px-4 py-2 bg-[#f0f0f0] border border-[#767676] rounded-lg text-sm text-black uppercase tracking-widest hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150 shadow-sm gap-2">
+                            <span class="material-icons text-black text-base">arrow_back</span>
                             Volver
                         </button>
                     </div>
