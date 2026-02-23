@@ -16,8 +16,8 @@ class PlanificacionViewRepo
             ->join('detalle_profesor_asignado as dpa', 'p.id_profesor_asignado', '=', 'dpa.id_detalle_profesor_asignado')
             ->join('users as u', 'dpa.id_users', '=', 'u.id')
             ->join('unidad_curricular as uc', 'dpa.id_unidad_curricular', '=', 'uc.id_unidad_curricular')
-            ->join('malla_academica as ma', 'uc.id_malla_academica', '=', 'ma.id_malla_academica')
-            ->join('pnf as pnf', 'ma.id_pnf', '=', 'pnf.id_pnf')
+            ->leftJoin('malla_academica as ma', 'uc.id_malla_academica', '=', 'ma.id_malla_academica')
+            ->leftJoin('pnf as pnf', 'ma.id_pnf', '=', 'pnf.id_pnf')
             ->join('seccion as s', 'dpa.id_seccion', '=', 's.id_seccion')
             ->join('lapso_academico as la', 's.id_lapso_academico', '=', 'la.id_lapso_academico')
             ->select(
@@ -50,12 +50,14 @@ class PlanificacionViewRepo
 
         $resultado = (array) $planificacion;
 
-        // 2. Bibliografías
+        // 2. Bibliografías (se obtienen a través de unidad_corte)
         $resultado['bibliografias'] = DB::table('detalle_bibliografia as db')
             ->join('bibliografia as b', 'db.id_bibliografia', '=', 'b.id_bibliografia')
-            ->where('db.id_planificacion', $planificacionId)
+            ->join('unidad_corte as uc_bib', 'db.id_unidad_corte', '=', 'uc_bib.id_unidad_corte')
+            ->where('uc_bib.id_planificacion', $planificacionId)
             ->where('db.estatus', '1')
             ->select('b.id_bibliografia as bibliografia_id', 'b.nombre_bibliografia as bibliografia')
+            ->distinct()
             ->get()
             ->map(fn($item) => (array) $item)
             ->toArray();
@@ -83,7 +85,7 @@ class PlanificacionViewRepo
                     ->join('detalle_estrategia as de', 'der.id_detalle_estrategia', '=', 'de.id_detalle_estrategia')
                     ->join('recurso as r', 'der.id_recurso', '=', 'r.id_recurso')
                     ->where('de.id_unidad_corte', $corte->detalle_id)
-                    ->where('dr.estatus', '1')
+                    ->where('der.estatus', '1')
                     ->select('r.id_recurso as recurso_id', 'r.nombre_recurso as recurso')
                     ->get()
                     ->map(fn($item) => (array) $item)
@@ -126,7 +128,7 @@ class PlanificacionViewRepo
 
                         // 3.4.1 Indicadores - No hay tabla detalle_indicador en este esquema, se usa el campo en unidad_corte o se omite si no aplica.
                         $indicadores = []; // Schema uses a text field in unidad_corte for indicators
-
+        
                         $contenidoArray['indicadores_logros'] = $indicadores;
                         return $contenidoArray;
                     })

@@ -65,7 +65,7 @@ class PlanificacionIndexRepo
                 ->update(['estatus' => 1]);
 
             // Actualizar todas las unidades asociadas a la planificación
-            DB::table('unidad')
+            DB::table('unidad_corte')
                 ->where('id_planificacion', $planificacionId)
                 ->update(['estatus' => 1]);
 
@@ -94,23 +94,13 @@ class PlanificacionIndexRepo
                 $corteId = $rechazo['detalle_id'];
                 $motivo = $rechazo['motivo'];
 
-                // Marcar la unidad como rechazada (3)
-                DB::table('unidad')
-                    ->where('id_unidad', $corteId)
-                    ->update(['estatus' => 3]);
-
-                // Desactivar motivos previos (si hubiera)
-                DB::table('motivo_rechazo')
-                    ->where('id_unidad', $corteId)
-                    ->update(['estatus' => '2']);
-
-                // Insertar el nuevo motivo de rechazo
-                DB::table('motivo_rechazo')->insert([
-                    'descripcion_motivo_rechazo' => $motivo,
-                    'id_unidad' => $corteId,
-                    'fecha_creacion' => now(),
-                    'estatus' => '1'
-                ]);
+                // Marcar la unidad_corte como rechazada (3) y guardar el motivo
+                DB::table('unidad_corte')
+                    ->where('id_unidad_corte', $corteId)
+                    ->update([
+                        'estatus' => 3,
+                        'descripcion_motivo_rechazo' => $motivo,
+                    ]);
             }
 
             DB::commit();
@@ -125,34 +115,28 @@ class PlanificacionIndexRepo
     public function eliminarMotivoRechazoPorCorte($detalleId)
     {
         try {
-            // Desactivar el motivo de rechazo
-            DB::table('motivo_rechazo')
-                ->where('id_unidad', $detalleId)
-                ->where('estatus', '1')
-                ->update(['estatus' => '2']);
-
-            // Volver la unidad a estado 'Pendiente' (2) si estaba rechazada
-            DB::table('unidad')
-                ->where('id_unidad', $detalleId)
-                ->where('estatus', 3)
-                ->update(['estatus' => 2]);
+            // Limpiar el motivo de rechazo y volver a estado 'Pendiente' (2)
+            DB::table('unidad_corte')
+                ->where('id_unidad_corte', $detalleId)
+                ->update([
+                    'descripcion_motivo_rechazo' => null,
+                    'estatus' => 2,
+                ]);
 
             // Verificar si quedan otras unidades rechazadas en la misma planificación
-            $corte = DB::table('unidad')->where('id_unidad', $detalleId)->first();
+            $corte = DB::table('unidad_corte')->where('id_unidad_corte', $detalleId)->first();
             if ($corte) {
                 $planificacionId = $corte->id_planificacion;
-                $hayRechazados = DB::table('unidad')
+                $hayRechazados = DB::table('unidad_corte')
                     ->where('id_planificacion', $planificacionId)
                     ->where('estatus', 3)
                     ->exists();
 
                 // Si no hay cortes rechazados, pasar la planificación a 'Pendiente' (2)
-                // (Asumiendo que no esté ya aprobada, pero si venimos de quitar un rechazo, 
-                //  es probable que deba quedar en pendiente o revisión)
                 if (!$hayRechazados) {
                     DB::table('planificacion')
                         ->where('id_planificacion', $planificacionId)
-                        ->where('estatus', '!=', 1) // No cambiar si ya está aprobada (caso raro pero posible)
+                        ->where('estatus', '!=', 1)
                         ->update(['estatus' => 2]);
                 }
             }
@@ -167,15 +151,15 @@ class PlanificacionIndexRepo
     public function aprobarCorte(int $corteId): bool
     {
         try {
-            DB::table('unidad')
-                ->where('id_unidad', $corteId)
+            DB::table('unidad_corte')
+                ->where('id_unidad_corte', $corteId)
                 ->update(['estatus' => 1]);
 
             // Verificar si todas las unidades de la misma planificación están aprobadas
-            $corte = DB::table('unidad')->where('id_unidad', $corteId)->first();
+            $corte = DB::table('unidad_corte')->where('id_unidad_corte', $corteId)->first();
             if ($corte) {
                 $planificacionId = $corte->id_planificacion;
-                $todosAprobados = !DB::table('unidad')
+                $todosAprobados = !DB::table('unidad_corte')
                     ->where('id_planificacion', $planificacionId)
                     ->where('estatus', '!=', 1)
                     ->exists();

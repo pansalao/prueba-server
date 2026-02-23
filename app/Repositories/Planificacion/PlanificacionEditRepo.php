@@ -96,7 +96,7 @@ class PlanificacionEditRepo
                     $evaluacionesData,
                     'id_evaluacion',
                     ['id_tecnica', 'ponderacion_detalle_evaluacion', 'fecha_evaluacion_detalle_evaluacion', 'forma_participacion_detalle_evaluacion', 'integrantes_detalle_evaluacion']
-                ); 
+                );
 
                 // --- Sincronizar Estrategias y Contenidos ---
                 // Esta parte necesita ser adaptada al nuevo esquema donde estrategias son tablas y contenidos tambien
@@ -112,7 +112,7 @@ class PlanificacionEditRepo
             foreach ($oldActiveCortes as $oldCorteId => $oldCorteData) {
                 if (!in_array($oldCorteId, $processedOldCorteIds)) {
                     DB::table('unidad_corte')
-                        ->where('id_unit_corte', $oldCorteId)
+                        ->where('id_unidad_corte', $oldCorteId)
                         ->update(['estatus' => '2']); // 2 = Eliminado/Inactivo
                 }
             }
@@ -214,7 +214,8 @@ class PlanificacionEditRepo
 
         foreach ($estrategiasData as $est) {
             $temaId = $est['tema_id'] ?? null;
-            if (!$temaId) continue;
+            if (!$temaId)
+                continue;
 
             DB::table('detalle_estrategia')->insert([
                 'id_unidad_corte' => $corteId,
@@ -235,7 +236,8 @@ class PlanificacionEditRepo
 
         foreach ($contenidosData as $cont) {
             $contenidoId = $cont['contenido_id'] ?? null;
-            if (!$contenidoId) continue;
+            if (!$contenidoId)
+                continue;
 
             DB::table('detalle_contenido')->insert([
                 'id_unidad_corte' => $corteId,
@@ -255,7 +257,8 @@ class PlanificacionEditRepo
 
         foreach ($bibliografiasData as $bib) {
             $bibId = $bib['bibliografia_id'] ?? null;
-            if (!$bibId) continue;
+            if (!$bibId)
+                continue;
 
             DB::table('detalle_bibliografia')->insert([
                 'id_unidad_corte' => $corteId,

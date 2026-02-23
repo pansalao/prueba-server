@@ -110,7 +110,7 @@ class UpdatePlanificacion extends Component
 
                 // Mapear las estrategias
                 $estrategias = collect($corte['estrategias'])
-                    ->map(fn($e) => ['estrategia_id' => $e['estrategia_id']])
+                    ->map(fn($e) => ['tema_id' => $e['tema_id'], 'actividad' => $e['actividad'] ?? ''])
                     ->toArray();
 
                 // Mapear contenidos e indicadores
@@ -189,7 +189,7 @@ class UpdatePlanificacion extends Component
             'estrategias' => [],
             'contenidos' => [],
             'evaluaciones' => [],
-            'ultimo_motivo_rechazo' => null, 
+            'ultimo_motivo_rechazo' => null,
             'indicadores_logro' => '',
         ];
         // Al añadir un nuevo corte, asegúrate de añadir al menos un contenido y una evaluación
@@ -215,7 +215,7 @@ class UpdatePlanificacion extends Component
         $defaultTemplates = [
             'contenidos' => ['contenido_id' => '', 'indicadores_logros' => [['indicador_id' => '']]],
             'recursos' => ['recurso_id' => ''],
-            'estrategias' => ['estrategia_id' => ''],
+            'estrategias' => ['tema_id' => '', 'actividad' => ''],
             'evaluaciones' => [
                 'fecha_evaluacion' => '',
                 'evaluacion_id' => '',
@@ -338,19 +338,19 @@ class UpdatePlanificacion extends Component
             // Validación para estrategias
             $rules["cortes.$index.estrategias"] = 'array';
             foreach ($corte['estrategias'] as $estrategiaIndex => $estrategia) {
-                $rules["cortes.$index.estrategias.$estrategiaIndex.estrategia_id"] = [
+                $rules["cortes.$index.estrategias.$estrategiaIndex.tema_id"] = [
                     'required',
-                    'exists:tecnica_actividad,id_tecnica_actividad',
+                    'exists:tema_unidad,id_tema_unidad',
                     function ($attribute, $value, $fail) use ($corte, $estrategiaIndex) {
-                        $estrategiaIdsInCorte = collect($corte['estrategias'])->pluck('estrategia_id')->filter()->all();
+                        $temaIdsInCorte = collect($corte['estrategias'])->pluck('tema_id')->filter()->all();
                         $currentValueCount = 0;
-                        foreach ($estrategiaIdsInCorte as $i => $id) {
+                        foreach ($temaIdsInCorte as $i => $id) {
                             if ($id == $value && $i != $estrategiaIndex) {
                                 $currentValueCount++;
                             }
                         }
                         if ($currentValueCount > 0) {
-                            $fail('Esta estrategia ya fue seleccionada en este corte.');
+                            $fail('Este tema ya fue seleccionado en este corte.');
                         }
                     }
                 ];
@@ -416,7 +416,7 @@ class UpdatePlanificacion extends Component
                     'max:25',
                     function ($attribute, $value, $fail) use ($index, $corte, $evaluacionIndex) {
                         $totalEvaluaciones = count($corte['evaluaciones']);
-                        if ($totalEvaluaciones === 1 && (int)$value !== 25) {
+                        if ($totalEvaluaciones === 1 && (int) $value !== 25) {
                             $fail('La única evaluación debe tener exactamente 25% de ponderación.');
                         }
                     },
@@ -464,8 +464,8 @@ class UpdatePlanificacion extends Component
             'cortes.min' => 'La planificación debe tener al menos un corte.',
             'cortes.*.recursos.*.recurso_id.required' => 'El recurso es obligatorio.',
             'cortes.*.recursos.*.recurso_id.exists' => 'El recurso seleccionado no es válido.',
-            'cortes.*.estrategias.*.estrategia_id.required' => 'La estrategia es obligatoria.',
-            'cortes.*.estrategias.*.estrategia_id.exists' => 'La estrategia seleccionada no es válida.',
+            'cortes.*.estrategias.*.tema_id.required' => 'El tema de la estrategia es obligatorio.',
+            'cortes.*.estrategias.*.tema_id.exists' => 'El tema seleccionado no es válido.',
             'cortes.*.contenidos.required' => 'Cada corte debe tener al menos un contenido.',
             'cortes.*.contenidos.array' => 'Los contenidos deben ser un array.',
             'cortes.*.contenidos.min' => 'Cada corte debe tener al menos un contenido.',

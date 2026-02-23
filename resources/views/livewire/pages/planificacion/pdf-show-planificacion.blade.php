@@ -84,7 +84,8 @@
             table-layout: fixed;
         }
 
-        .main-table th, .main-table td {
+        .main-table th,
+        .main-table td {
             border: 1px solid #000;
             padding: 5px;
             vertical-align: top;
@@ -123,32 +124,45 @@
     </header>
 
     <footer>
-        <div class="footer-text">U.P.T.P. - Avenida Circunvalación Sur, sector Bellas Artes, diagonal a la Cruz Roja. Acarigua Edo. Portuguesa, República Bolivariana de Venezuela. R.I.F.: G-20010200-4.</div>
-        <div class="footer-text">Zona postal 3301, Apartado N° 108. Teléfonos: (0255) 623.7538 - 623.7519 - 623.6085 | http://uptp.sytes.net</div>
-        <div class="footer-text">Página <span class="pagenum"></span> - {{ now()->format('d/m/Y h:i a') }} - INGJ.T</div>
+        <div class="footer-text">U.P.T.P. - Avenida Circunvalación Sur, sector Bellas Artes, diagonal a la Cruz Roja.
+            Acarigua Edo. Portuguesa, República Bolivariana de Venezuela. R.I.F.: G-20010200-4.</div>
+        <div class="footer-text">Zona postal 3301, Apartado N° 108. Teléfonos: (0255) 623.7538 - 623.7519 - 623.6085 |
+            http://uptp.sytes.net</div>
+        <div class="footer-text">Página <span class="pagenum"></span> - {{ now()->format('d/m/Y h:i a') }} - INGJ.T
+        </div>
     </footer>
 
     {{-- Nuevo Header Grid --}}
     <table class="table-header-grid">
         <tr>
-            <td class="label-cell" width="25%">PNF<br><span class="uppercase">{{ $planificacion->nombre_pnf ?? 'INFORMÁTICA' }}</span></td>
-            <td class="label-cell" colspan="2">Unidad curricular:<br><span class="uppercase">{{ $planificacion->nombre_unidad_curricular }}</span></td>
-            <td class="label-cell">Trayecto: <span class="uppercase">{{ $planificacion->trayecto_unidad_curricular ?? 'N/A' }}</span></td>
-            <td class="label-cell">Semestre: <span class="uppercase">{{ $planificacion->duracion_unidad_curricular ?? 'N/A' }}</span></td>
+            <td class="label-cell" width="25%">PNF<br><span
+                    class="uppercase">{{ $planificacion->nombre_pnf ?? 'INFORMÁTICA' }}</span></td>
+            <td class="label-cell" colspan="2">Unidad curricular:<br><span
+                    class="uppercase">{{ $planificacion->nombre_unidad_curricular }}</span></td>
+            <td class="label-cell">Trayecto: <span
+                    class="uppercase">{{ $planificacion->trayecto_unidad_curricular ?? 'N/A' }}</span></td>
+            <td class="label-cell">Semestre: <span
+                    class="uppercase">{{ $planificacion->duracion_unidad_curricular ?? 'N/A' }}</span></td>
             <td class="label-cell">Secciones: <span class="uppercase">{{ $planificacion->nombre_seccion }}</span></td>
         </tr>
         <tr>
-            <td colspan="2" class="content-cell">Coordinador (a) de eje: <strong>{{ $planificacion->coordinador_nombre }} {{ $planificacion->coordinador_apellido }}</strong> V-{{ $planificacion->coordinador_cedula }}</td>
-            <td class="content-cell">Horas semanales: <strong>{{ $planificacion->horas_semanales_unidad_curricular ?? '' }}</strong></td>
+            <td colspan="2" class="content-cell">Coordinador (a) de eje:
+                <strong>{{ $planificacion->coordinador_nombre }} {{ $planificacion->coordinador_apellido }}</strong>
+                V-{{ $planificacion->coordinador_cedula }}</td>
+            <td class="content-cell">Horas semanales:
+                <strong>{{ $planificacion->horas_semanales_unidad_curricular ?? '' }}</strong></td>
             <td class="content-cell">Lapso académico: <strong>{{ $planificacion->nombre_lapso }}</strong></td>
             <td class="content-cell">Código:<br><strong></strong></td>
-            <td class="content-cell">Unidades de crédito: <strong>{{ $planificacion->unidades_credito_unidad_curricular ?? '' }}</strong></td>
+            <td class="content-cell">Unidades de crédito:
+                <strong>{{ $planificacion->unidades_credito_unidad_curricular ?? '' }}</strong></td>
         </tr>
         <tr>
-            <td colspan="6" class="content-cell">Profesores que administran la unidad curricular: <strong>{{ $planificacion->docente_nombre }} {{ $planificacion->docente_apellido }}</strong></td>
+            <td colspan="6" class="content-cell">Profesores que administran la unidad curricular:
+                <strong>{{ $planificacion->docente_nombre }} {{ $planificacion->docente_apellido }}</strong></td>
         </tr>
         <tr>
-            <td colspan="6" class="content-cell">Propósito de la unidad curricular: {{ $planificacion->proposito_unidad_curricular ?? '' }}</td>
+            <td colspan="6" class="content-cell">Propósito de la unidad curricular:
+                {{ $planificacion->proposito_unidad_curricular ?? '' }}</td>
         </tr>
     </table>
 
@@ -158,8 +172,12 @@
         <thead>
             <tr>
                 <th width="6%">Semana (Horas y/o minutos)</th>
-                <th width="18%">Temática general<hr>Unidad/objetivo/ contenido</th>
-                <th width="12%">Estrategia pedagógica<hr>Actividad/ Técnica</th>
+                <th width="18%">Temática general
+                    <hr>Unidad/objetivo/ contenido
+                </th>
+                <th width="12%">Estrategia pedagógica
+                    <hr>Actividad/ Técnica
+                </th>
                 <th width="8%">Recursos</th>
                 <th width="13%">Indicadores de logros</th>
                 <th width="13%">Técnicas /Instrumentos y tipos de Evaluación</th>
@@ -182,7 +200,7 @@
                     <td>
                         @foreach($corte['contenidos'] as $cont)
                             <strong>{{ $cont['titulo_contenido'] }}</strong><br>
-                            <small>{{ $cont['descripcion_contenido'] }}</small>
+                            <small>Tema: {{ $cont['titulo_tema'] ?? '' }}</small>
                             <br><br>
                         @endforeach
                     </td>
@@ -190,7 +208,7 @@
                     {{-- Estrategia --}}
                     <td>
                         @foreach($corte['estrategias'] as $est)
-                            - {{ $est['estrategia'] }}<br>
+                            - {{ $est['titulo_tema'] ?? '' }}@if(!empty($est['actividad'])): {{ $est['actividad'] }}@endif<br>
                         @endforeach
                     </td>
 
@@ -250,4 +268,3 @@
 </body>
 
 </html>
-
