@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-800 dark:text-gray-500 leading-tight uppercase text-center">
-            {{ __('Auditoría del Sistema (Bitácora)') }}
+            {{ __('Bitácora') }}
         </h2>
     </x-slot>
 
@@ -9,10 +9,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 sm:rounded-lg">
 
             <div class="sogat-table-container">
-                <!-- Controles -->
                 <div
                     class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between p-4 bg-white dark:bg-gray-800">
-                    <!-- Componente de búsqueda -->
                     <x-table.search-input model="busqueda" placeholder="Buscar transacción..." debounce="300ms" />
                 </div>
 
@@ -23,9 +21,8 @@
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Usuario</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Acción</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Tabla</th>
-                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">IP
-                            </th>
-                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">Acciones</th>
+                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
+                                Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,24 +38,40 @@
                                     </td>
                                     <td class="px-4 py-4">
                                         @php
-                                            $color = match ($log->accion) {
+                                            $accionMostrar = $log->accion;
+
+                                            // Verificamos si es una modificación y validamos el estatus en el JSON
+                                            if ($accionMostrar === 'MODIFICAR' && !empty($log->nuevos)) {
+                                                $datosNuevos = json_decode($log->nuevos, true);
+
+                                                if (is_array($datosNuevos) && isset($datosNuevos['estatus'])) {
+                                                    if ($datosNuevos['estatus'] == 3) {
+                                                        $accionMostrar = 'INHABILITAR';
+                                                    } elseif ($datosNuevos['estatus'] == 1) {
+                                                        $accionMostrar = 'REHABILITAR'; // Agregamos la nueva acción
+                                                    }
+                                                }
+                                            }
+
+                                            // Asignamos el color
+                                            $color = match ($accionMostrar) {
                                                 'CREAR' => 'text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300',
                                                 'MODIFICAR' => 'text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-300',
                                                 'ELIMINAR' => 'text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300',
+                                                'INHABILITAR' => 'text-orange-800 bg-orange-100 dark:bg-orange-900 dark:text-orange-300',
+                                                'REHABILITAR' => 'text-teal-800 bg-teal-100 dark:bg-teal-900 dark:text-teal-300', // Color nuevo
                                                 'LOGIN' => 'text-purple-800 bg-purple-100 dark:bg-purple-900 dark:text-purple-300',
                                                 'LOGOUT' => 'text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300',
+                                                'MOSTRAR' => 'text-indigo-800 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300',
                                                 default => 'text-gray-800 bg-gray-100 dark:bg-gray-900 dark:text-gray-300',
                                             };
                                         @endphp
                                         <span class="{{ $color }} text-xs font-medium px-2.5 py-0.5 rounded">
-                                            {{ $log->accion }}
+                                            {{ $accionMostrar }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-4 italic text-gray-900 dark:text-white">
+                                    <td class="px-4 py-4 text-gray-900 dark:text-white">
                                         {{ $log->tabla ?? '---' }}
-                                    </td>
-                                    <td class="px-4 py-4 font-mono text-gray-900 dark:text-white text-right">
-                                        {{ $log->ip }}
                                     </td>
                                     <td class="px-4 py-4 text-right">
                                         <a href="{{ route('bitacora/show', $log->id_bitacora) }}" wire:navigate
@@ -82,23 +95,23 @@
                         @endif
                     </tbody>
                 </table>
-
-                <div
-                    class="flex flex-col md:flex-row items-center justify-between p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center mb-4 md:mb-0">
-                        <select wire:model.live="paginacion"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white w-24">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <span class="ml-2 text-xs text-gray-500">registros por página</span>
-                    </div>
-                    <div>{{ $bitacoras->links() }}</div>
-                </div>
             </div>
+
+            <div
+                class="flex flex-col md:flex-row items-center justify-between p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 sm:rounded-b-lg">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <select wire:model.live="paginacion"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white w-24">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <div>{{ $bitacoras->links() }}</div>
+            </div>
+
         </div>
     </div>
 </div>

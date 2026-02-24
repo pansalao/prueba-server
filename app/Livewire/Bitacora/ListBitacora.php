@@ -11,7 +11,7 @@ class ListBitacora extends Component
     use WithPagination;
 
     public $busqueda = '';
-    public $paginacion = 10;
+    public $paginacion = 5;
 
     protected $bitacoraRepository;
 
