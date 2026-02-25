@@ -32,14 +32,14 @@ class UpdateEvento extends Component
                 return redirect()->route('evento/listar')->with('error', 'Evento no encontrado.');
             }
 
-            $this->form->fill((array) $evento);
+            // Cambio aquí: Se extraen los atributos del modelo correctamente
+            $this->form->fill($evento->toArray());
 
         } catch (Exception $e) {
             session()->flash('error', 'Error al cargar el evento: ' . $e->getMessage());
             return redirect()->route('evento/listar');
         }
     }
-
     public function updated($propertyName)
     {
         $field = str_replace('form.', '', $propertyName);
