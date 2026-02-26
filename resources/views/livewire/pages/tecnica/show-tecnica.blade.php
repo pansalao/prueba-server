@@ -3,7 +3,7 @@
     <x-slot name="header">
         <h2
             class="font-semibold text-xl text-center {{ $tecnica && $tecnica->estatus != 1 ? 'text-red-600 dark:text-red-400' : 'text-gray-800 dark:text-gray-500' }} leading-tight uppercase">
-            {{ $tecnica && $tecnica->estatus != 1 ? __('Detalles de la Técnica Inactiva') : __('Detalles de la Técnica') }}
+            {{ $tecnica && $tecnica->estatus != 1 ? __('Detalles de la Técnica Inhabilitada') : __('Detalles de la Técnica') }}
         </h2>
     </x-slot>
 
@@ -18,7 +18,8 @@
                                 <div>
                                     <x-input-label value="Nombre de la Técnica:" />
                                     <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">
-                                        {{ $tecnica->nombre_tecnica_evaluacion }}</p>
+                                        {{ $tecnica->nombre_tecnica_evaluacion }}
+                                    </p>
                                 </div>
 
                                 <div>
@@ -28,7 +29,7 @@
                                             class="{{ $tecnica->estatus == 1
                     ? 'px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-600 dark:text-green-100'
                     : 'px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-red-600 dark:text-red-100' }}">
-                                            {{ $tecnica->estatus == 1 ? 'Activo' : 'Inactivo' }}
+                                            {{ $tecnica->estatus == 1 ? 'Activo' : 'Inhabilitado' }}
                                         </span>
                                     </p>
                                 </div>
@@ -57,4 +58,3 @@
         </div>
     </div>
 </div>
-

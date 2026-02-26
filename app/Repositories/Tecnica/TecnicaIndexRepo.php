@@ -29,7 +29,7 @@ class TecnicaIndexRepo
         $tecnica = \App\Models\Tecnica::find($id);
         if ($tecnica) {
             return $tecnica->update([
-                'estatus' => '2',
+                'estatus' => '3',
                 'fecha_actualizacion' => Carbon::now()
             ]);
         }
@@ -41,7 +41,7 @@ class TecnicaIndexRepo
      */
     public function restaurar($id)
     {
-        $tecnica = \App\Models\Tecnica::find($id);
+        $tecnica = \App\Models\Tecnica::where('id_tecnica', $id)->where('estatus', '3')->first();
         if ($tecnica) {
             return $tecnica->update([
                 'estatus' => '1',

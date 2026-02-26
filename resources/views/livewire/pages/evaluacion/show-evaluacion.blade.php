@@ -3,7 +3,7 @@
     <x-slot name="header">
         <h2
             class="font-semibold text-xl text-center {{ $evaluacion && $evaluacion->estatus != 1 ? 'text-red-600 dark:text-red-400' : 'text-gray-800 dark:text-gray-500' }} leading-tight uppercase">
-            {{ $evaluacion && $evaluacion->estatus != 1 ? __('Detalles de la Evaluación Inactiva') : __('Detalles de la Evaluación') }}
+            {{ $evaluacion && $evaluacion->estatus != 1 ? __('Detalles de la Evaluación Inhabilitada') : __('Detalles de la Evaluación') }}
         </h2>
     </x-slot>
 
@@ -18,7 +18,8 @@
                                 <div>
                                     <x-input-label value="Nombre de la Evaluación:" />
                                     <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold break-words overflow-hidden">
-                                        {{ $evaluacion->nombre_evaluacion }}</p>
+                                        {{ $evaluacion->nombre_evaluacion }}
+                                    </p>
                                 </div>
 
                                 <div>
@@ -28,7 +29,7 @@
                                             class="{{ $evaluacion->estatus == 1
                     ? 'px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-600 dark:text-green-100'
                     : 'px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-red-600 dark:text-red-100' }}">
-                                            {{ $evaluacion->estatus == 1 ? 'Activo' : 'Inactivo' }}
+                                            {{ $evaluacion->estatus == 1 ? 'Activo' : 'Inhabilitado' }}
                                         </span>
                                     </p>
                                 </div>
@@ -57,4 +58,3 @@
         </div>
     </div>
 </div>
-

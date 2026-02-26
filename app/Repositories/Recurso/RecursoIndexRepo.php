@@ -23,7 +23,7 @@ class RecursoIndexRepo
         $recurso = \App\Models\Recurso::find($id);
         if ($recurso) {
             return $recurso->update([
-                'estatus' => '2',
+                'estatus' => '3',
                 'fecha_actualizacion' => Carbon::now()
             ]);
         }
@@ -32,7 +32,7 @@ class RecursoIndexRepo
 
     public function restaurar($id)
     {
-        $recurso = \App\Models\Recurso::find($id);
+        $recurso = \App\Models\Recurso::where('id_recurso', $id)->where('estatus', '3')->first();
         if ($recurso) {
             return $recurso->update([
                 'estatus' => '1',

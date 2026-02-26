@@ -29,7 +29,7 @@ class EstrategiaIndexRepo
         $estrategia = \App\Models\Estrategia::find($id);
         if ($estrategia) {
             return $estrategia->update([
-                'estatus' => '2',
+                'estatus' => '3',
                 'fecha_actualizacion' => Carbon::now()
             ]);
         }
@@ -41,7 +41,7 @@ class EstrategiaIndexRepo
      */
     public function restaurar($id)
     {
-        $estrategia = \App\Models\Estrategia::find($id);
+        $estrategia = \App\Models\Estrategia::where('id_tecnica_actividad', $id)->where('estatus', '3')->first();
         if ($estrategia) {
             return $estrategia->update([
                 'estatus' => '1',

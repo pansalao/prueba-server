@@ -29,7 +29,7 @@ class EvaluacionIndexRepo
         $evaluacion = \App\Models\Evaluacion::find($id);
         if ($evaluacion) {
             return $evaluacion->update([
-                'estatus' => '2',
+                'estatus' => '3',
                 'fecha_actualizacion' => Carbon::now()
             ]);
         }
@@ -41,7 +41,7 @@ class EvaluacionIndexRepo
      */
     public function restaurar($id)
     {
-        $evaluacion = \App\Models\Evaluacion::find($id);
+        $evaluacion = \App\Models\Evaluacion::where('id_evaluacion', $id)->where('estatus', '3')->first();
         if ($evaluacion) {
             return $evaluacion->update([
                 'estatus' => '1',
