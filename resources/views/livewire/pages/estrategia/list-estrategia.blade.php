@@ -42,8 +42,8 @@
                                     <!-- Estatus -->
                                     <td class="px-4 py-4 text-right">
                                         <span class="{{ $estrategia->estatus == 1 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }} 
-                                                                    text-xs font-medium px-2.5 py-0.5 rounded">
-                                            {{ $estrategia->estatus == 1 ? 'Activo' : 'Inhabilitado' }}
+                                                                            text-xs font-medium px-2.5 py-0.5 rounded">
+                                            {{ $estrategia->estatus == 1 ? 'Activo' : 'Inactivo' }}
                                         </span>
                                     </td>
                                     <!-- Acciones -->
@@ -74,7 +74,7 @@
 
                                             <!-- Acciones según estado -->
                                             @if ($estrategia->estatus == 1)
-                                                <!-- Inhabilitar -->
+                                                <!-- Inactivar -->
                                                 <button
                                                     wire:click="confirmarInhabilitar({{ $estrategia->id_estrategia_pedagogica }})"
                                                     class="flex items-center gap-1 bg-red-50 text-red-600 dark:bg-red-900 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-800 text-xs font-medium px-2.5 py-0.5 rounded">
@@ -83,17 +83,17 @@
                                                             d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
                                                             clip-rule="evenodd" />
                                                     </svg>
-                                                    Inhabilitar
+                                                    Inactivar
                                                 </button>
                                             @else
-                                                <!-- Restaurar -->
+                                                <!-- Activar -->
                                                 <button wire:click="confirmarRestaurar({{ $estrategia->id_estrategia_pedagogica }})"
                                                     class="flex items-center gap-1 bg-green-50 text-green-600 dark:bg-green-900 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-800 text-xs font-medium px-2.5 py-0.5 rounded text-left">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                             d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                                                     </svg>
-                                                    Restaurar
+                                                    Activar
                                                 </button>
                                             @endif
                                         </div>
@@ -110,15 +110,15 @@
                     </tbody>
                 </table>
 
-                <!-- Modal de confirmación de inhabilitación -->
-                <x-table.delete-modal :show="$idInhabilitar !== null" title="Confirmar Inhabilitación"
-                    message="¿Estás seguro de que deseas inhabilitar esta estrategia pedagógica?"
+                <!-- Modal de confirmación de inactivación -->
+                <x-table.delete-modal :show="$idInhabilitar !== null" title="Confirmar Inactivación"
+                    message="¿Estás seguro de que deseas inactivar esta estrategia pedagógica?"
                     cancel-method="$set('idInhabilitar', null)" confirm-method="inhabilitar" actionType="delete" />
 
-                <!-- Modal de confirmación de restauración -->
-                <x-table.delete-modal :show="$idRestaurar !== null" title="Confirmar Restauración"
-                    message="¿Estás seguro de que deseas restaurar esta estrategia pedagógica?"
-                    cancel-method="$set('idRestaurar', null)" confirm-method="restaurar" :confirmText="'Restaurar'"
+                <!-- Modal de confirmación de activación -->
+                <x-table.delete-modal :show="$idRestaurar !== null" title="Confirmar Activación"
+                    message="¿Estás seguro de que deseas activar esta estrategia pedagógica?"
+                    cancel-method="$set('idRestaurar', null)" confirm-method="restaurar" :confirmText="'Activar'"
                     :actionType="'restore'" />
             </div>
 

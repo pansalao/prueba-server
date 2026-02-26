@@ -3,7 +3,7 @@
     <x-slot name="header">
         <h2
             class="font-semibold text-xl text-center {{ $recurso && $recurso->estatus != 1 ? 'text-red-600 dark:text-red-400' : 'text-gray-800 dark:text-gray-500' }} leading-tight uppercase">
-            {{ $recurso && $recurso->estatus != 1 ? __('Detalles del Recurso Inhabilitado') : __('Detalles del Recurso') }}
+            {{ $recurso && $recurso->estatus != 1 ? __('Detalles del Recurso Inactivo') : __('Detalles del Recurso') }}
         </h2>
     </x-slot>
 
@@ -29,7 +29,7 @@
                                             class="{{ $recurso->estatus == 1
                     ? 'px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-600 dark:text-green-100'
                     : 'px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-red-600 dark:text-red-100' }}">
-                                            {{ $recurso->estatus == 1 ? 'Activo' : 'Inhabilitado' }}
+                                            {{ $recurso->estatus == 1 ? 'Activo' : 'Inactivo' }}
                                         </span>
                                     </p>
                                 </div>

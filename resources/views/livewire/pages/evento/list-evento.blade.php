@@ -74,7 +74,7 @@
                                                             d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
                                                             clip-rule="evenodd" />
                                                     </svg>
-                                                    Inhabilitar
+                                                    Inactivar
                                                 </button>
                                             @else
                                                 <button wire:click="confirmarRestaurar({{ $evento->id_evento }})"
@@ -83,7 +83,7 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                             d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                                                     </svg>
-                                                    Restaurar
+                                                    Activar
                                                 </button>
                                             @endif
                                         </div>
@@ -100,12 +100,12 @@
                     </tbody>
                 </table>
 
-                <x-table.delete-modal :show="$idInhabilitar !== null" title="Confirmar Inhabilitación"
-                    message="¿Estás seguro de que deseas inhabilitar este evento?"
+                <x-table.delete-modal :show="$idInhabilitar !== null" title="Confirmar Inactivación"
+                    message="¿Estás seguro de que deseas inactivar este evento?"
                     cancel-method="$set('idInhabilitar', null)" confirm-method="inhabilitar" actionType="delete" />
-                <x-table.delete-modal :show="$idRestaurar !== null" title="Confirmar Restauración"
-                    message="¿Estás seguro de que deseas restaurar este evento?"
-                    cancel-method="$set('idRestaurar', null)" confirm-method="restaurar" :confirmText="'Restaurar'"
+                <x-table.delete-modal :show="$idRestaurar !== null" title="Confirmar Activación"
+                    message="¿Estás seguro de que deseas activar este evento?"
+                    cancel-method="$set('idRestaurar', null)" confirm-method="restaurar" :confirmText="'Activar'"
                     :actionType="'restore'" />
             </div>
 

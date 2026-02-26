@@ -46,9 +46,9 @@
 
                                                 if (is_array($datosNuevos) && isset($datosNuevos['estatus'])) {
                                                     if ($datosNuevos['estatus'] == 3) {
-                                                        $accionMostrar = 'INHABILITAR';
+                                                        $accionMostrar = 'INACTIVAR';
                                                     } elseif ($datosNuevos['estatus'] == 1) {
-                                                        $accionMostrar = 'REHABILITAR'; // Agregamos la nueva acción
+                                                        $accionMostrar = 'ACTIVAR'; // Agregamos la nueva acción
                                                     }
                                                 }
                                             }
@@ -58,8 +58,8 @@
                                                 'CREAR' => 'text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300',
                                                 'MODIFICAR' => 'text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-300',
                                                 'ELIMINAR' => 'text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300',
-                                                'INHABILITAR' => 'text-orange-800 bg-orange-100 dark:bg-orange-900 dark:text-orange-300',
-                                                'REHABILITAR' => 'text-teal-800 bg-teal-100 dark:bg-teal-900 dark:text-teal-300', // Color nuevo
+                                                'INACTIVAR' => 'text-orange-800 bg-orange-100 dark:bg-orange-900 dark:text-orange-300',
+                                                'ACTIVAR' => 'text-teal-800 bg-teal-100 dark:bg-teal-900 dark:text-teal-300', // Color nuevo
                                                 'LOGIN' => 'text-purple-800 bg-purple-100 dark:bg-purple-900 dark:text-purple-300',
                                                 'LOGOUT' => 'text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300',
                                                 'MOSTRAR' => 'text-indigo-800 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300',

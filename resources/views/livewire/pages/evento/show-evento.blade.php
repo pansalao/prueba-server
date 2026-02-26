@@ -57,7 +57,7 @@
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Estatus</h3>
                     <span
                         class="{{ $evento->estatus == 1 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }} text-lg font-bold">
-                        {{ $evento->estatus == 1 ? 'Activo' : ($evento->estatus == 3 ? 'Eliminado' : 'Inactivo') }}
+                        {{ $evento->estatus == 1 ? 'Activo' : 'Inactivo' }}
                     </span>
                 </div>
             </div>
