@@ -236,7 +236,7 @@ class PlanificacionCreateRepo
                             'fecha_evaluacion_detalle_evaluacion' => $evaluacion['fecha_evaluacion'],
                             'forma_participacion_detalle_evaluacion' => $evaluacion['forma_participacion'],
                             'fecha_creacion' => now(),
-                            'estatus' => '2',
+                            'estatus' => '1',
                         ]);
                     }
                 }
