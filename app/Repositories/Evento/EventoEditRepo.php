@@ -17,17 +17,20 @@ class EventoEditRepo
     {
         $evento = \App\Models\Evento::find($id);
         if ($evento) {
-            $id_calendario = $data['id_calendario'] ?? null;
-            if (empty($id_calendario)) {
-                $activo = DB::table('calendario_academico')->where('estatus', '1')->first();
+            $id_lapso = $data['id_lapso'] ?? null;
+            if (empty($id_lapso)) {
+                $activo = DB::connection('pgsql_daece')->table('lapso_academico')
+                    ->where('lap_estatus', 'A')
+                    ->where('lap_cerrado', 'N')
+                    ->first();
                 if (!$activo) {
-                    throw new \Exception('No se puede actualizar el evento porque no existe un calendario académico activo.');
+                    throw new \Exception('No se puede actualizar el evento porque no existe un lapso académico activo.');
                 }
-                $id_calendario = $activo->id_calendario_academico;
+                $id_lapso = $activo->lap_codigo;
             }
 
             return $evento->update([
-                'id_calendario' => $id_calendario,
+                'id_lapso' => $id_lapso,
                 'dia_inicio_evento' => $data['dia_inicio_evento'],
                 'dia_fin_evento' => $data['dia_fin_evento'],
                 'semana_evento' => $data['semana_evento'],
@@ -38,10 +41,10 @@ class EventoEditRepo
         return false;
     }
 
-    public function existeEventoConDescripcion(string $descripcion, ?int $idCalendario, ?int $idEventoExcluir): bool
+    public function existeEventoConDescripcion(string $descripcion, ?int $idLapso, ?int $idEventoExcluir): bool
     {
         return DB::table('evento')
-            ->where('id_calendario', $idCalendario)
+            ->where('id_lapso', $idLapso)
             ->where('descripcion_evento', $descripcion)
             ->where('id_evento', '!=', $idEventoExcluir)
             ->where('estatus', '!=', '3')

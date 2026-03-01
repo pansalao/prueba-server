@@ -9,6 +9,14 @@
     <div class="sogat-card">
         <div class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Lapso -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Lapso</h3>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                        {{ $evento->nombre_lapso }}
+                    </p>
+                </div>
+
                 <!-- Descripción -->
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Descripción</h3>

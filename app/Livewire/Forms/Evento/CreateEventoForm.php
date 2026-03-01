@@ -6,7 +6,7 @@ use Livewire\Form;
 
 class CreateEventoForm extends Form
 {
-    public $id_calendario = '';
+    public $id_lapso = '';
     public $dia_inicio_evento = '';
     public $dia_fin_evento = '';
     public $semana_evento = '';
@@ -16,26 +16,25 @@ class CreateEventoForm extends Form
     protected function rules()
     {
         return [
-            'id_calendario' => [
+            'id_lapso' => [
                 'nullable',
-                'integer',
-                'exists:calendario_academico,id_calendario_academico'
+                'integer'
             ],
             'dia_inicio_evento' => [
                 'required',
                 'date',
                 function ($attribute, $value, $fail) {
-                    $id_cal = $this->id_calendario;
-                    if (empty($id_cal)) {
-                        $activo = \Illuminate\Support\Facades\DB::table('calendario_academico')->where('estatus', '1')->first();
-                        $id_cal = $activo ? $activo->id_calendario_academico : null;
+                    $id_lapso = $this->id_lapso;
+                    if (empty($id_lapso)) {
+                        $activo = \Illuminate\Support\Facades\DB::connection('pgsql_daece')->table('lapso_academico')->where('lap_estatus', 'A')->where('lap_cerrado', 'N')->first();
+                        $id_lapso = $activo ? $activo->lap_codigo : null;
                     }
 
-                    if ($id_cal) {
-                        $cal = \Illuminate\Support\Facades\DB::table('calendario_academico')->where('id_calendario_academico', $id_cal)->first();
-                        if ($cal) {
-                            if ($value < $cal->dia_inicio_calendario_academico || $value > $cal->dia_fin_calendario_academico) {
-                                $fail("La fecha de inicio debe estar entre {$cal->dia_inicio_calendario_academico} y {$cal->dia_fin_calendario_academico}.");
+                    if ($id_lapso) {
+                        $lapso = \Illuminate\Support\Facades\DB::connection('pgsql_daece')->table('lapso_academico')->where('lap_codigo', $id_lapso)->first();
+                        if ($lapso) {
+                            if ($value < $lapso->lap_fecha_inicio || $value > $lapso->lap_fecha_fin) {
+                                $fail("La fecha de inicio debe estar entre {$lapso->lap_fecha_inicio} y {$lapso->lap_fecha_fin}.");
                             }
                         }
                     }
@@ -46,17 +45,17 @@ class CreateEventoForm extends Form
                 'date',
                 'after_or_equal:dia_inicio_evento',
                 function ($attribute, $value, $fail) {
-                    $id_cal = $this->id_calendario;
-                    if (empty($id_cal)) {
-                        $activo = \Illuminate\Support\Facades\DB::table('calendario_academico')->where('estatus', '1')->first();
-                        $id_cal = $activo ? $activo->id_calendario_academico : null;
+                    $id_lapso = $this->id_lapso;
+                    if (empty($id_lapso)) {
+                        $activo = \Illuminate\Support\Facades\DB::connection('pgsql_daece')->table('lapso_academico')->where('lap_estatus', 'A')->where('lap_cerrado', 'N')->first();
+                        $id_lapso = $activo ? $activo->lap_codigo : null;
                     }
 
-                    if ($id_cal) {
-                        $cal = \Illuminate\Support\Facades\DB::table('calendario_academico')->where('id_calendario_academico', $id_cal)->first();
-                        if ($cal) {
-                            if ($value < $cal->dia_inicio_calendario_academico || $value > $cal->dia_fin_calendario_academico) {
-                                $fail("La fecha de fin debe estar entre {$cal->dia_inicio_calendario_academico} y {$cal->dia_fin_calendario_academico}.");
+                    if ($id_lapso) {
+                        $lapso = \Illuminate\Support\Facades\DB::connection('pgsql_daece')->table('lapso_academico')->where('lap_codigo', $id_lapso)->first();
+                        if ($lapso) {
+                            if ($value < $lapso->lap_fecha_inicio || $value > $lapso->lap_fecha_fin) {
+                                $fail("La fecha de fin debe estar entre {$lapso->lap_fecha_inicio} y {$lapso->lap_fecha_fin}.");
                             }
                         }
                     }
@@ -65,43 +64,23 @@ class CreateEventoForm extends Form
             'semana_evento' => [
                 'required',
                 'integer',
-                'min:1',
-                function ($attribute, $value, $fail) {
-                    $id_cal = $this->id_calendario;
-                    if (empty($id_cal)) {
-                        $activo = \Illuminate\Support\Facades\DB::table('calendario_academico')->where('estatus', '1')->first();
-                        $id_cal = $activo ? $activo->id_calendario_academico : null;
-                    }
-
-                    if ($id_cal) {
-                        $calRecord = \Illuminate\Support\Facades\DB::table('calendario_academico')->where('id_calendario_academico', $id_cal)->first();
-                        if ($calRecord) {
-                            $maxSemana = \Illuminate\Support\Facades\DB::table('calendario_academico')
-                                ->where('id_lapso_academico', $calRecord->id_lapso_academico)
-                                ->max('semana_calendario_academico');
-
-                            if ($maxSemana && $value > $maxSemana) {
-                                $fail("La semana del evento ($value) no puede ser superior a la duración en semanas establecida en el calendario ($maxSemana).");
-                            }
-                        }
-                    }
-                }
+                'min:1'
             ],
             'descripcion_evento' => [
                 'required',
                 'string',
                 'max:100',
                 function ($attribute, $value, $fail) {
-                    $id_cal = $this->id_calendario;
-                    if (empty($id_cal)) {
-                        $activo = \Illuminate\Support\Facades\DB::table('calendario_academico')->where('estatus', '1')->first();
-                        $id_cal = $activo ? $activo->id_calendario_academico : null;
+                    $id_lapso = $this->id_lapso;
+                    if (empty($id_lapso)) {
+                        $activo = \Illuminate\Support\Facades\DB::connection('pgsql_daece')->table('lapso_academico')->where('lap_estatus', 'A')->where('lap_cerrado', 'N')->first();
+                        $id_lapso = $activo ? $activo->lap_codigo : null;
                     }
 
-                    if ($id_cal) {
+                    if ($id_lapso) {
                         $repo = new \App\Repositories\Evento\EventoCreateRepo();
-                        if ($repo->existeEventoConDescripcion($value, (int) $id_cal)) {
-                            $fail('Ya existe un evento con esta descripción en el calendario seleccionado.');
+                        if ($repo->existeEventoConDescripcion($value, (int) $id_lapso)) {
+                            $fail('Ya existe un evento con esta descripción en el lapso seleccionado.');
                         }
                     }
                 },
@@ -117,8 +96,7 @@ class CreateEventoForm extends Form
     protected function messages()
     {
         return [
-            'id_calendario.integer' => 'El calendario debe ser un número entero.',
-            'id_calendario.exists' => 'El calendario seleccionado no existe.',
+            'id_lapso.integer' => 'El lapso debe ser un número entero.',
             'dia_inicio_evento.required' => 'La fecha de inicio es obligatoria.',
             'dia_inicio_evento.date' => 'La fecha de inicio debe ser válida.',
             'dia_fin_evento.required' => 'La fecha de fin es obligatoria.',
