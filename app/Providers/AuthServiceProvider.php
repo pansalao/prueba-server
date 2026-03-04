@@ -67,12 +67,7 @@ class AuthServiceProvider extends ServiceProvider
             return $accesoRepository->checkPermission('Ver Detalles de Planificacion');
         });
 
-        Gate::define('aprobar-planificacion', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Aceptar corte Planificacion') ||
-                $accesoRepository->checkPermission('Rechazar corte Planificacion');
-        });
         // ---------------------------------------------
-
         // NOTA: Si ya habías creado directivas personalizadas en AppServiceProvider (ej. @ifcoordinador),
         // y ahora vas a usar Gates (@can), puedes considerar eliminar esas directivas duplicadas para evitar redundancia.
     }

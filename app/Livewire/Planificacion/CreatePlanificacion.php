@@ -102,8 +102,8 @@ class CreatePlanificacion extends Component
         $this->recursosMaestros = $this->planificacionRepository->select_recursos();
         $this->bibliografiasMaestras = $this->planificacionRepository->select_bibliografias();
 
-        // Cargar asignaciones: Si tiene permiso de aprobación ve todas, si es docente solo las suyas
-        if (Gate::allows('aprobar-planificacion')) {
+        // Cargar asignaciones: Si tiene permiso de edición (como un coordinador) ve todas, si es docente solo las suyas
+        if (Gate::allows('editar-planificacion')) {
             $this->asignaciones = $this->planificacionRepository->getAsignacionesDocente();
         } else {
             $this->asignaciones = $this->planificacionRepository->getAsignacionesDocente($this->docente_id);
@@ -130,8 +130,8 @@ class CreatePlanificacion extends Component
 
     protected function verifyDocenteRole()
     {
-        // Allow based on permissions (crear-planificacion or aprobar-planificacion)
-        if (Auth::check() && (Gate::allows('crear-planificacion') || Gate::allows('aprobar-planificacion'))) {
+        // Allow based on permissions (crear-planificacion or editar-planificacion)
+        if (Auth::check() && (Gate::allows('crear-planificacion') || Gate::allows('editar-planificacion'))) {
             $this->docenteNombre = Auth::user()->name . ' ' . Auth::user()->apellido;
         } else {
             $this->dispatch('mostrar-mensaje', ['tipo' => 'error', 'mensaje' => 'Acceso denegado.']);

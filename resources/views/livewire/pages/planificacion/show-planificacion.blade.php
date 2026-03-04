@@ -234,7 +234,7 @@
                                         @endif
 
                                         {{-- Area de Motivo de Rechazo (Solo Coordinador) --}}
-                                        @if ($mostrarBotonRechazarPlanificacion && Gate::allows('aprobar-planificacion'))
+                                        @if ($mostrarBotonRechazarPlanificacion && Gate::allows('editar-planificacion'))
                                             <div class="mt-4 border-t pt-4 dark:border-gray-600">
                                                 {{-- Caso 1: El corte no está rechazado y no se ha pulsado 'Rechazar' --}}
                                                 @if (($corte->estatus ?? 0) != 3 && empty($mostrarMotivoRechazoCorte[$corte->detalle_id]))
@@ -289,7 +289,7 @@
                                                         {{ $corte->ultimo_motivo_rechazo }}
                                                     </p>
                                                 </div>
-                                                @if (Gate::allows('aprobar-planificacion'))
+                                                @if (Gate::allows('editar-planificacion'))
                                                     <div class="flex justify-end mt-2">
                                                         <button wire:click="eliminarMotivoRechazo({{ $corte->detalle_id }})"
                                                             class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">

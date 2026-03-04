@@ -79,7 +79,7 @@ class UpdatePlanificacion extends Component
         // Acceder a 'docente_id' que ahora viene del array principal
         $this->docente_id = $planificacion['docente_id'];
 
-        if (Auth::id() !== $this->docente_id && Gate::denies('aprobar-planificacion')) {
+        if (Auth::id() !== $this->docente_id && Gate::denies('editar-planificacion')) {
             abort(403, 'No tienes permiso para editar esta planificación.');
         }
 
