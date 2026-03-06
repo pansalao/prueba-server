@@ -23,8 +23,10 @@
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Descripción</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Inicio</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Fin</th>
-                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
-                                Estatus</th>
+                            @can('cambiar-estatus-evento')
+                                <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
+                                    Estatus</th>
+                            @endcan
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                                 Acciones</th>
                         </tr>
@@ -40,12 +42,14 @@
                                         {{ \Carbon\Carbon::parse($evento->dia_inicio_evento)->format('d/m/Y') }}</td>
                                     <td class="px-4 py-4 text-gray-900 dark:text-white">
                                         {{ \Carbon\Carbon::parse($evento->dia_fin_evento)->format('d/m/Y') }}</td>
-                                    <td class="px-4 py-4 text-right">
-                                        <span class="{{ $evento->estatus == 1 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }} 
-                                                            text-xs font-medium px-2.5 py-0.5 rounded">
-                                            {{ $evento->estatus == 1 ? 'Activo' : 'Inactivo' }}
-                                        </span>
-                                    </td>
+                                    @can('cambiar-estatus-evento')
+                                        <td class="px-4 py-4 text-right">
+                                            <span class="{{ $evento->estatus == 1 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }} 
+                                                                text-xs font-medium px-2.5 py-0.5 rounded">
+                                                {{ $evento->estatus == 1 ? 'Activo' : 'Inactivo' }}
+                                            </span>
+                                        </td>
+                                    @endcan
                                     <td class="px-4 py-4">
                                         <div class="flex items-center justify-end space-x-3">
                                             @can('ver-evento')
@@ -98,7 +102,7 @@
                             @endforeach
                         @else
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="{{ auth()->user()->can('cambiar-estatus-evento') ? 6 : 5 }}" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                     {{ $busqueda ? 'No se encontraron eventos' : 'No hay eventos registrados' }}
                                 </td>
                             </tr>
