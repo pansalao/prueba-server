@@ -76,38 +76,39 @@ class RolPermisoRepo
         DB::beginTransaction();
         try {
             // Desactivar los permisos que ya no están seleccionados
-            if (empty($selectedPermissions)) {
-                DB::table('rol_permiso')
-                    ->where('id_rol', $rolId)
-                    ->update(['estatus' => '3', 'fecha_actualizacion' => Carbon::now()]);
-            } else {
-                DB::table('rol_permiso')
-                    ->where('id_rol', $rolId)
-                    ->whereNotIn('id_permiso', $selectedPermissions)
-                    ->update(['estatus' => '3', 'fecha_actualizacion' => Carbon::now()]);
+            $queryToDeactivate = \App\Models\RolPermiso::where('id_rol', $rolId);
+            if (!empty($selectedPermissions)) {
+                $queryToDeactivate->whereNotIn('id_permiso', $selectedPermissions);
+            }
+            $toDeactivate = $queryToDeactivate->get();
+            foreach ($toDeactivate as $rp) {
+                if ($rp->estatus != '3') {
+                    $rp->update(['estatus' => '3', 'fecha_actualizacion' => Carbon::now()]);
+                }
             }
 
             // Insertar o activar los permisos seleccionados
-            foreach ($selectedPermissions as $idPermiso) {
-                $exists = DB::table('rol_permiso')
-                    ->where('id_rol', $rolId)
-                    ->where('id_permiso', $idPermiso)
-                    ->first();
+            if (!empty($selectedPermissions)) {
+                foreach ($selectedPermissions as $idPermiso) {
+                    $rp = \App\Models\RolPermiso::where('id_rol', $rolId)
+                        ->where('id_permiso', $idPermiso)
+                        ->first();
 
-                if ($exists) {
-                    DB::table('rol_permiso')
-                        ->where('id_rol_permiso', $exists->id_rol_permiso)
-                        ->update([
+                    if ($rp) {
+                        if ($rp->estatus != '1') {
+                            $rp->update([
+                                'estatus' => '1',
+                                'fecha_actualizacion' => Carbon::now()
+                            ]);
+                        }
+                    } else {
+                        \App\Models\RolPermiso::create([
+                            'id_rol' => $rolId,
+                            'id_permiso' => $idPermiso,
                             'estatus' => '1',
-                            'fecha_actualizacion' => Carbon::now()
+                            'fecha_creacion' => Carbon::now()
                         ]);
-                } else {
-                    DB::table('rol_permiso')->insert([
-                        'id_rol' => $rolId,
-                        'id_permiso' => $idPermiso,
-                        'estatus' => '1',
-                        'fecha_creacion' => Carbon::now()
-                    ]);
+                    }
                 }
             }
 
