@@ -35,6 +35,10 @@ class ListEstrategia extends Component
 
     public function inhabilitar()
     {
+        if (!\Illuminate\Support\Facades\Gate::allows('cambiar-estatus-estrategia')) {
+            abort(403);
+        }
+
         try {
             $this->estrategiasRepository->inhabilitar($this->idInhabilitar);
             session()->flash('message', 'Estrategia inhabilitada correctamente.');
@@ -51,6 +55,10 @@ class ListEstrategia extends Component
 
     public function restaurar()
     {
+        if (!\Illuminate\Support\Facades\Gate::allows('cambiar-estatus-estrategia')) {
+            abort(403);
+        }
+
         try {
             $this->estrategiasRepository->restaurar($this->idRestaurar);
             session()->flash('message', 'Estrategia restaurada correctamente.');

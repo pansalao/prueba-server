@@ -15,51 +15,12 @@ class RolPermisoRepo
             ->first();
     }
 
-    public function getModules()
+    public function getActivePermissions()
     {
-        $permisos = DB::table('permiso')
+        return DB::table('permiso')
             ->orderBy('nombre_permiso')
             ->where('estatus', '1')
             ->get();
-
-        $modules = [];
-
-        foreach ($permisos as $p) {
-            if (empty($p->nombre_permiso))
-                continue;
-
-            // Nueva lógica de agrupación inteligente:
-            // Si el nombre contiene ' de ', el módulo es lo que está después.
-            // Ejemplo: 'Reporte General de Planificacion' -> Módulo: 'Planificacion', Acción: 'Reporte General'
-            if (str_contains(strtolower($p->nombre_permiso), ' de ')) {
-                $parts = explode(' de ', $p->nombre_permiso);
-                $module = ucwords(trim(array_pop($parts))); // El último elemento es el módulo
-                $action = trim(implode(' de ', $parts));    // Lo anterior es la acción
-            } else {
-                // Si no hay ' de ', dividimos por el último espacio.
-                // Ejemplo: 'Listar Evento' -> Módulo: 'Evento', Acción: 'Listar'
-                $parts = explode(' ', trim($p->nombre_permiso));
-                if (count($parts) < 2) {
-                    $module = 'General';
-                    $action = $p->nombre_permiso;
-                } else {
-                    $module = ucwords(trim(array_pop($parts))); // La última palabra es el módulo
-                    $action = trim(implode(' ', $parts));     // Lo anterior es la acción
-                }
-            }
-
-            $modules[$module][] = [
-                'id' => $p->id_permiso,
-                'action' => $action,
-                'full_name' => $p->nombre_permiso,
-                'estatus' => $p->estatus
-            ];
-        }
-
-        // Ordenamos alfabéticamente los módulos
-        ksort($modules);
-
-        return $modules;
     }
 
     public function getRolePermissions($rolId)

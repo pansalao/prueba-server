@@ -133,6 +133,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('ver-estrategia', function ($user) use ($accesoRepository) {
             return $accesoRepository->checkPermission('Ver Detalles de Estrategia');
         });
+        Gate::define('cambiar-estatus-estrategia', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Cambiar Estatus de Estrategia');
+        });
 
         // --- GATES PARA EL MÓDULO DE TECNICA ---
         Gate::define('listar-tecnica', function ($user) use ($accesoRepository) {

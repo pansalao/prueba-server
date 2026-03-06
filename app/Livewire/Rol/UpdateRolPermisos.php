@@ -28,8 +28,50 @@ class UpdateRolPermisos extends Component
             abort(404, 'Rol no encontrado en DAECE');
         }
 
-        $this->modulosPermisos = $this->rolPermisoRepo->getModules();
+        $permisosRaw = $this->rolPermisoRepo->getActivePermissions();
+        $this->modulosPermisos = $this->groupPermissionsByModule($permisosRaw);
+
         $this->selectedPermisos = array_map('strval', $this->rolPermisoRepo->getRolePermissions($this->rolId));
+    }
+
+    private function groupPermissionsByModule($permisos)
+    {
+        $modules = [];
+
+        foreach ($permisos as $p) {
+            if (empty($p->nombre_permiso)) {
+                continue;
+            }
+
+            // Lógica de agrupación inteligente:
+            if (str_contains(strtolower($p->nombre_permiso), ' de ')) {
+                $parts = explode(' de ', $p->nombre_permiso);
+                $module = ucwords(trim(array_pop($parts))); // El último elemento es el módulo
+                $action = trim(implode(' de ', $parts));    // Lo anterior es la acción
+            } else {
+                // Si no hay ' de ', dividimos por el último espacio.
+                $parts = explode(' ', trim($p->nombre_permiso));
+                if (count($parts) < 2) {
+                    $module = 'General';
+                    $action = $p->nombre_permiso;
+                } else {
+                    $module = ucwords(trim(array_pop($parts))); // La última palabra es el módulo
+                    $action = trim(implode(' ', $parts));     // Lo anterior es la acción
+                }
+            }
+
+            $modules[$module][] = [
+                'id' => $p->id_permiso,
+                'action' => $action,
+                'full_name' => $p->nombre_permiso,
+                'estatus' => $p->estatus
+            ];
+        }
+
+        // Ordenamos alfabéticamente los módulos
+        ksort($modules);
+
+        return $modules;
     }
 
     public function savePermisos()
