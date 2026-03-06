@@ -21,7 +21,6 @@
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Usuario</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Módulo</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Acción</th>
-                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Tabla</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                                 Acciones</th>
                         </tr>
@@ -74,9 +73,6 @@
                                         <span class="{{ $color }} text-xs font-medium px-2.5 py-0.5 rounded">
                                             {{ $accionMostrar }}
                                         </span>
-                                    </td>
-                                    <td class="px-4 py-4 text-gray-900 dark:text-white">
-                                        {{ $log->tabla ?? '---' }}
                                     </td>
                                     <td class="px-4 py-4 text-right">
                                         @can('ver-bitacora')
