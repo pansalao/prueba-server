@@ -50,6 +50,11 @@ use App\Livewire\TecnicaEvaluacion\UpdateTecnicaEvaluacion;
 use App\Livewire\TecnicaEvaluacion\ShowTecnicaEvaluacion;
 use App\Livewire\TecnicaEvaluacion\ListTecnicaEvaluacion;
 
+use App\Livewire\TipoEvaluacion\CreateTipoEvaluacion;
+use App\Livewire\TipoEvaluacion\UpdateTipoEvaluacion;
+use App\Livewire\TipoEvaluacion\ShowTipoEvaluacion;
+use App\Livewire\TipoEvaluacion\ListTipoEvaluacion;
+
 use App\Livewire\Evento\CreateEvento;
 use App\Livewire\Evento\ListEvento;
 use App\Livewire\Evento\UpdateEvento;
@@ -126,6 +131,12 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
     Route::get('tecnica-evaluacion/create', CreateTecnicaEvaluacion::class)->middleware('can:crear-evaluacion')->name('tecnica-evaluacion/crear');
     Route::get('tecnica-evaluacion/update/{id}', UpdateTecnicaEvaluacion::class)->middleware('can:editar-evaluacion')->name('tecnica-evaluacion/update');
     Route::get('tecnica-evaluacion/show/{id}', ShowTecnicaEvaluacion::class)->middleware('can:ver-evaluacion')->name('tecnica-evaluacion/show');
+
+    // Rutas para Tipos de Evaluación
+    Route::get('tipo-evaluacion/list', ListTipoEvaluacion::class)->middleware('can:listar-tipo-evaluacion')->name('tipo-evaluacion/listar');
+    Route::get('tipo-evaluacion/create', CreateTipoEvaluacion::class)->middleware('can:crear-tipo-evaluacion')->name('tipo-evaluacion/crear');
+    Route::get('tipo-evaluacion/update/{id}', UpdateTipoEvaluacion::class)->middleware('can:editar-tipo-evaluacion')->name('tipo-evaluacion/update');
+    Route::get('tipo-evaluacion/show/{id}', ShowTipoEvaluacion::class)->middleware('can:ver-tipo-evaluacion')->name('tipo-evaluacion/show');
 
     // Rutas para Eventos
     Route::get('evento/list', ListEvento::class)->middleware('can:listar-evento')->name('evento/listar');

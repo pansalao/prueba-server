@@ -162,6 +162,20 @@ class AuthServiceProvider extends ServiceProvider
             return $accesoRepository->checkPermission('Ver Detalles de Tecnica Evaluacion');
         });
 
+        // --- GATES PARA EL MÓDULO DE TIPO EVALUACION ---
+        Gate::define('listar-tipo-evaluacion', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Listar de Tipo Evaluacion');
+        });
+        Gate::define('crear-tipo-evaluacion', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Crear de Tipo Evaluacion');
+        });
+        Gate::define('editar-tipo-evaluacion', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Editar de Tipo Evaluacion');
+        });
+        Gate::define('ver-tipo-evaluacion', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Ver Detalles de Tipo Evaluacion');
+        });
+
         // --- GATES PARA EL MÓDULO DE ROL ---
         Gate::define('listar-rol', function ($user) use ($accesoRepository) {
             return $accesoRepository->checkPermission('Listar de Rol');

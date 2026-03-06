@@ -64,7 +64,7 @@
                 </div>
             @endcan
 
-            @canany(['listar-recurso', 'listar-estrategia', 'listar-evaluacion', 'listar-bibliografia'])
+            @canany(['listar-recurso', 'listar-estrategia', 'listar-evaluacion', 'listar-tipo-evaluacion', 'listar-bibliografia'])
                 <!-- Recursos Educativos -->
                 <div>
                     <button @click="openMenu === 10 ? openMenu = null : (openMenu = 10, subMenu = null)"
@@ -128,6 +128,26 @@
                                                 class="sogat-sidebar-link !text-xs">Crear</a></li>
                                     @endcan
                                     <li><a href="{{ route('tecnica-evaluacion/listar') }}"
+                                            class="sogat-sidebar-link !text-xs">Gestionar</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        @endcan
+
+                        @can('listar-tipo-evaluacion')
+                            <!-- Tipos de Evaluación -->
+                            <div>
+                                <button @click="subMenu === 7 ? subMenu = null : subMenu = 7" class="sogat-sidebar-subitem">
+                                    <span>Tipos de Evaluación</span>
+                                    <img :src="subMenu === 7 ? '{{ asset('img/down.png') }}' : '{{ asset('img/left.png') }}'"
+                                        class="w-4 h-4 ml-auto">
+                                </button>
+                                <ul x-show="subMenu === 7" x-collapse class="mt-0 space-y-0">
+                                    @can('crear-tipo-evaluacion')
+                                        <li><a href="{{ route('tipo-evaluacion/crear') }}"
+                                                class="sogat-sidebar-link !text-xs">Crear</a></li>
+                                    @endcan
+                                    <li><a href="{{ route('tipo-evaluacion/listar') }}"
                                             class="sogat-sidebar-link !text-xs">Gestionar</a>
                                     </li>
                                 </ul>
