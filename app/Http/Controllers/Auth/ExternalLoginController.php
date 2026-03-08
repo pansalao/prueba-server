@@ -19,7 +19,7 @@ class ExternalLoginController extends Controller
         $payload = $request->query('payload');
 
         if (!$payload) {
-            return redirect('/')->with('error', 'Para ingresar al sistema, debe usar el enlace generado desde SOGAC.');
+            return redirect('/');
         }
 
         try {
@@ -32,13 +32,13 @@ class ExternalLoginController extends Controller
 
             // Validar que el JSON tenga la estructura esperada
             if (!isset($data['cedula'], $data['fecha_creacion'], $data['firma_validacion'])) {
-                return redirect('/')->with('error', 'El formato del enlace es inválido.');
+                return redirect('/');
             }
 
             // 2. Validar Expiración (5 minutos = 300 segundos)
             $tiempoLimite = 300;
             if ((time() - $data['fecha_creacion']) > $tiempoLimite) {
-                return redirect('/')->with('error', 'El enlace de acceso ha caducado por seguridad.');
+                return redirect('/');
             }
 
             // 3. Validar Firma de Seguridad (Re-calculamos en el servidor)
@@ -49,20 +49,19 @@ class ExternalLoginController extends Controller
             $firmaServidor = hash('sha256', $seed);
 
             if ($firmaServidor !== $data['firma_validacion']) {
-                Log::warning("Intento de acceso con firma inválida. Cédula: " . $data['cedula']);
-                return redirect('/')->with('error', 'La firma de validación no es auténtica.');
+                return redirect('/');
             }
 
             // 4. Buscar al usuario en la base de datos externa (vía modelo User mapeado)
             $user = User::where('usu_cedula', $data['cedula'])->first();
 
             if (!$user) {
-                return redirect('/')->with('error', 'El usuario no existe en el sistema local.');
+                return redirect('/');
             }
 
             // 5. Verificar estatus del usuario (el modelo traduce 'A' a 1)
             if ($user->estatus != 1) {
-                return redirect('/')->with('error', 'Tu cuenta no tiene permiso para acceder.');
+                return redirect('/');
             }
 
             // 6. Iniciar Sesión
@@ -73,10 +72,10 @@ class ExternalLoginController extends Controller
             return redirect()->intended(route('dashboard', absolute: false));
 
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            return redirect('/')->with('error', 'El enlace de acceso ha sido manipulado o es inválido.');
+            return redirect('/');
         } catch (\Exception $e) {
             Log::error("Error en ExternalLogin: " . $e->getMessage());
-            return redirect('/')->with('error', 'Ocurrió un error inesperado al procesar el enlace.');
+            return redirect('/');
         }
     }
 }
