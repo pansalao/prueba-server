@@ -41,8 +41,8 @@
     <div class="min-h-screen bg-gray-100 dark:bg-gray-950 py-8 px-4 sm:px-6">
         {{-- Contenedor Principal Unificado (Estilo Card de la imagen) --}}
         <div class="max-w-[1200px] mx-auto bg-white dark:bg-gray-900 rounded-[2rem] overflow-hidden border border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300"
-             style="box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);">
-            
+            style="box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);">
+
             <!-- Logo Header (Sintillo) -->
             <div class="bg-white dark:bg-gray-800 px-8 py-2 flex items-center transition-colors duration-300">
                 <div class="flex items-center w-full">
@@ -50,10 +50,12 @@
                     <button @click="Livewire.dispatch('toggle-sidebar')" aria-label="Abrir menú"
                         class="lg:hidden p-2 mr-4 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none transition duration-150 ease-in-out">
                         <svg class="h-8 w-8" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
-                    <img src="{{ asset('img/logo_viejo-Photoroom.png') }}" alt="SOGAT Sintillo" class="w-full h-auto max-h-[100px] object-contain">
+                    <img src="{{ asset('img/logo_viejo-Photoroom.png') }}" alt="SOGAT Sintillo"
+                        class="w-full h-auto max-h-[100px] object-contain">
                 </div>
             </div>
 
@@ -63,17 +65,17 @@
             </div>
 
             {{-- Alpine.js wrapper para el estado de la sidebar --}}
-            <div x-data="{ alpineSidebarOpen: false }"
-                class="flex flex-1 relative overflow-hidden"
+            <div x-data="{ alpineSidebarOpen: false }" class="flex flex-1 relative overflow-hidden"
                 @sidebar-state-changed.window="alpineSidebarOpen = $event.detail.isOpen">
-                
+
                 {{-- SideBar wrapper --}}
                 <div class="z-40">
                     <livewire:side-bar />
                 </div>
 
                 {{-- Área de Contenido Principal --}}
-                <div id="main-content-wrapper" class="flex-1 min-w-0 transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 min-h-[600px] relative z-0"
+                <div id="main-content-wrapper"
+                    class="flex-1 min-w-0 transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 min-h-[600px] relative z-0"
                     :class="{ 
                         'ml-[234px] lg:ml-0': alpineSidebarOpen, 
                         'ml-0': !alpineSidebarOpen 
@@ -95,7 +97,7 @@
                         {{ $slot }}
 
                         @php
-                            $formRoutes = ['*/crear', '*/update', '*/editar', 'planificaciones.update', 'register', 'profile', 'password.confirm', 'password.request', 'password.reset'];
+                            $formRoutes = ['*/crear', '*/update', '*/editar', 'planificaciones.update', 'profile'];
                             $showMandatoryNote = request()->routeIs($formRoutes);
                         @endphp
 
@@ -111,9 +113,11 @@
             </div>
 
             <!-- Footer al estilo de la imagen -->
-            <footer class="bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 py-3 text-center transition-colors duration-300">
+            <footer
+                class="bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 py-3 text-center transition-colors duration-300">
                 <p class="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-tighter">
-                    Todos los derechos reservados © {{ date('Y') }} UPTP - CRÉDITOS UNIDAD DE SISTEMAS / DESARROLLO DE SOFTWARE.
+                    Todos los derechos reservados © {{ date('Y') }} UPTP - CRÉDITOS UNIDAD DE SISTEMAS / DESARROLLO DE
+                    SOFTWARE.
                 </p>
             </footer>
         </div>

@@ -230,12 +230,8 @@
                 </a>
             @endcan
 
-            <!-- Perfil y Sesión -->
+            <!-- Sesión -->
             <div class="border-t border-gray-200 dark:border-gray-700">
-                <a href="{{ route('profile') }}" class="sogat-sidebar-item" wire:navigate>
-                    <span>Perfil</span>
-                </a>
-
                 <button wire:click="logout" class="sogat-sidebar-item w-full text-left">
                     <span>Cerrar Sesión</span>
                 </button>
