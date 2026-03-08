@@ -71,11 +71,6 @@ class User extends Authenticatable
         return $this->usu_nombre . '@sogac.com';
     }
 
-    public function getTelefonoAttribute()
-    {
-        return 'N/A';
-    }
-
     /**
      * Get the attributes that should be cast.
      *
