@@ -1,11 +1,4 @@
 <?php
-
-/**
- * Script de Acceso Independiente (PHP Puro)
- * Este script emula el comportamiento de SOGAC para generar enlaces de acceso.
- */
-
-// --- CONFIGURACIÓN ---
 $SOGAC_ACCESS_KEY_BASE64 = "RXN0ZUVzVW5TZWNyZXRvRGUzMkJ5dGVzRXhhY3Rvc3M=";
 $URL_BASE_SISTEMA = "http://localhost:8000";
 
@@ -67,8 +60,6 @@ function conectar_y_validar($usuario, $password_input)
         if ($user) {
             // SOGAC usa bcrypt. En PHP password_verify es compatible con el hash de Laravel/Bcrypt
             if (password_verify(strtoupper($password_input), $user['usu_clave'])) {
-                if ($user['usu_estatus'] == '3')
-                    return null;
                 return $user;
             }
         }
