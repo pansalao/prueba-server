@@ -13,7 +13,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 import getpass
 
-APP_KEY_BASE64 = "uWFs4abgnI+PRsPg4Pe80VxAQfsxQx4fBgRYU2MkkuQ="
+SOGAC_ACCESS_KEY_BASE64 = "RXN0ZUVzVW5TZWNyZXRvRGUzMkJ5dGVzRXhhY3Rvc3M="
 URL_BASE_SISTEMA = "http://localhost:8000"
 
 CONFIG_SOGC = {
@@ -72,15 +72,14 @@ def login():
     usuario_data = conectar_y_validar_local(usuario_input, password_input)
     if usuario_data:
         timestamp_actual = int(time.time())
-        seed_validacion = f"{usuario_data['usu_cedula']}{timestamp_actual}{APP_KEY_BASE64}"
+        seed_validacion = f"{usuario_data['usu_cedula']}{timestamp_actual}{SOGAC_ACCESS_KEY_BASE64}"
         firma_seguridad = hashlib.sha256(seed_validacion.encode()).hexdigest()
         payload_data = {
             'cedula': usuario_data['usu_cedula'].strip(),
             'fecha_creacion': timestamp_actual,
-            'firma_validacion': firma_seguridad,
-            'token_operaciones': "TKN-SAUPA-OPS-2026-ACTIVE"
+            'firma_validacion': firma_seguridad
         }
-        ticket_encriptado = encrypt_for_laravel(payload_data, APP_KEY_BASE64)
+        ticket_encriptado = encrypt_for_laravel(payload_data, SOGAC_ACCESS_KEY_BASE64)
         url_final = f"{URL_BASE_SISTEMA}/login?payload={urllib.parse.quote(ticket_encriptado)}"
         print(f"\nLink de acceso: {url_final}")
     else:

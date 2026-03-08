@@ -23,13 +23,15 @@ class ExternalLoginController extends Controller
         }
 
         try {
-            // 1. Desencriptar el paquete (Laravel valida automáticamente el MAC y el IV)
-            // Usamos decryptString para obtener el JSON original que envió Python
-            $decrypted = Crypt::decryptString($payload);
+            // 1. Desencriptar el paquete usando la llave exclusiva de SOGAC
+            $sogacKey = env('SOGAC_ACCESS_KEY');
+            $cleanSogacKey = base64_decode(str_replace('base64:', '', $sogacKey));
+            $encrypter = new \Illuminate\Encryption\Encrypter($cleanSogacKey, config('app.cipher'));
+            $decrypted = $encrypter->decryptString($payload);
             $data = json_decode($decrypted, true);
 
             // Validar que el JSON tenga la estructura esperada
-            if (!isset($data['cedula'], $data['fecha_creacion'], $data['firma_validacion'], $data['token_operaciones'])) {
+            if (!isset($data['cedula'], $data['fecha_creacion'], $data['firma_validacion'])) {
                 return redirect('/')->with('error', 'El formato del enlace es inválido.');
             }
 
@@ -40,11 +42,10 @@ class ExternalLoginController extends Controller
             }
 
             // 3. Validar Firma de Seguridad (Re-calculamos en el servidor)
-            $appKey = config('app.key');
-            $cleanKey = str_replace('base64:', '', $appKey);
+            $cleanSogacKeyStr = str_replace('base64:', '', env('SOGAC_ACCESS_KEY'));
 
             // La semilla debe ser exacta a la de Python: cedula + timestamp + key
-            $seed = $data['cedula'] . $data['fecha_creacion'] . $cleanKey;
+            $seed = $data['cedula'] . $data['fecha_creacion'] . $cleanSogacKeyStr;
             $firmaServidor = hash('sha256', $seed);
 
             if ($firmaServidor !== $data['firma_validacion']) {
@@ -59,16 +60,16 @@ class ExternalLoginController extends Controller
                 return redirect('/')->with('error', 'El usuario no existe en el sistema local.');
             }
 
-            // 5. Verificar estatus del usuario (ej. 3 es inactivo según LoginForm)
-            if ($user->estatus === '3' || $user->estatus === '2') {
+            // 5. Verificar estatus del usuario (el modelo traduce 'A' a 1)
+            if ($user->estatus != 1) {
                 return redirect('/')->with('error', 'Tu cuenta no tiene permiso para acceder.');
             }
 
             // 6. Iniciar Sesión
             Auth::login($user);
 
-            // Guardar el token de operaciones en la sesión si es necesario para el futuro
-            session(['token_operaciones' => $data['token_operaciones']]);
+            // Guardar un token de operaciones seguro en la sesión para el futuro
+            session(['token_operaciones' => \Illuminate\Support\Str::random(40)]);
 
             // Redirigir al inicio del sistema
             return redirect()->intended(route('dashboard', absolute: false));
