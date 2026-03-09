@@ -16,7 +16,7 @@ class RolIndexRepo
             ->select('rol_codigo', 'rol_nombre')
             ->when($busqueda, function ($consulta, $busqueda) {
                 // Compatible con Postgres e ILIKE para búsqueda insensible a mayúsculas
-                $consulta->where('rol_nombre', /*'ILIKE'*/ 'LIKE', '%' . $busqueda . '%');
+                $consulta->where('rol_nombre', 'ILIKE', '%' . $busqueda . '%');
             })
             ->orderBy('rol_codigo', 'desc')
             ->paginate($paginacion);
