@@ -71,13 +71,30 @@ function conectar_y_validar($usuario, $password_input)
 
 // --- EJECUCIÓN POR CONSOLA ---
 
+function obtener_password_oculto($prompt)
+{
+    echo $prompt;
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        // En Windows usa PowerShell para ocultar la escritura con asteriscos
+        $cmd = 'powershell -Command "$pword = Read-Host -AsSecureString; $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($pword); [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)"';
+        $password = shell_exec($cmd);
+        echo "\n";
+        return trim($password);
+    } else {
+        // En Linux/Mac oculta el texto nativamente
+        system('stty -echo');
+        $password = trim(fgets(STDIN));
+        system('stty echo');
+        echo "\n";
+        return $password;
+    }
+}
+
 if (php_sapi_name() === 'cli') {
     echo "Usuario: ";
     $usuario_input = trim(fgets(STDIN));
 
-    echo "Contrasena: ";
-    // Ocultar password en consola (funciona en Linux/Mac, en Windows es texto plano por limitaciones de PHP puro)
-    $password_input = trim(fgets(STDIN));
+    $password_input = obtener_password_oculto("Contrasena: ");
 
     $usuario_data = conectar_y_validar($usuario_input, $password_input);
 
