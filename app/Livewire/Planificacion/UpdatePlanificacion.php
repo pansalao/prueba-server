@@ -169,12 +169,11 @@ class UpdatePlanificacion extends Component
     // Carga las opciones para los selects usando el repositorio
     private function loadDropdownOptions()
     {
-        $this->recursosDisponibles = $this->planificacionCreateRepo->select_recursos()->toArray();
-        $this->estrategiasDisponibles = $this->planificacionCreateRepo->select_tecnica_actividad()->toArray();
-        // $this->indicadoresDisponibles = $this->planificacionCreateRepo->select_tabla('indicador_logro', 'id_indicador_logro', 'nombre_indicador_logro', [['estatus', '1']])->toArray();
-        $this->evaluacionesDisponibles = $this->planificacionCreateRepo->select_evaluaciones()->toArray();
-        $this->tecnicaDisponibles = $this->planificacionCreateRepo->select_tecnica()->toArray();
-        $this->bibliografiasDisponibles = $this->planificacionCreateRepo->select_bibliografias()->toArray();
+        $this->recursosDisponibles = $this->planificacionCreateRepo->select_recursos();
+        $this->estrategiasDisponibles = $this->planificacionCreateRepo->select_tecnica_actividad();
+        $this->evaluacionesDisponibles = $this->planificacionCreateRepo->select_evaluaciones();
+        $this->tecnicaDisponibles = $this->planificacionCreateRepo->select_tecnica();
+        $this->bibliografiasDisponibles = $this->planificacionCreateRepo->select_bibliografias();
     }
 
     // Métodos específicos para añadir/eliminar cortes
@@ -254,7 +253,7 @@ class UpdatePlanificacion extends Component
 
     protected function loadContenidosUnidad()
     {
-        $this->contenidosDisponibles = $this->planificacionCreateRepo->select_contenidos($this->id_unidad_curricular)->toArray();
+        $this->contenidosDisponibles = $this->planificacionCreateRepo->select_contenidos($this->id_unidad_curricular);
     }
 
     public function toggleDetallesUnidad()

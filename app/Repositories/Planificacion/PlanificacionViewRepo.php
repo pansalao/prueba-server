@@ -82,7 +82,7 @@ class PlanificacionViewRepo
                 // 3.1 Motivo Rechazo (Último)
                 $ultimoMotivoRechazo = DB::table('unidad_corte')
                     ->where('id_unidad_corte', $corte->detalle_id)
-                    ->select('descripcion_motivo_rechazo as motivo')
+                    ->select('descripcion_motivo_rechazo_unidad_corte as motivo')
                     ->first();
 
                 $corteArray['ultimo_motivo_rechazo'] = $ultimoMotivoRechazo ? $ultimoMotivoRechazo->motivo : null;
@@ -117,7 +117,8 @@ class PlanificacionViewRepo
     
                 $corteArray['contenidos'] = DB::table('detalle_contenido as dc')
                     ->join('contenido as c', 'dc.id_contenido', '=', 'c.id_contenido')
-                    ->join('objetivo as o', 'c.id_objetivo', '=', 'o.id_objetivo')
+                    ->join('detalle_objetivo as do', 'c.id_contenido', '=', 'do.id_contenido')
+                    ->join('objetivo as o', 'do.id_objetivo', '=', 'o.id_objetivo')
                     ->join('tema_unidad as tu', 'o.id_tema_unidad', '=', 'tu.id_tema_unidad')
                     ->where('dc.id_unidad_corte', $corte->detalle_id)
                     ->where('dc.estatus', '1')
@@ -125,7 +126,7 @@ class PlanificacionViewRepo
                         'c.id_contenido as contenido_id',
                         'dc.id_detalle_contenido as detalle_contenido_id',
                         'c.titulo_contenido as titulo_contenido',
-                        'c.id_objetivo',
+                        'do.id_objetivo',
                         'o.titulo_objetivo',
                         'tu.id_tema_unidad as tema_id',
                         'tu.titulo_tema as titulo_tema'
@@ -144,15 +145,15 @@ class PlanificacionViewRepo
 
                 // 3.5 Evaluaciones
                 $corteArray['evaluaciones'] = DB::table('detalle_evaluacion as dev')
-                    ->leftJoin('evaluacion as eva', 'dev.id_evaluacion', '=', 'eva.id_evaluacion')
-                    ->leftJoin('tecnica_evaluacion as tec', 'dev.id_tecnica', '=', 'tec.id_tecnica')
+                    ->leftJoin('tipo_evaluacion as eva', 'dev.id_tipo_evaluacion', '=', 'eva.id_tipo_evaluacion')
+                    ->leftJoin('tecnica_evaluacion as tec', 'dev.id_tecnica_evaluacion', '=', 'tec.id_tecnica_evaluacion')
                     ->where('dev.id_unidad_corte', $corte->detalle_id)
                     ->where('dev.estatus', '!=', '3')
                     ->select(
                         'dev.id_detalle_evaluacion as detalle_evaluacion_id',
-                        'dev.id_evaluacion as evaluacion_id',
-                        'dev.id_tecnica as tecnica_id',
-                        'eva.nombre_evaluacion as evaluacion',
+                        'dev.id_tipo_evaluacion as evaluacion_id',
+                        'dev.id_tecnica_evaluacion as tecnica_id',
+                        'eva.nombre_tipo_evaluacion as evaluacion',
                         'tec.nombre_tecnica_evaluacion as tecnica',
                         'dev.ponderacion_detalle_evaluacion as ponderacion',
                         'dev.fecha_evaluacion_detalle_evaluacion as fecha_evaluacion',

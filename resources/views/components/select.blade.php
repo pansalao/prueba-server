@@ -45,7 +45,7 @@
     <div class="flex items-center gap-1 w-full">
         <select id="{{ $finalWireModel ?: Str::random(8) }}" name="{{ $name ?? $finalWireModel }}"
             @if ($finalWireModel) wire:model.live.debounce.250ms="{{ $finalWireModel }}" @endif
-            @required($required) @disabled($disabled) {{ $attributes->class($selectClasses) }}>
+            @required($required) @disabled($disabled) {{ $attributes->class([$selectClasses, $attributes->get('selectClass')]) }}>
             <option value="">{{ $placeholder }}</option>
             @foreach ($options as $option)
                 <option value="{{ $option->{$valueField} }}">

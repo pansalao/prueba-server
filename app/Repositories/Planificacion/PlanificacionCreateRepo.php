@@ -24,7 +24,7 @@ class PlanificacionCreateRepo
 
     public function select_tecnica()
     {
-        return $this->select_tabla('tecnica_evaluacion', 'id_tecnica', 'nombre_tecnica_evaluacion', [['estatus', '1']]);
+        return $this->select_tabla('tecnica_evaluacion', 'id_tecnica_evaluacion', 'nombre_tecnica_evaluacion', [['estatus', '1']]);
     }
 
     public function select_tecnica_actividad()
@@ -40,7 +40,7 @@ class PlanificacionCreateRepo
 
     public function select_evaluaciones()
     {
-        return $this->select_tabla('evaluacion', 'id_evaluacion', 'nombre_evaluacion', [['estatus', '1']]);
+        return $this->select_tabla('tipo_evaluacion', 'id_tipo_evaluacion', 'nombre_tipo_evaluacion', [['estatus', '1']]);
     }
 
     public function select_bibliografias()
@@ -65,7 +65,8 @@ class PlanificacionCreateRepo
     public function select_contenidos($idUnidadCurricular = null)
     {
         $query = DB::table('contenido as c')
-            ->join('objetivo as o', 'c.id_objetivo', '=', 'o.id_objetivo')
+            ->join('detalle_objetivo as do', 'c.id_contenido', '=', 'do.id_contenido')
+            ->join('objetivo as o', 'do.id_objetivo', '=', 'o.id_objetivo')
             ->join('tema_unidad as t', 'o.id_tema_unidad', '=', 't.id_tema_unidad')
             ->where('c.estatus', '1')
             ->where('t.estatus', '1');
@@ -77,7 +78,7 @@ class PlanificacionCreateRepo
         return $query->select(
             'c.id_contenido',
             'c.titulo_contenido',
-            'c.id_objetivo',
+            'do.id_objetivo',
             'o.id_tema_unidad',
             't.unidad_tema'
         )
@@ -228,8 +229,8 @@ class PlanificacionCreateRepo
                     if (!empty($evaluacion['evaluacion_id'])) {
                         \App\Models\DetalleEvaluacion::create([
                             'id_unidad_corte' => $unidadId,
-                            'id_evaluacion' => $evaluacion['evaluacion_id'],
-                            'id_tecnica' => $evaluacion['tecnica_id'],
+                            'id_tipo_evaluacion' => $evaluacion['evaluacion_id'],
+                            'id_tecnica_evaluacion' => $evaluacion['tecnica_id'],
                             'id_instrumento' => null, // null for now as per schema
                             'ponderacion_detalle_evaluacion' => $evaluacion['ponderacion'],
                             'integrantes_detalle_evaluacion' => ($evaluacion['forma_participacion'] == '2') ? ($evaluacion['integrantes'] ?? null) : 1, // 1 if individual

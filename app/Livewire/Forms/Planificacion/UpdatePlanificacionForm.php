@@ -125,8 +125,7 @@ class UpdatePlanificacionForm extends Form
 
                         if ($this->id_lapso_academico) {
                             $evento = \Illuminate\Support\Facades\DB::table('evento as e')
-                                ->join('calendario_academico as ca', 'e.id_calendario', '=', 'ca.id_calendario_academico')
-                                ->where('ca.id_lapso_academico', $this->id_lapso_academico)
+                                ->where('e.id_lapso', $this->id_lapso_academico)
                                 ->where(function ($q) use ($value) {
                                     $q->whereDate('e.dia_inicio_evento', '<=', $value)
                                         ->whereDate('e.dia_fin_evento', '>=', $value);
@@ -141,8 +140,8 @@ class UpdatePlanificacionForm extends Form
                     }
                 ];
                 $rules["cortes.$index.evaluaciones.$evaluacionIndex.fecha_evaluacion"] = $fechaEvaluacionRules;
-                $rules["cortes.$index.evaluaciones.$evaluacionIndex.evaluacion_id"] = 'required|exists:evaluacion,id_evaluacion';
-                $rules["cortes.$index.evaluaciones.$evaluacionIndex.tecnica_id"] = 'required|exists:tecnica_evaluacion,id_tecnica';
+                $rules["cortes.$index.evaluaciones.$evaluacionIndex.evaluacion_id"] = 'required|exists:tipo_evaluacion,id_tipo_evaluacion';
+                $rules["cortes.$index.evaluaciones.$evaluacionIndex.tecnica_id"] = 'required|exists:tecnica_evaluacion,id_tecnica_evaluacion';
 
                 $rules["cortes.$index.evaluaciones.$evaluacionIndex.ponderacion"] = [
                     'bail',

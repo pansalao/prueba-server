@@ -100,7 +100,7 @@ class PlanificacionIndexRepo
                 if ($corte) {
                     $corte->update([
                         'estatus' => 3,
-                        'descripcion_motivo_rechazo' => $motivo,
+                        'descripcion_motivo_rechazo_unidad_corte' => $motivo,
                     ]);
                 }
             }
@@ -121,7 +121,7 @@ class PlanificacionIndexRepo
             $corte = \App\Models\UnidadCorte::find($detalleId);
             if ($corte) {
                 $corte->update([
-                    'descripcion_motivo_rechazo' => null,
+                    'descripcion_motivo_rechazo_unidad_corte' => null,
                     'estatus' => 2,
                 ]);
 

@@ -61,7 +61,7 @@ class PlanificacionEditRepo
                         $corteModel->update([
                             'indicador_logro_unidad_corte' => $corteData['indicadores_logro'] ?? null,
                             'estatus' => '2', // Reactivar a pendiente/guardado
-                            'descripcion_motivo_rechazo' => null // Limpiar motivos de rechazo previos
+                            'descripcion_motivo_rechazo_unidad_corte' => null // Limpiar motivos de rechazo previos
                         ]);
                     }
                 } else {
@@ -77,8 +77,8 @@ class PlanificacionEditRepo
 
                 $evaluacionesData = array_map(function ($eval) {
                     return [
-                        'id_evaluacion' => $eval['evaluacion_id'],
-                        'id_tecnica' => $eval['tecnica_id'],
+                        'id_tipo_evaluacion' => $eval['evaluacion_id'],
+                        'id_tecnica_evaluacion' => $eval['tecnica_id'],
                         'ponderacion_detalle_evaluacion' => $eval['ponderacion'],
                         'fecha_evaluacion_detalle_evaluacion' => $eval['fecha_evaluacion'],
                         'forma_participacion_detalle_evaluacion' => $eval['forma_participacion'],
@@ -88,11 +88,11 @@ class PlanificacionEditRepo
 
                 $this->syncCorteDetails(
                     'detalle_evaluacion',
-                    'id_evaluacion',
+                    'id_tipo_evaluacion',
                     $corteId,
                     $evaluacionesData,
-                    'id_evaluacion',
-                    ['id_tecnica', 'ponderacion_detalle_evaluacion', 'fecha_evaluacion_detalle_evaluacion', 'forma_participacion_detalle_evaluacion', 'integrantes_detalle_evaluacion']
+                    'id_tipo_evaluacion',
+                    ['id_tecnica_evaluacion', 'ponderacion_detalle_evaluacion', 'fecha_evaluacion_detalle_evaluacion', 'forma_participacion_detalle_evaluacion', 'integrantes_detalle_evaluacion']
                 );
 
                 // --- Sincronizar Estrategias y Contenidos ---

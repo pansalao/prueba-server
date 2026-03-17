@@ -22,6 +22,7 @@
                         <x-select label="Unidad Curricular" :options="$asignaciones"
                             valueField="id_detalle_profesor_asignado" textField="descripcion_completa"
                             wire:model.live="form.id_profesor_asignado" placeholder="Seleccione una asignación"
+                            selectClass="truncate max-w-full"
                             required />
 
                     </div>
@@ -370,8 +371,8 @@
 
                                                                 <div class="space-y-1">
                                                                     <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Evaluación <span class="text-red-500">*</span></label>
-                                                                    <x-select :options="$evaluaciones" valueField="id_evaluacion"
-                                                                        textField="nombre_evaluacion"
+                                                                    <x-select :options="$evaluaciones" valueField="id_tipo_evaluacion"
+                                                                        textField="nombre_tipo_evaluacion"
                                                                         wire:model.live.debounce.250ms="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.evaluacion_id"
                                                                         placeholder="Seleccione" class="text-xs w-full" required />
 
@@ -379,7 +380,7 @@
 
                                                                 <div class="space-y-1">
                                                                     <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Técnica <span class="text-red-500">*</span></label>
-                                                                    <x-select :options="$tecnica" valueField="id_tecnica"
+                                                                    <x-select :options="$tecnica" valueField="id_tecnica_evaluacion"
                                                                         textField="nombre_tecnica_evaluacion"
                                                                         wire:model.live.debounce.250ms="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.tecnica_id"
                                                                         placeholder="Seleccione" class="text-xs w-full" required />

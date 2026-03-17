@@ -83,7 +83,7 @@
                 {{-- Header / Información General --}}
                 <div class="flex justify-between items-start border-b pb-4 mb-4 dark:border-gray-700">
                     <div>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight truncate max-w-3xl">
                             {{ $nombre_unidad_curricular }}
                         </h3>
                         <div class="flex flex-col gap-1 mt-1">
@@ -378,13 +378,13 @@
                                                             </td>
                                                             <td class="px-2 py-3">
                                                                 <x-select :options="$evaluacionesDisponibles"
-                                                                    valueField="id_evaluacion" textField="nombre_evaluacion"
+                                                                    valueField="id_tipo_evaluacion" textField="nombre_tipo_evaluacion"
                                                                     wire:model.live.debounce.250ms="form.cortes.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.evaluacion_id"
                                                                     placeholder="Seleccione" class="w-full text-xs"
                                                                     :disabled="$locked" required />
                                                             </td>
                                                             <td class="px-2 py-3">
-                                                                <x-select :options="$tecnicaDisponibles" valueField="id_tecnica"
+                                                                <x-select :options="$tecnicaDisponibles" valueField="id_tecnica_evaluacion"
                                                                     textField="nombre_tecnica_evaluacion"
                                                                     wire:model.live.debounce.250ms="form.cortes.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.tecnica_id"
                                                                     placeholder="Seleccione" class="w-full text-xs"
