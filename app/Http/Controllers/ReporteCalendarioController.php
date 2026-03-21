@@ -29,10 +29,14 @@ class ReporteCalendarioController extends Controller
         
         $calendario->nombre_lapso = $lapso ? $lapso->lap_nombre : 'No definido (DAECE)';
 
-        $pdf = Pdf::loadView('livewire.pages.calendario.pdf-calendario', [
-            'calendario' => $calendario
-        ]);
+        // Determinar el año a mostrar (el año del inicio del calendario)
+        $year = Carbon::parse($calendario->dia_inicio_calendario_academico)->year;
 
-        return $pdf->stream('calendario_academico.pdf');
+        $pdf = Pdf::loadView('livewire.pages.calendario.pdf-calendario', [
+            'calendario' => $calendario,
+            'year' => $year
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('calendario_academico_' . $year . '.pdf');
     }
 }

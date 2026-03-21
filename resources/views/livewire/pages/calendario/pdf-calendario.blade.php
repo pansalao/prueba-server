@@ -57,6 +57,48 @@
             background-color: #f2f2f2;
             width: 30%;
         }
+        .calendar-container {
+            width: 100%;
+            text-align: center;
+        }
+        .month-box {
+            display: inline-block;
+            width: 22.5%;
+            margin: 0.5%;
+            vertical-align: top;
+            border: 0.5pt solid #ccc;
+            padding: 3px;
+        }
+        .month-name {
+            text-align: center;
+            font-weight: bold;
+            background-color: #eee;
+            margin-bottom: 3px;
+            font-size: 8pt;
+        }
+        .month-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 6.5pt;
+        }
+        .month-table th, .month-table td {
+            text-align: center;
+            padding: 1px;
+            border: 0.1pt solid #eee;
+        }
+        .month-table th {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        .active-range {
+            color: #000000;
+            font-weight: bold;
+            background-color: #ffffff;
+        }
+        .out-of-range {
+            color: #bbbbbb;
+            background-color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -72,22 +114,64 @@
         <div class="footer-text">{{ now()->format('d/m/Y h:i a') }} - Reporte de Calendario</div>
     </footer>
 
-    <div class="title">REPORTE DE CALENDARIO ACADÉMICO</div>
+    <div class="title">CALENDARIO ACADÉMICO {{ $year }}</div>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <strong>Lapso:</strong> {{ $calendario->nombre_lapso }} | 
+        <strong>Vigencia:</strong> {{ \Carbon\Carbon::parse($calendario->dia_inicio_calendario_academico)->format('d/m/Y') }} 
+        hasta {{ \Carbon\Carbon::parse($calendario->dia_fin_calendario_academico)->format('d/m/Y') }}
+    </div>
 
-    <table class="info-table">
-        <tr>
-            <td class="label">Lapso Académico:</td>
-            <td>{{ $calendario->nombre_lapso }}</td>
-        </tr>
-        <tr>
-            <td class="label">Fecha de Inicio:</td>
-            <td>{{ \Carbon\Carbon::parse($calendario->dia_inicio_calendario_academico)->format('d/m/Y') }}</td>
-        </tr>
-        <tr>
-            <td class="label">Fecha de Fin:</td>
-            <td>{{ \Carbon\Carbon::parse($calendario->dia_fin_calendario_academico)->format('d/m/Y') }}</td>
-        </tr>
-    </table>
+    @php
+        $startDate = \Carbon\Carbon::parse($calendario->dia_inicio_calendario_academico)->startOfDay();
+        $endDate = \Carbon\Carbon::parse($calendario->dia_fin_calendario_academico)->endOfDay();
+        $meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    @endphp
+
+    <div class="calendar-container">
+        @foreach(range(1, 12) as $m)
+            @php
+                $currentMonth = \Carbon\Carbon::create($year, $m, 1);
+                $daysInMonth = $currentMonth->daysInMonth;
+                $startDayOfWeek = $currentMonth->dayOfWeek; // 0 (Sun) to 6 (Sat)
+                // Convert to Monday start if preferred, but Sunday is common. 
+                // Let's use Sunday start for simplicity (0=Sun, 1=Mon, ..., 6=Sat)
+            @endphp
+            <div class="month-box">
+                <div class="month-name">{{ $meses[$m-1] }}</div>
+                <table class="month-table">
+                    <thead>
+                        <tr>
+                            <th>D</th><th>L</th><th>M</th><th>M</th><th>j</th><th>V</th><th>S</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $dayCounter = 1; @endphp
+                        @for($row = 0; $row < 6; $row++)
+                            <tr>
+                                @for($col = 0; $col < 7; $col++)
+                                    @php
+                                        $currentDayNum = ($row * 7 + $col) - $startDayOfWeek + 1;
+                                        $cellDate = null;
+                                        if($currentDayNum >= 1 && $currentDayNum <= $daysInMonth) {
+                                            $cellDate = \Carbon\Carbon::create($year, $m, $currentDayNum)->startOfDay();
+                                        }
+                                        $isActive = false;
+                                        if($cellDate && $cellDate->between($startDate, $endDate)) {
+                                            $isActive = true;
+                                        }
+                                    @endphp
+                                    <td class="{{ $isActive ? 'active-range' : ($cellDate ? 'out-of-range' : '') }}">
+                                        {{ ($currentDayNum >= 1 && $currentDayNum <= $daysInMonth) ? $currentDayNum : '' }}
+                                    </td>
+                                @endfor
+                            </tr>
+                            @if($currentDayNum >= $daysInMonth) @break @endif
+                        @endfor
+                    </tbody>
+                </table>
+            </div>
+        @endforeach
+    </div>
 
 </body>
 </html>
