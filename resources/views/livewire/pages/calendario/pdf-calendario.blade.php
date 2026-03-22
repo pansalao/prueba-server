@@ -48,9 +48,10 @@
             border-collapse: collapse;
             margin-top: 20px;
         }
-        .info-table td {
+        .info-table td, .info-table th {
             padding: 10px;
             border: 1px solid #000;
+            text-align: left;
         }
         .label {
             font-weight: bold;
@@ -98,6 +99,18 @@
         .out-of-range {
             color: #bbbbbb;
             background-color: #ffffff;
+        }
+        .event-circle {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            line-height: 14px;
+            border-radius: 50%;
+            border-width: 1.5px;
+            border-style: solid;
+            font-size: 6pt;
+            font-weight: bold;
+            margin: 1px auto;
         }
     </style>
 </head>
@@ -159,9 +172,18 @@
                                         if($cellDate && $cellDate->between($startDate, $endDate)) {
                                             $isActive = true;
                                         }
+                                        $eventId = ($cellDate && isset($eventDays[$cellDate->format('Y-m-d')])) ? $eventDays[$cellDate->format('Y-m-d')] : null;
                                     @endphp
                                     <td class="{{ $isActive ? 'active-range' : ($cellDate ? 'out-of-range' : '') }}">
-                                        {{ ($currentDayNum >= 1 && $currentDayNum <= $daysInMonth) ? $currentDayNum : '' }}
+                                        @if($currentDayNum >= 1 && $currentDayNum <= $daysInMonth)
+                                            @if($eventId)
+                                                <div class="event-circle" style="border-color: {{ $eventColors[$eventId] }}; color: {{ $eventColors[$eventId] }};">
+                                                    {{ $currentDayNum }}
+                                                </div>
+                                            @else
+                                                {{ $currentDayNum }}
+                                            @endif
+                                        @endif
                                     </td>
                                 @endfor
                             </tr>
@@ -172,6 +194,45 @@
             </div>
         @endforeach
     </div>
+
+    <div style="page-break-before: always;"></div>
+
+    <div class="title">EVENTOS DEL CALENDARIO ACADÉMICO {{ $year }}</div>
+    
+    <table class="info-table">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="width: 2%"></th>
+                <th style="width: 38%">Evento</th>
+                <th style="width: 20%">Inicio</th>
+                <th style="width: 20%">Finalización</th>
+                <th style="width: 20%">Tipo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($eventos->sortBy('dia_inicio_evento') as $evento)
+                <tr>
+                    <td style="background-color: {{ $eventColors[$evento->id_evento] }}; padding: 0; border: 1px solid #000;"></td>
+                    <td>
+                        {{ $evento->descripcion_evento }}
+                    </td>
+                    <td>{{ \Carbon\Carbon::parse($evento->dia_inicio_evento)->format('d/m/Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($evento->dia_fin_evento)->format('d/m/Y') }}</td>
+                    <td>
+                        @if($evento->tipo_evento == '1') Feriado
+                        @elseif($evento->tipo_evento == '2') Actividad Académica
+                        @else Extraordinario
+                        @endif
+                    </td>
+                </tr>
+            @endforeach
+            @if($eventos->isEmpty())
+                <tr>
+                    <td colspan="5" style="text-align: center;">No hay eventos registrados para este calendario.</td>
+                </tr>
+            @endif
+        </tbody>
+    </table>
 
 </body>
 </html>

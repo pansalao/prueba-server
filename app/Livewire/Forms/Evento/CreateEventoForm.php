@@ -24,6 +24,7 @@ class CreateEventoForm extends Form
                 'date',
                 function ($attribute, $value, $fail) {
                     $ultimoCalendario = \Illuminate\Support\Facades\DB::table('calendario_academico')
+                        ->where('estatus', 1)
                         ->orderBy('id_calendario_academico', 'desc')
                         ->first();
 
@@ -48,6 +49,7 @@ class CreateEventoForm extends Form
                 'after_or_equal:dia_inicio_evento',
                 function ($attribute, $value, $fail) {
                     $ultimoCalendario = \Illuminate\Support\Facades\DB::table('calendario_academico')
+                        ->where('estatus', 1)
                         ->orderBy('id_calendario_academico', 'desc')
                         ->first();
 
@@ -70,7 +72,10 @@ class CreateEventoForm extends Form
                     $id_cal = $this->id_calendario;
                     
                     if (empty($id_cal)) {
-                        $ultimo = \Illuminate\Support\Facades\DB::table('calendario_academico')->orderBy('id_calendario_academico', 'desc')->first();
+                        $ultimo = \Illuminate\Support\Facades\DB::table('calendario_academico')
+                            ->where('estatus', 1)
+                            ->orderBy('id_calendario_academico', 'desc')
+                            ->first();
                         $id_cal = $ultimo ? $ultimo->id_calendario_academico : null;
                     }
 

@@ -11,6 +11,7 @@ class EventoCreateRepo
     {
         if (empty($data['id_calendario'])) {
             $ultimo = DB::table('calendario_academico')
+                ->where('estatus', 1)
                 ->orderBy('id_calendario_academico', 'desc')
                 ->first();
             
