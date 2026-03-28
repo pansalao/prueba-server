@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 12-03-2026 a las 19:54:06
+-- Tiempo de generación: 24-03-2026 a las 01:25:39
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `hp_10`
+-- Base de datos: `hp_11`
 --
 
 -- --------------------------------------------------------
@@ -35,13 +35,6 @@ CREATE TABLE `bibliografia` (
   `estatus` enum('1','2','3') DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `bibliografia`
---
-
-INSERT INTO `bibliografia` (`id_bibliografia`, `nombre_bibliografia`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 'pppppppppp', '2026-03-08 05:02:11', '2026-03-08 05:03:28', '3');
-
 -- --------------------------------------------------------
 
 --
@@ -50,7 +43,7 @@ INSERT INTO `bibliografia` (`id_bibliografia`, `nombre_bibliografia`, `fecha_cre
 
 CREATE TABLE `bitacora` (
   `id_bitacora` int(11) NOT NULL,
-  `id_usuario` int(11) NOT NULL COMMENT 'Clave foránea de sogac:',
+  `id_usuario` int(11) NOT NULL,
   `modulo_afectado_bitacora` varchar(255) DEFAULT NULL,
   `tabla_afectada_bitacora` text DEFAULT NULL,
   `id_registro_afectado_bitacora` text DEFAULT NULL,
@@ -67,50 +60,7 @@ CREATE TABLE `bitacora` (
 --
 
 INSERT INTO `bitacora` (`id_bitacora`, `id_usuario`, `modulo_afectado_bitacora`, `tabla_afectada_bitacora`, `id_registro_afectado_bitacora`, `accion_bitacora`, `valores_anteriores_bitacora`, `valores_nuevos_bitacora`, `ip_origen_bitacora`, `fecha_creacion`, `estatus`) VALUES
-(1, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-07 16:27:41', '1'),
-(2, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-07 16:39:43', '1'),
-(3, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-07 17:40:36', '1'),
-(4, 39195, 'Roles (Permisos)', 'rol_permiso', '1', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"53\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:01.092528Z\",\"id_rol_permiso\":1}', '127.0.0.1', '2026-03-07 17:50:01', '1'),
-(5, 39195, 'Roles (Permisos)', 'rol_permiso', '2', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"18\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:01.103908Z\",\"id_rol_permiso\":2}', '127.0.0.1', '2026-03-07 17:50:01', '1'),
-(6, 39195, 'Roles (Permisos)', 'rol_permiso', '3', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"19\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:01.111350Z\",\"id_rol_permiso\":3}', '127.0.0.1', '2026-03-07 17:50:01', '1'),
-(7, 39195, 'Roles (Permisos)', 'rol_permiso', '4', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"17\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:01.113733Z\",\"id_rol_permiso\":4}', '127.0.0.1', '2026-03-07 17:50:01', '1'),
-(8, 39195, 'Roles (Permisos)', 'rol_permiso', '5', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"20\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:01.116056Z\",\"id_rol_permiso\":5}', '127.0.0.1', '2026-03-07 17:50:01', '1'),
-(9, 39195, 'Roles (Permisos)', 'rol_permiso', '6', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"54\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:26.425117Z\",\"id_rol_permiso\":6}', '127.0.0.1', '2026-03-07 17:50:26', '1'),
-(10, 39195, 'Roles (Permisos)', 'rol_permiso', '7', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"22\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:26.428645Z\",\"id_rol_permiso\":7}', '127.0.0.1', '2026-03-07 17:50:26', '1'),
-(11, 39195, 'Roles (Permisos)', 'rol_permiso', '8', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"23\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:26.431360Z\",\"id_rol_permiso\":8}', '127.0.0.1', '2026-03-07 17:50:26', '1'),
-(12, 39195, 'Roles (Permisos)', 'rol_permiso', '9', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"21\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:26.440013Z\",\"id_rol_permiso\":9}', '127.0.0.1', '2026-03-07 17:50:26', '1'),
-(13, 39195, 'Roles (Permisos)', 'rol_permiso', '10', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"24\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T13:50:26.442491Z\",\"id_rol_permiso\":10}', '127.0.0.1', '2026-03-07 17:50:26', '1'),
-(14, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-07 19:26:21', '1'),
-(15, 39195, 'Roles (Permisos)', 'rol_permiso', '11', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"47\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T15:53:33.297376Z\",\"id_rol_permiso\":11}', '127.0.0.1', '2026-03-07 19:53:33', '1'),
-(16, 39195, 'Roles (Permisos)', 'rol_permiso', '12', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"48\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-07T15:53:33.326600Z\",\"id_rol_permiso\":12}', '127.0.0.1', '2026-03-07 19:53:33', '1'),
-(17, 0, 'Seguridad', 'users', '39195', 'LOGOUT', NULL, NULL, '127.0.0.1', '2026-03-07 20:44:07', '1'),
-(18, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-07 22:51:07', '1'),
-(19, 0, 'Seguridad', 'users', '39195', 'LOGOUT', NULL, NULL, '127.0.0.1', '2026-03-07 22:51:13', '1'),
-(20, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-07 23:57:03', '1'),
-(21, 0, 'Seguridad', 'users', '39195', 'LOGOUT', NULL, NULL, '127.0.0.1', '2026-03-07 23:57:17', '1'),
-(22, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-08 04:54:45', '1'),
-(23, 39195, 'Bibliografia', 'bibliografia', '1', 'CREAR', NULL, '{\"nombre_bibliografia\":\"pppppppppp\",\"fecha_creacion\":\"2026-03-08T01:02:11.678935Z\",\"estatus\":\"1\",\"id_bibliografia\":1}', '127.0.0.1', '2026-03-08 05:02:11', '1'),
-(24, 39195, 'Roles (Permisos)', 'rol_permiso', '8', 'MODIFICAR', '{\"id_rol_permiso\":8,\"id_permiso\":23,\"id_rol\":4,\"fecha_creacion\":\"2026-03-07 13:50:26\",\"fecha_actualizacion\":null,\"estatus\":\"1\"}', '{\"fecha_actualizacion\":\"2026-03-08T01:02:52.525083Z\",\"estatus\":\"3\"}', '127.0.0.1', '2026-03-08 05:02:52', '1'),
-(25, 39195, 'Bibliografia', 'bibliografia', '1', 'MODIFICAR', '{\"id_bibliografia\":1,\"nombre_bibliografia\":\"pppppppppp\",\"fecha_creacion\":\"2026-03-08 01:02:11\",\"fecha_actualizacion\":null,\"estatus\":\"1\"}', '{\"fecha_actualizacion\":\"2026-03-08T01:03:28.998982Z\",\"estatus\":\"3\"}', '127.0.0.1', '2026-03-08 05:03:29', '1'),
-(26, 39195, 'Roles (Permisos)', 'rol_permiso', '13', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"50\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:03:48.989413Z\",\"id_rol_permiso\":13}', '127.0.0.1', '2026-03-08 05:03:48', '1'),
-(27, 39195, 'Roles (Permisos)', 'rol_permiso', '14', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"8\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:03:48.995012Z\",\"id_rol_permiso\":14}', '127.0.0.1', '2026-03-08 05:03:48', '1'),
-(28, 39195, 'Roles (Permisos)', 'rol_permiso', '15', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"6\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:03:49.001604Z\",\"id_rol_permiso\":15}', '127.0.0.1', '2026-03-08 05:03:49', '1'),
-(29, 39195, 'Roles (Permisos)', 'rol_permiso', '16', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"7\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:03:49.003834Z\",\"id_rol_permiso\":16}', '127.0.0.1', '2026-03-08 05:03:49', '1'),
-(30, 39195, 'Roles (Permisos)', 'rol_permiso', '17', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"5\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:03:49.010865Z\",\"id_rol_permiso\":17}', '127.0.0.1', '2026-03-08 05:03:49', '1'),
-(31, 39195, 'Tema', 'tema_unidad', '1', 'CREAR', NULL, '{\"id_unidad_curricular\":\"241\",\"titulo_tema\":\"prueba\",\"unidad_tema\":\"2\",\"fecha_creacion\":\"2026-03-08T01:04:18.160348Z\",\"fecha_actualizacion\":null,\"estatus\":\"1\",\"id_tema_unidad\":1}', '127.0.0.1', '2026-03-08 05:04:18', '1'),
-(32, 39195, 'Roles (Permisos)', 'rol_permiso', '18', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"49\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:04:29.888643Z\",\"id_rol_permiso\":18}', '127.0.0.1', '2026-03-08 05:04:29', '1'),
-(33, 39195, 'Roles (Permisos)', 'rol_permiso', '19', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"2\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:04:29.891691Z\",\"id_rol_permiso\":19}', '127.0.0.1', '2026-03-08 05:04:29', '1'),
-(34, 39195, 'Roles (Permisos)', 'rol_permiso', '20', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"3\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:04:29.893659Z\",\"id_rol_permiso\":20}', '127.0.0.1', '2026-03-08 05:04:29', '1'),
-(35, 39195, 'Roles (Permisos)', 'rol_permiso', '21', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"1\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:04:29.900814Z\",\"id_rol_permiso\":21}', '127.0.0.1', '2026-03-08 05:04:29', '1'),
-(36, 39195, 'Roles (Permisos)', 'rol_permiso', '22', 'CREAR', NULL, '{\"id_rol\":\"4\",\"id_permiso\":\"4\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-03-08T01:04:29.907710Z\",\"id_rol_permiso\":22}', '127.0.0.1', '2026-03-08 05:04:29', '1'),
-(37, 39195, 'Contenido', 'contenido', '1', 'CREAR', NULL, '{\"titulo_contenido\":\"asjdsd \",\"fecha_creacion\":\"2026-03-08T01:04:56.068689Z\",\"estatus\":\"1\",\"id_contenido\":1}', '127.0.0.1', '2026-03-08 05:04:56', '1'),
-(38, 0, 'Seguridad', 'users', '39195', 'LOGOUT', NULL, NULL, '127.0.0.1', '2026-03-08 05:09:08', '1'),
-(39, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-08 05:14:28', '1'),
-(40, 0, 'Seguridad', 'users', '39195', 'LOGOUT', NULL, NULL, '127.0.0.1', '2026-03-08 05:14:50', '1'),
-(41, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-08 19:36:38', '1'),
-(42, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-09 04:23:46', '1'),
-(43, 0, 'Seguridad', 'users', '39195', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-09 04:31:48', '1'),
-(44, 0, 'Seguridad', 'users', '39195', 'LOGOUT', NULL, NULL, '127.0.0.1', '2026-03-09 04:31:56', '1');
+(1, 0, 'Seguridad', 'users', '43327', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-03-24 04:25:12', '1');
 
 -- --------------------------------------------------------
 
@@ -139,6 +89,21 @@ CREATE TABLE `cache_locks` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `calendario_academico`
+--
+
+CREATE TABLE `calendario_academico` (
+  `id_calendario_academico` int(11) NOT NULL,
+  `semana_calendario_academico` int(11) DEFAULT NULL,
+  `dia_inicio_calendario_academico` date DEFAULT NULL,
+  `dia_fin_calendario_academico` date DEFAULT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
+  `estatus` enum('1','2','3') DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `contenido`
 --
 
@@ -149,13 +114,6 @@ CREATE TABLE `contenido` (
   `fecha_actualizacion` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `estatus` enum('1','2','3') DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `contenido`
---
-
-INSERT INTO `contenido` (`id_contenido`, `titulo_contenido`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 'asjdsd ', '2026-03-08 05:04:56', NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -223,13 +181,6 @@ CREATE TABLE `detalle_objetivo` (
   `estatus` enum('1','2','3') DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `detalle_objetivo`
---
-
-INSERT INTO `detalle_objetivo` (`id_detalle_objetivo`, `id_contenido`, `id_objetivo`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 1, 1, '2026-03-08 05:04:56', NULL, '1');
-
 -- --------------------------------------------------------
 
 --
@@ -253,9 +204,10 @@ CREATE TABLE `detalle_recurso` (
 
 CREATE TABLE `evento` (
   `id_evento` int(11) NOT NULL,
-  `id_lapso` int(11) DEFAULT NULL COMMENT 'Clave foránea de sogac:',
+  `id_calendario` int(11) DEFAULT NULL,
   `dia_inicio_evento` date DEFAULT NULL,
   `dia_fin_evento` date DEFAULT NULL,
+  `semana_evento` int(11) DEFAULT NULL,
   `descripcion_evento` varchar(100) DEFAULT NULL,
   `tipo_evento` enum('1','2','3') DEFAULT NULL,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -339,15 +291,6 @@ CREATE TABLE `migrations` (
   `batch` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `migrations`
---
-
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(1, '0001_01_01_000001_create_cache_table', 1),
-(2, '0001_01_01_000002_create_jobs_table', 2),
-(3, '2026_02_12_181809_create_sessions_table', 3);
-
 -- --------------------------------------------------------
 
 --
@@ -363,13 +306,6 @@ CREATE TABLE `objetivo` (
   `estatus` enum('1','2','3') DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `objetivo`
---
-
-INSERT INTO `objetivo` (`id_objetivo`, `titulo_objetivo`, `id_tema_unidad`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 'ppop', 1, '2026-03-08 05:04:18', NULL, '1');
-
 -- --------------------------------------------------------
 
 --
@@ -384,73 +320,6 @@ CREATE TABLE `permiso` (
   `estatus` enum('1','2','3') DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `permiso`
---
-
-INSERT INTO `permiso` (`id_permiso`, `nombre_permiso`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 'Listar de Contenido', '2026-03-07 16:39:52', NULL, '1'),
-(2, 'Crear de Contenido', '2026-03-07 16:39:52', NULL, '1'),
-(3, 'Editar de Contenido', '2026-03-07 16:39:52', NULL, '1'),
-(4, 'Ver Detalles de Contenido', '2026-03-07 16:39:52', NULL, '1'),
-(5, 'Listar de Tema', '2026-03-07 16:39:52', NULL, '1'),
-(6, 'Crear de Tema', '2026-03-07 16:39:52', NULL, '1'),
-(7, 'Editar de Tema', '2026-03-07 16:39:52', NULL, '1'),
-(8, 'Ver Detalles de Tema', '2026-03-07 16:39:52', NULL, '1'),
-(9, 'Crear de Usuarios', '2026-03-07 16:39:52', NULL, '1'),
-(10, 'Listar de Usuarios', '2026-03-07 16:39:52', NULL, '1'),
-(11, 'Listar de Planificacion', '2026-03-07 16:39:52', NULL, '1'),
-(12, 'Crear de Planificacion', '2026-03-07 16:39:52', NULL, '1'),
-(13, 'Editar de Planificacion', '2026-03-07 16:39:52', NULL, '1'),
-(14, 'Ver Detalles de Planificacion', '2026-03-07 16:39:52', NULL, '1'),
-(15, 'Reporte General de Planificacion', '2026-03-07 16:39:52', NULL, '1'),
-(16, 'Reporte Detallado de Planificacion', '2026-03-07 16:39:52', NULL, '1'),
-(17, 'Listar de Indicador Logro', '2026-03-07 16:39:52', NULL, '1'),
-(18, 'Crear de Indicador Logro', '2026-03-07 16:39:52', NULL, '1'),
-(19, 'Editar de Indicador Logro', '2026-03-07 16:39:52', NULL, '1'),
-(20, 'Ver Detalles de Indicador Logro', '2026-03-07 16:39:52', NULL, '1'),
-(21, 'Listar de Bibliografia', '2026-03-07 16:39:52', NULL, '1'),
-(22, 'Crear de Bibliografia', '2026-03-07 16:39:52', NULL, '1'),
-(23, 'Editar de Bibliografia', '2026-03-07 16:39:52', NULL, '1'),
-(24, 'Ver Detalles de Bibliografia', '2026-03-07 16:39:52', NULL, '1'),
-(25, 'Listar de Recurso', '2026-03-07 16:39:52', NULL, '1'),
-(26, 'Crear de Recurso', '2026-03-07 16:39:52', NULL, '1'),
-(27, 'Editar de Recurso', '2026-03-07 16:39:52', NULL, '1'),
-(28, 'Ver Detalles de Recurso', '2026-03-07 16:39:52', NULL, '1'),
-(29, 'Listar de Estrategia', '2026-03-07 16:39:52', NULL, '1'),
-(30, 'Crear de Estrategia', '2026-03-07 16:39:52', NULL, '1'),
-(31, 'Editar de Estrategia', '2026-03-07 16:39:52', NULL, '1'),
-(32, 'Ver Detalles de Estrategia', '2026-03-07 16:39:52', NULL, '1'),
-(33, 'Listar de Tecnica Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(34, 'Crear de Tecnica Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(35, 'Editar de Tecnica Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(36, 'Ver Detalles de Tecnica Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(37, 'Listar de Tipo Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(38, 'Crear de Tipo Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(39, 'Editar de Tipo Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(40, 'Ver Detalles de Tipo Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(41, 'Listar de Evento', '2026-03-07 16:39:52', NULL, '1'),
-(42, 'Crear de Evento', '2026-03-07 16:39:52', NULL, '1'),
-(43, 'Editar de Evento', '2026-03-07 16:39:52', NULL, '1'),
-(44, 'Ver Detalles de Evento', '2026-03-07 16:39:52', NULL, '1'),
-(45, 'Listar de Rol', '2026-03-07 16:39:52', NULL, '1'),
-(46, 'Editar de Rol', '2026-03-07 16:39:52', NULL, '1'),
-(47, 'Listar de Bitacora', '2026-03-07 16:39:52', NULL, '1'),
-(48, 'Ver Detalles de Bitacora', '2026-03-07 16:39:52', NULL, '1'),
-(49, 'Cambiar Estatus de Contenido', '2026-03-07 16:39:52', NULL, '1'),
-(50, 'Cambiar Estatus de Tema', '2026-03-07 16:39:52', NULL, '1'),
-(51, 'Cambiar Estatus de Usuarios', '2026-03-07 16:39:52', NULL, '1'),
-(52, 'Cambiar Estatus de Planificacion', '2026-03-07 16:39:52', NULL, '1'),
-(53, 'Cambiar Estatus de Indicador Logro', '2026-03-07 16:39:52', NULL, '1'),
-(54, 'Cambiar Estatus de Bibliografia', '2026-03-07 16:39:52', NULL, '1'),
-(55, 'Cambiar Estatus de Recurso', '2026-03-07 16:39:52', NULL, '1'),
-(56, 'Cambiar Estatus de Estrategia', '2026-03-07 16:39:52', NULL, '1'),
-(57, 'Cambiar Estatus de Tecnica Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(58, 'Cambiar Estatus de Tipo Evaluacion', '2026-03-07 16:39:52', NULL, '1'),
-(59, 'Cambiar Estatus de Evento', '2026-03-07 16:39:52', NULL, '1'),
-(60, 'Cambiar Estatus de Rol', '2026-03-07 16:39:52', NULL, '1'),
-(61, 'Cambiar Estatus de Bitacora', '2026-03-07 16:39:52', NULL, '1');
-
 -- --------------------------------------------------------
 
 --
@@ -459,7 +328,7 @@ INSERT INTO `permiso` (`id_permiso`, `nombre_permiso`, `fecha_creacion`, `fecha_
 
 CREATE TABLE `planificacion` (
   `id_planificacion` int(11) NOT NULL,
-  `id_profesor_asignado` int(11) DEFAULT NULL COMMENT 'Clave foránea de sogac:',
+  `id_profesor_asignado` int(11) DEFAULT NULL,
   `aceptado_vocero` int(11) DEFAULT NULL,
   `aceptado_coordinador` int(11) DEFAULT NULL,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -490,39 +359,11 @@ CREATE TABLE `recurso` (
 CREATE TABLE `rol_permiso` (
   `id_rol_permiso` int(11) NOT NULL,
   `id_permiso` int(11) DEFAULT NULL,
-  `id_rol` int(11) DEFAULT NULL COMMENT 'Clave foránea de sogac:',
+  `id_rol` int(11) DEFAULT NULL,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
   `fecha_actualizacion` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `estatus` enum('1','2','3') DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `rol_permiso`
---
-
-INSERT INTO `rol_permiso` (`id_rol_permiso`, `id_permiso`, `id_rol`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 53, 4, '2026-03-07 17:50:01', NULL, '1'),
-(2, 18, 4, '2026-03-07 17:50:01', NULL, '1'),
-(3, 19, 4, '2026-03-07 17:50:01', NULL, '1'),
-(4, 17, 4, '2026-03-07 17:50:01', NULL, '1'),
-(5, 20, 4, '2026-03-07 17:50:01', NULL, '1'),
-(6, 54, 4, '2026-03-07 17:50:26', NULL, '1'),
-(7, 22, 4, '2026-03-07 17:50:26', NULL, '1'),
-(8, 23, 4, '2026-03-07 17:50:26', '2026-03-08 05:02:52', '3'),
-(9, 21, 4, '2026-03-07 17:50:26', NULL, '1'),
-(10, 24, 4, '2026-03-07 17:50:26', NULL, '1'),
-(11, 47, 4, '2026-03-07 19:53:33', NULL, '1'),
-(12, 48, 4, '2026-03-07 19:53:33', NULL, '1'),
-(13, 50, 4, '2026-03-08 05:03:48', NULL, '1'),
-(14, 8, 4, '2026-03-08 05:03:48', NULL, '1'),
-(15, 6, 4, '2026-03-08 05:03:49', NULL, '1'),
-(16, 7, 4, '2026-03-08 05:03:49', NULL, '1'),
-(17, 5, 4, '2026-03-08 05:03:49', NULL, '1'),
-(18, 49, 4, '2026-03-08 05:04:29', NULL, '1'),
-(19, 2, 4, '2026-03-08 05:04:29', NULL, '1'),
-(20, 3, 4, '2026-03-08 05:04:29', NULL, '1'),
-(21, 1, 4, '2026-03-08 05:04:29', NULL, '1'),
-(22, 4, 4, '2026-03-08 05:04:29', NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -544,7 +385,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('vs0cJshpBoY0DjKzDpaW6H5cmFe04VtD9J7SlnuJ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoia3ROeGNQSkVoNFNodlVLU2JTWUd2SWZjUEZFdldzeUFqUWkwSFRwSSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCI7fXM6MzoidXJsIjthOjE6e3M6ODoiaW50ZW5kZWQiO3M6MzE6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9kYXNoYm9hcmQiO319', 1773016319);
+('iLnadA9NfWz3nE5XvAtnXXn84pchVd2QeX5lhUWy', 43327, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiTmFEQmMxMU80cmZBa1F3VDdlSEZRMnA0V2lDbENIRlNvRTFUaUt5UCI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjIxOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjExOiJhY3RpdmVfcm9sZSI7aTo0O3M6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjQzMzI3O30=', 1774311921);
 
 -- --------------------------------------------------------
 
@@ -582,20 +423,13 @@ CREATE TABLE `tecnica_evaluacion` (
 
 CREATE TABLE `tema_unidad` (
   `id_tema_unidad` int(11) NOT NULL,
-  `id_unidad_curricular` varchar(7) DEFAULT NULL COMMENT 'Clave foránea de sogac:',
+  `id_unidad_curricular` varchar(7) DEFAULT NULL,
   `titulo_tema` text DEFAULT NULL,
   `unidad_tema` enum('1','2','3','4') DEFAULT NULL,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
   `fecha_actualizacion` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `estatus` enum('1','2','3') DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `tema_unidad`
---
-
-INSERT INTO `tema_unidad` (`id_tema_unidad`, `id_unidad_curricular`, `titulo_tema`, `unidad_tema`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, '241', 'prueba', '2', '2026-03-08 05:04:18', NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -659,6 +493,12 @@ ALTER TABLE `cache_locks`
   ADD PRIMARY KEY (`key`);
 
 --
+-- Indices de la tabla `calendario_academico`
+--
+ALTER TABLE `calendario_academico`
+  ADD PRIMARY KEY (`id_calendario_academico`);
+
+--
 -- Indices de la tabla `contenido`
 --
 ALTER TABLE `contenido`
@@ -669,8 +509,8 @@ ALTER TABLE `contenido`
 --
 ALTER TABLE `detalle_bibliografia`
   ADD PRIMARY KEY (`id_detalle_bibliografia`),
-  ADD KEY `fk_detbibliografia_bibliografia` (`id_bibliografia`),
-  ADD KEY `fk_detbibliografia_unidadcorte` (`id_unidad_corte`);
+  ADD KEY `fk_detbibliografia_unidadcorte` (`id_unidad_corte`),
+  ADD KEY `fk_detbibliografia_bibliografia` (`id_bibliografia`);
 
 --
 -- Indices de la tabla `detalle_contenido`
@@ -710,7 +550,8 @@ ALTER TABLE `detalle_recurso`
 -- Indices de la tabla `evento`
 --
 ALTER TABLE `evento`
-  ADD PRIMARY KEY (`id_evento`);
+  ADD PRIMARY KEY (`id_evento`),
+  ADD KEY `fk_evento_calendario` (`id_calendario`);
 
 --
 -- Indices de la tabla `failed_jobs`
@@ -824,19 +665,25 @@ ALTER TABLE `unidad_corte`
 -- AUTO_INCREMENT de la tabla `bibliografia`
 --
 ALTER TABLE `bibliografia`
-  MODIFY `id_bibliografia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_bibliografia` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `bitacora`
 --
 ALTER TABLE `bitacora`
-  MODIFY `id_bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id_bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `calendario_academico`
+--
+ALTER TABLE `calendario_academico`
+  MODIFY `id_calendario_academico` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `contenido`
 --
 ALTER TABLE `contenido`
-  MODIFY `id_contenido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_contenido` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_bibliografia`
@@ -860,7 +707,7 @@ ALTER TABLE `detalle_evaluacion`
 -- AUTO_INCREMENT de la tabla `detalle_objetivo`
 --
 ALTER TABLE `detalle_objetivo`
-  MODIFY `id_detalle_objetivo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_detalle_objetivo` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_recurso`
@@ -896,19 +743,19 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT de la tabla `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `objetivo`
 --
 ALTER TABLE `objetivo`
-  MODIFY `id_objetivo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_objetivo` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `permiso`
 --
 ALTER TABLE `permiso`
-  MODIFY `id_permiso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `id_permiso` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `planificacion`
@@ -926,7 +773,7 @@ ALTER TABLE `recurso`
 -- AUTO_INCREMENT de la tabla `rol_permiso`
 --
 ALTER TABLE `rol_permiso`
-  MODIFY `id_rol_permiso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_rol_permiso` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `tecnica_actividad`
@@ -944,7 +791,7 @@ ALTER TABLE `tecnica_evaluacion`
 -- AUTO_INCREMENT de la tabla `tema_unidad`
 --
 ALTER TABLE `tema_unidad`
-  MODIFY `id_tema_unidad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_tema_unidad` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_evaluacion`
@@ -998,6 +845,12 @@ ALTER TABLE `detalle_objetivo`
 ALTER TABLE `detalle_recurso`
   ADD CONSTRAINT `fk_detrecurso_recurso` FOREIGN KEY (`id_recurso`) REFERENCES `recurso` (`id_recurso`),
   ADD CONSTRAINT `fk_detrecurso_unidadcorte` FOREIGN KEY (`id_unidad_corte`) REFERENCES `unidad_corte` (`id_unidad_corte`);
+
+--
+-- Filtros para la tabla `evento`
+--
+ALTER TABLE `evento`
+  ADD CONSTRAINT `fk_evento_calendario` FOREIGN KEY (`id_calendario`) REFERENCES `calendario_academico` (`id_calendario_academico`);
 
 --
 -- Filtros para la tabla `objetivo`

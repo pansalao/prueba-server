@@ -11,36 +11,30 @@ class PlanificacionViewRepo
      */
     public function getDetallesPlanificacion(int $planificacionId): ?array
     {
+        $dbSogc = config('database.connections.emulacion_sogac_2.database');
+
         // 1. Obtener datos principales de la planificación + Docente + Sección + Unidad + Lapso
         $planificacion = DB::table('planificacion as p')
-            ->join('detalle_profesor_asignado as dpa', 'p.id_profesor_asignado', '=', 'dpa.id_detalle_profesor_asignado')
-            ->join('users as u', 'dpa.id_users', '=', 'u.id')
-            ->join('unidad_curricular as uc', 'dpa.id_unidad_curricular', '=', 'uc.id_unidad_curricular')
-            ->leftJoin('malla_academica as ma', 'uc.id_malla_academica', '=', 'ma.id_malla_academica')
-            ->leftJoin('pnf as pnf', 'ma.id_pnf', '=', 'pnf.id_pnf')
-            ->join('seccion as s', 'dpa.id_seccion', '=', 's.id_seccion')
-            ->join('lapso_academico as la', 's.id_lapso_academico', '=', 'la.id_lapso_academico')
+            ->join("$dbSogc.seccion_unidad_docente as sud", 'p.id_profesor_asignado', '=', 'sud.sud_codigo')
+            ->join("$dbSogc.usuario as u", 'sud.sud_ced_docente', '=', 'u.usu_cedula')
+            ->join("$dbSogc.persona as per", 'u.usu_cedula', '=', 'per.per_cedula')
+            ->join("$dbSogc.unidad_curricular as uc", 'sud.sud_cod_unidad', '=', 'uc.ucu_codigo')
+            ->join("$dbSogc.seccion as s", 'sud.sud_cod_seccion', '=', 's.sec_codigo')
+            ->join("$dbSogc.lapso_academico as la", 's.sec_cod_lapso_academico', '=', 'la.lap_codigo')
             ->select(
                 'p.id_planificacion as planificacion_id',
                 'p.estatus',
-                'u.id as docente_id',
-                'u.name as docente_nombre',
-                'u.apellido as docente_apellido',
-                'u.cedula',
-                'u.telefono',
-                'uc.id_unidad_curricular',
-                'uc.nombre_unidad_curricular',
-                'uc.unidades_credito_unidad_curricular',
-                'uc.trayecto_unidad_curricular',
-                'uc.duracion_unidad_curricular',
-                'uc.horas_semanales_unidad_curricular',
-                'uc.proposito_unidad_curricular',
-                'pnf.nombre_pnf',
-                's.nombre_seccion',
-                'la.id_lapso_academico',
-                'la.nombre_lapso_academico as nombre_lapso',
-                'la.fecha_inicio_lapso_academico as lapso_fecha_inicio',
-                'la.fecha_fin_lapso_academico as lapso_fecha_fin'
+                'u.usu_codigo as docente_id',
+                'per.per_nombres as docente_nombre',
+                'per.per_apellidos as docente_apellido',
+                'u.usu_cedula as cedula',
+                'uc.ucu_codigo as id_unidad_curricular',
+                'uc.ucu_nombre as nombre_unidad_curricular',
+                's.sec_nombre as nombre_seccion',
+                'la.lap_codigo as id_lapso_academico',
+                'la.lap_nombre as nombre_lapso',
+                'la.lap_fecha_inicio as lapso_fecha_inicio',
+                'la.lap_fecha_fin as lapso_fecha_fin'
             )
             ->where('p.id_planificacion', $planificacionId)
             ->first();
@@ -170,10 +164,10 @@ class PlanificacionViewRepo
 
         // 4. Coordinador (Datos ficticios o reales dependiendo de permisos, 
         // lo dejamos igual pero ajustando nombres de tablas si fuera necesario)
-        $coordinador = DB::table('users as u')
-            ->join('usuario_rol as ur', 'u.id', '=', 'ur.id_users')
-            ->where('ur.id_rol', 1) // 1 = Coordinador
-            ->select('u.name', 'u.apellido', 'u.cedula')
+        $coordinador = DB::table("$dbSogc.usuario as u")
+            ->join("$dbSogc.persona as p", 'u.usu_cedula', '=', 'p.per_cedula')
+            ->where('u.usu_cod_rol', 11) // 11 = Coordinador en SOGAC
+            ->select('p.per_nombres as name', 'p.per_apellidos as apellido', 'u.usu_cedula as cedula')
             ->first();
 
         if ($coordinador) {

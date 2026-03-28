@@ -80,7 +80,7 @@ class CreatePlanificacion extends Component
                     // Obtener propósito de la unidad curricular
                     $unidad = $this->planificacionRepository->getUnidadCurricular($detalle->id_unidad_curricular);
                     if ($unidad) {
-                        $this->proposito = $unidad->proposito_unidad_curricular;
+                        $this->proposito = property_exists($unidad, 'proposito_unidad_curricular') ? $unidad->proposito_unidad_curricular : '';
                     }
                 }
             }
@@ -132,7 +132,7 @@ class CreatePlanificacion extends Component
     {
         // Allow based on permissions (crear-planificacion or editar-planificacion)
         if (Auth::check() && (Gate::allows('crear-planificacion') || Gate::allows('editar-planificacion'))) {
-            $this->docenteNombre = Auth::user()->name . ' ' . Auth::user()->apellido;
+            $this->docenteNombre = Auth::user()->name;
         } else {
             $this->dispatch('mostrar-mensaje', ['tipo' => 'error', 'mensaje' => 'Acceso denegado.']);
         }

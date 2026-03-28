@@ -20,7 +20,7 @@ class CreatePlanificacionForm extends Form
     public function rules()
     {
         $rules = [
-            'id_profesor_asignado' => 'required|exists:detalle_profesor_asignado,id_detalle_profesor_asignado',
+            'id_profesor_asignado' => 'required|exists:emulacion_sogac_2.seccion_unidad_docente,sud_codigo',
         ];
 
         foreach ($this->unidades as $index => $unidad) {
@@ -68,20 +68,21 @@ class CreatePlanificacionForm extends Form
                         if (!$this->id_profesor_asignado)
                             return;
 
-                        $lapso = \Illuminate\Support\Facades\DB::table('detalle_profesor_asignado as dpa')
-                            ->join('seccion as s', 'dpa.id_seccion', '=', 's.id_seccion')
-                            ->join('lapso_academico as la', 's.id_lapso_academico', '=', 'la.id_lapso_academico')
-                            ->where('dpa.id_detalle_profesor_asignado', $this->id_profesor_asignado)
-                            ->select('la.fecha_inicio_lapso_academico', 'la.fecha_fin_lapso_academico', 'la.id_lapso_academico')
+                        $lapso = \Illuminate\Support\Facades\DB::connection('emulacion_sogac_2')
+                            ->table('seccion_unidad_docente as sud')
+                            ->join('seccion as s', 'sud.sud_cod_seccion', '=', 's.sec_codigo')
+                            ->join('lapso_academico as la', 's.sec_cod_lapso_academico', '=', 'la.lap_codigo')
+                            ->where('sud.sud_codigo', $this->id_profesor_asignado)
+                            ->select('la.lap_fecha_inicio', 'la.lap_fecha_fin', 'la.lap_codigo')
                             ->first();
 
                         if ($lapso) {
-                            if ($value < $lapso->fecha_inicio_lapso_academico || $value > $lapso->fecha_fin_lapso_academico) {
-                                $fail("La fecha de evaluación debe estar dentro del lapso académico ({$lapso->fecha_inicio_lapso_academico} al {$lapso->fecha_fin_lapso_academico}).");
+                            if ($value < $lapso->lap_fecha_inicio || $value > $lapso->lap_fecha_fin) {
+                                $fail("La fecha de evaluación debe estar dentro del lapso académico ({$lapso->lap_fecha_inicio} al {$lapso->lap_fecha_fin}).");
                             }
 
                             $evento = \Illuminate\Support\Facades\DB::table('evento as e')
-                                ->where('e.id_lapso', $lapso->id_lapso_academico)
+                                ->where('e.id_lapso', $lapso->lap_codigo)
                                 ->where(function ($q) use ($value) {
                                     $q->whereDate('e.dia_inicio_evento', '<=', $value)
                                         ->whereDate('e.dia_fin_evento', '>=', $value);

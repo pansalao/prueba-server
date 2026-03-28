@@ -12,36 +12,34 @@ class PlanificacionIndexRepo
      */
     public function listar(array $filters = [], int $perPage = 10, bool $onlyCurrentUserAndRole = false)
     {
+        $dbSogc = config('database.connections.emulacion_sogac_2.database');
+
         $query = DB::table('planificacion as p')
-            ->join('detalle_profesor_asignado as dpa', 'p.id_profesor_asignado', '=', 'dpa.id_detalle_profesor_asignado')
-            ->join('users as u', 'dpa.id_users', '=', 'u.id')
-            ->join('unidad_curricular as uc', 'dpa.id_unidad_curricular', '=', 'uc.id_unidad_curricular')
-            ->join('seccion as s', 'dpa.id_seccion', '=', 's.id_seccion')
-            ->leftJoin('malla_academica as ma', 'uc.id_malla_academica', '=', 'ma.id_malla_academica')
-            ->leftJoin('pnf', 'ma.id_pnf', '=', 'pnf.id_pnf')
+            ->join("$dbSogc.seccion_unidad_docente as sud", 'p.id_profesor_asignado', '=', 'sud.sud_codigo')
+            ->join("$dbSogc.usuario as u", 'sud.sud_ced_docente', '=', 'u.usu_cedula')
+            ->join("$dbSogc.persona as per", 'u.usu_cedula', '=', 'per.per_cedula')
+            ->join("$dbSogc.unidad_curricular as uc", 'sud.sud_cod_unidad', '=', 'uc.ucu_codigo')
+            ->join("$dbSogc.seccion as s", 'sud.sud_cod_seccion', '=', 's.sec_codigo')
             ->select(
                 'p.id_planificacion as planificacion_id',
-                'u.name as docente_nombre',
-                'u.apellido as docente_apellido',
+                'per.per_nombres as docente_nombre',
+                'per.per_apellidos as docente_apellido',
                 'p.estatus',
-                'uc.nombre_unidad_curricular',
-                's.nombre_seccion',
-                'pnf.nombre_pnf',
-                'uc.trayecto_unidad_curricular'
+                'uc.ucu_nombre as nombre_unidad_curricular',
+                's.sec_nombre as nombre_seccion'
             );
 
         if (isset($filters['search_term']) && !empty($filters['search_term'])) {
             $query->where(function ($q) use ($filters) {
-                $q->where('u.name', 'like', '%' . $filters['search_term'] . '%')
-                    ->orWhere('u.apellido', 'like', '%' . $filters['search_term'] . '%')
-                    ->orWhere('uc.nombre_unidad_curricular', 'like', '%' . $filters['search_term'] . '%')
-                    ->orWhere('pnf.nombre_pnf', 'like', '%' . $filters['search_term'] . '%');
+                $q->where('per.per_nombres', 'like', '%' . $filters['search_term'] . '%')
+                    ->orWhere('per.per_apellidos', 'like', '%' . $filters['search_term'] . '%')
+                    ->orWhere('uc.ucu_nombre', 'like', '%' . $filters['search_term'] . '%');
             });
         }
 
         if ($onlyCurrentUserAndRole && Auth::check()) {
             $userId = Auth::id();
-            $query->where('dpa.id_users', $userId);
+            $query->where('u.usu_codigo', $userId);
         }
 
         $query->orderByDesc('p.id_planificacion');

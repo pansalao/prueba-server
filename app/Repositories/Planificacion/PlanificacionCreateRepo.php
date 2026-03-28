@@ -110,47 +110,72 @@ class PlanificacionCreateRepo
     // Nueva función vital: Obtener las asignaciones del docente logueado
     public function getAsignacionesDocente($userId = null)
     {
-        $query = DB::table('detalle_profesor_asignado as dpa')
-            ->join('unidad_curricular as uc', 'dpa.id_unidad_curricular', '=', 'uc.id_unidad_curricular')
-            ->join('seccion as s', 'dpa.id_seccion', '=', 's.id_seccion')
-            ->join('users as u', 'dpa.id_users', '=', 'u.id')
-            ->where('dpa.estatus', '1');
+        $query = DB::connection('emulacion_sogac_2')
+            ->table('seccion_unidad_docente as sud')
+            ->join('unidad_curricular as uc', 'sud.sud_cod_unidad', '=', 'uc.ucu_codigo')
+            ->join('seccion as s', 'sud.sud_cod_seccion', '=', 's.sec_codigo')
+            ->join('usuario as u', 'sud.sud_ced_docente', '=', 'u.usu_cedula')
+            ->join('persona as p', 'u.usu_cedula', '=', 'p.per_cedula')
+            ->where('sud.sud_estatus', 'A');
 
         if ($userId) {
-            $query->where('dpa.id_users', $userId);
+            $query->where('u.usu_codigo', $userId);
         }
 
         return $query->select(
-            'dpa.id_detalle_profesor_asignado',
-            'uc.nombre_unidad_curricular',
-            'uc.trayecto_unidad_curricular',
-            's.nombre_seccion',
-            'u.name',
-            'u.apellido'
+            'sud.sud_codigo as id_detalle_profesor_asignado',
+            'uc.ucu_nombre as nombre_unidad_curricular',
+            'uc.ucu_codigo as id_unidad_curricular',
+            's.sec_nombre as nombre_seccion',
+            'p.per_nombres as name',
+            'p.per_apellidos as apellido'
         )
             ->get()
             ->map(function ($asignacion) {
-                $trayecto = $asignacion->trayecto_unidad_curricular ? "T{$asignacion->trayecto_unidad_curricular}" : 'S/T';
                 $docente = "{$asignacion->name} {$asignacion->apellido}";
-                $asignacion->descripcion_completa = "{$asignacion->nombre_unidad_curricular} ({$trayecto}) - Sección {$asignacion->nombre_seccion} | Docente: {$docente}";
+                $asignacion->descripcion_completa = "{$asignacion->nombre_unidad_curricular} - Sección {$asignacion->nombre_seccion} | Docente: {$docente}";
                 return $asignacion;
             });
     }
 
+    public function getLapsoAcademicoByAsignacion($idAsignacion)
+    {
+        return DB::connection('emulacion_sogac_2')
+            ->table('seccion_unidad_docente as sud')
+            ->join('seccion as s', 'sud.sud_cod_seccion', '=', 's.sec_codigo')
+            ->join('lapso_academico as l', 's.sec_cod_lapso_academico', '=', 'l.lap_codigo')
+            ->where('sud.sud_codigo', $idAsignacion)
+            ->select('l.lap_nombre', 'l.lap_fecha_inicio', 'l.lap_fecha_fin', 'l.lap_codigo')
+            ->first();
+    }
+
     public function hasDocenteOrCoordinadorRole($userId)
     {
-        return DB::table('usuario_rol')->where('id_users', $userId)->where('id_rol', 1)->exists() ||
-            DB::table('usuario_rol')->where('id_users', $userId)->where('id_rol', 2)->exists();
+        // El rol_id para Coordinador es 11 y para Docente es 3 en emulacion_sogac_2
+        return DB::connection('emulacion_sogac_2')
+            ->table('usuario')
+            ->where('usu_codigo', $userId)
+            ->whereIn('usu_cod_rol', [3, 11])
+            ->where('usu_estatus', 'A')
+            ->exists();
     }
 
     public function getDetalleProfesorAsignado($id)
     {
-        return DB::table('detalle_profesor_asignado')->where('id_detalle_profesor_asignado', $id)->first();
+        return DB::connection('emulacion_sogac_2')
+            ->table('seccion_unidad_docente')
+            ->where('sud_codigo', $id)
+            ->select('sud_codigo as id_detalle_profesor_asignado', 'sud_cod_unidad as id_unidad_curricular', 'sud_cod_seccion as id_seccion')
+            ->first();
     }
 
     public function getUnidadCurricular($id)
     {
-        return DB::table('unidad_curricular')->where('id_unidad_curricular', $id)->first();
+        return DB::connection('emulacion_sogac_2')
+            ->table('unidad_curricular')
+            ->where('ucu_codigo', $id)
+            ->select('ucu_codigo as id_unidad_curricular', 'ucu_nombre as nombre_unidad_curricular')
+            ->first();
     }
 
     public function saveNuevoObjetivo($titulo, $idTemaUnidad)
