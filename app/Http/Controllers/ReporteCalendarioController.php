@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use App\Exports\CalendarioExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReporteCalendarioController extends Controller
 {
@@ -56,14 +57,12 @@ class ReporteCalendarioController extends Controller
             }
         }
 
-        $pdf = Pdf::loadView('livewire.pages.calendario.pdf-calendario', [
+        return Excel::download(new CalendarioExport([
             'calendario' => $calendario,
             'year' => $year,
             'eventDays' => $eventDays,
             'eventColors' => $eventColors,
             'eventos' => $eventosRaw
-        ])->setPaper('a4', 'landscape');
-
-        return $pdf->stream('calendario_academico_' . $year . '.pdf');
+        ]), 'calendario_academico_' . $year . '.xlsx');
     }
 }
