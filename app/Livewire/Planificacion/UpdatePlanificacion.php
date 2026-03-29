@@ -34,6 +34,7 @@ class UpdatePlanificacion extends Component
     public $nombre_unidad_curricular;
     public $nombre_seccion;
     public $nombre_lapso;
+    public $nombre_malla;
 
     // Datos editables que vienen del formulario
     public UpdatePlanificacionForm $form;
@@ -97,6 +98,11 @@ class UpdatePlanificacion extends Component
         $this->nombre_unidad_curricular = $planificacion['nombre_unidad_curricular'];
         $this->nombre_seccion = $planificacion['nombre_seccion'];
         $this->nombre_lapso = $planificacion['nombre_lapso'];
+
+        // Obtener Malla (usando el id_profesor_asignado que está en la DB o el id_detalle_profesor_asignado)
+        // El Repo viewRepo ya debería darnos esto, pero si no, lo buscamos
+        $malla = $this->planificacionCreateRepo->getMallaByAsignacion($planificacion['id_detalle_profesor_asignado'] ?? null);
+        $this->nombre_malla = $malla ? $malla->mal_nombre : 'No especificada';
 
         // Cargar contenidos disponibles filtrados por unidad
         $this->loadContenidosUnidad();
@@ -268,7 +274,12 @@ class UpdatePlanificacion extends Component
         $this->form->id_lapso_academico = $this->id_lapso_academico;
 
         $field = str_replace('form.', '', $propertyName);
-        $this->form->validateOnly($field);
+
+        if (str_contains($field, 'forma_participacion')) {
+            $this->form->validate();
+        } else {
+            $this->form->validateOnly($field);
+        }
     }
 
     public function getTotalPonderacionForCorte($corteIndex)

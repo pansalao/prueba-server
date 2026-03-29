@@ -160,6 +160,28 @@ class PlanificacionCreateRepo
             ->exists();
     }
 
+    public function isCoordinador($userId)
+    {
+        // El rol_id para Coordinador es 11 en emulacion_sogac_2
+        return DB::connection('emulacion_sogac_2')
+            ->table('usuario')
+            ->where('usu_codigo', $userId)
+            ->where('usu_cod_rol', 11)
+            ->where('usu_estatus', 'A')
+            ->exists();
+    }
+
+    public function getMallaByAsignacion($idAsignacion)
+    {
+        return DB::connection('emulacion_sogac_2')
+            ->table('seccion_unidad_docente as sud')
+            ->join('seccion as s', 'sud.sud_cod_seccion', '=', 's.sec_codigo')
+            ->join('malla as m', 's.sec_cod_malla', '=', 'm.mal_codigo')
+            ->where('sud.sud_codigo', $idAsignacion)
+            ->select('m.mal_nombre', 'm.mal_codigo')
+            ->first();
+    }
+
     public function getDetalleProfesorAsignado($id)
     {
         return DB::connection('emulacion_sogac_2')

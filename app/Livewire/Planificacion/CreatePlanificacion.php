@@ -9,7 +9,8 @@ use Carbon\Carbon;
 
 class CreatePlanificacion extends Component
 {
-    public $docente_id, $docenteNombre, $proposito;
+    public $docente_id, $docenteNombre, $proposito, $mallaNombre, $lapsoNombre;
+    public $isCoordinador = false;
     public Collection $tecnica, $recursosMaestros, $evaluaciones, $bibliografiasMaestras, $asignaciones;
     public \App\Livewire\Forms\Planificacion\CreatePlanificacionForm $form;
     public array $temasPorUnidad = [];
@@ -49,6 +50,7 @@ class CreatePlanificacion extends Component
 
         $this->loadInitialData();
         $this->verifyDocenteRole();
+        $this->isCoordinador = $this->planificacionRepository->isCoordinador($this->docente_id);
         $this->inicializarUnidades();
     }
 
@@ -82,6 +84,13 @@ class CreatePlanificacion extends Component
                     if ($unidad) {
                         $this->proposito = property_exists($unidad, 'proposito_unidad_curricular') ? $unidad->proposito_unidad_curricular : '';
                     }
+
+                    // Obtener Malla y Lapso
+                    $malla = $this->planificacionRepository->getMallaByAsignacion($value);
+                    $this->mallaNombre = $malla ? $malla->mal_nombre : 'No especificada';
+
+                    $lapso = $this->planificacionRepository->getLapsoAcademicoByAsignacion($value);
+                    $this->lapsoNombre = $lapso ? $lapso->lap_nombre : 'No especificado';
                 }
             }
         } else {
@@ -89,6 +98,8 @@ class CreatePlanificacion extends Component
             $this->todosLosContenidos = collect();
             $this->todosLosObjetivos = collect();
             $this->proposito = '';
+            $this->mallaNombre = '';
+            $this->lapsoNombre = '';
         }
 
         // Reiniciar los contenidos seleccionados en las unidades porque cambiaron las opciones disponibles
@@ -148,7 +159,13 @@ class CreatePlanificacion extends Component
     public function updated($propertyName)
     {
         $field = str_replace('form.', '', $propertyName);
-        $this->form->validateOnly($field);
+
+        // Si cambia la forma de participación, revalidar integrantes
+        if (str_contains($field, 'forma_participacion')) {
+            $this->form->validate();
+        } else {
+            $this->form->validateOnly($field);
+        }
     }
 
     protected function createUnidadTemplate($numero)
@@ -282,6 +299,11 @@ class CreatePlanificacion extends Component
     }
     public function openObjetivoModal($temaId)
     {
+        if (!$this->isCoordinador) {
+            session()->flash('error', 'Solo los coordinadores pueden añadir nuevos objetivos.');
+            return;
+        }
+
         if (!$temaId || $temaId === '') {
             session()->flash('error', 'Debe seleccionar un tema primero.');
             return;
@@ -299,6 +321,12 @@ class CreatePlanificacion extends Component
 
     public function saveObjetivo()
     {
+        if (!$this->isCoordinador) {
+            session()->flash('error', 'Solo los coordinadores pueden añadir nuevos objetivos.');
+            $this->closeObjetivoModal();
+            return;
+        }
+
         $this->validate([
             'newObjetivoNombre' => 'required|min:3|max:255',
             'selectedTemaIdForObjetivo' => 'required|exists:tema_unidad,id_tema_unidad',

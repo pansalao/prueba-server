@@ -29,9 +29,25 @@
 
                     </div>
 
-                    {{-- Propósito de la Unidad Curricular --}}
-                    @if($form->id_profesor_asignado && $proposito)
-                        <div class="p-4 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 rounded-lg shadow-sm">
+                    {{-- Propósito de la Unidad Curricular, Malla y Lapso --}}
+                    @if($form->id_profesor_asignado)
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                            @if($mallaNombre)
+                            <div class="p-4 bg-gray-50 dark:bg-gray-700 border-l-4 border-gray-400 rounded-lg shadow-sm">
+                                <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-tight">Malla Curricular</h4>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ $mallaNombre }}</p>
+                            </div>
+                            @endif
+                            @if($lapsoNombre)
+                            <div class="p-4 bg-gray-50 dark:bg-gray-700 border-l-4 border-gray-400 rounded-lg shadow-sm">
+                                <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-tight">Lapso Académico</h4>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ $lapsoNombre }}</p>
+                            </div>
+                            @endif
+                        </div>
+
+                        @if($proposito)
+                        <div class="p-4 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 rounded-lg shadow-sm mt-4">
                             <div class="flex items-start gap-3">
                                 <span class="material-icons text-blue-600 dark:text-blue-400">info</span>
                                 <div>
@@ -43,20 +59,27 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
                     @endif
                 </div>
 
                 <div class="space-y-6" x-data="{ openUnidad: 0 }">
-                    <div class="flex items-center justify-between border-b border-gray-300 dark:border-gray-600 pb-4">
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
-                            Planificación de Unidades
-                        </h2>
-                        <div class="flex gap-2">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-300 dark:border-gray-600 pb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+                                Planificación de Unidades
+                            </h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Diligencie cada unidad paso a paso.</p>
+                        </div>
+                        <div class="flex items-center gap-3 bg-gray-100 dark:bg-gray-900 p-2 rounded-2xl shadow-inner">
                             @foreach ($form->unidades as $idx => $u)
                                 <button type="button" @click="openUnidad = {{ $idx }}"
-                                    :class="openUnidad === {{ $idx }} ? 'bg-[#767676] text-white' : 'bg-[#f0f0f0] text-black border border-[#767676]'"
-                                    class="w-8 h-8 rounded-full flex items-center justify-center font-bold transition-all duration-200 text-sm shadow-sm">
-                                    {{ $idx + 1 }}
+                                    class="relative group focus:outline-none">
+                                    <div :class="openUnidad === {{ $idx }} ? 'bg-blue-600 dark:bg-blue-500 text-white scale-110 shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-400'"
+                                        class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 text-sm">
+                                        {{ $idx + 1 }}
+                                    </div>
+                                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" :class="openUnidad === {{ $idx }} ? 'hidden' : ''"></div>
                                 </button>
                             @endforeach
                         </div>
@@ -77,41 +100,41 @@
                             ]);
                         @endphp
 
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm transition-all duration-300"
-                            :class="openUnidad === {{ $index }} ? 'ring-2 ring-blue-500 ring-opacity-50' : ''">
-
-                            <!-- Cabecera del Accordion -->
-                            <button type="button" @click="openUnidad = openUnidad === {{ $index }} ? null : {{ $index }}"
-                                class="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <div class="flex items-center gap-3">
-                                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                                        Unidad {{ $unidad['numero'] }}
-                                    </h3>
-                                </div>
+                        <div x-show="openUnidad === {{ $index }}" 
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform translate-x-8"
+                            x-transition:enter-end="opacity-100 transform translate-x-0"
+                            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl overflow-hidden min-h-[500px] flex flex-col">
+                            
+                            {{-- Cabecera de la Página de Unidad --}}
+                            <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div class="flex items-center gap-4">
-                                    <div class="flex items-center gap-2">
-                                        <span
-                                            class="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Ponderación:</span>
-                                        <span
-                                            class="text-sm font-bold {{ $validPonderacion ? 'text-green-600 dark:text-green-400' : 'text-red-600' }}">
-                                            {{ $totalPonderacion }}% / 25%
-                                        </span>
+                                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center font-black text-xl shadow-inner">
+                                        {{ $unidad['numero'] }}
                                     </div>
-                                    <svg class="w-5 h-5 text-gray-400 transform transition-transform duration-300"
-                                        :class="openUnidad === {{ $index }} ? 'rotate-180' : ''" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+                                            Contenido de la Unidad {{ $unidad['numero'] }}
+                                        </h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Planificación Académica Detallada</p>
+                                    </div>
                                 </div>
-                            </button>
+                                
+                                <div class="flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Ponderación</span>
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-lg font-black {{ $validPonderacion ? 'text-green-600' : 'text-red-600' }}">
+                                            {{ $totalPonderacion }}%
+                                        </span>
+                                        <span class="text-xs text-gray-400 font-bold">/ 25%</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <!-- Contenido del Accordion -->
-                            <div x-show="openUnidad === {{ $index }}" x-collapse>
-                                <div class="p-6 bg-white dark:bg-gray-800 space-y-8">
+                            <div class="p-8 space-y-10 flex-grow">
 
                                     {{-- Contenidos agrupados por Objetivo --}}
-                                    <div class="space-y-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="space-y-6">
                                         <div class="flex items-center justify-between">
                                             <h4
                                                 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
@@ -148,6 +171,9 @@
                                                             textField="titulo_tema"
                                                             wire:model.live.debounce.250ms="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.tema_id"
                                                             placeholder="Seleccione un tema" class="text-sm w-full" required />
+                                                        @error("form.unidades.$index.objetivos.$objetivoIndex.tema_id")
+                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                        @enderror
 
 
                                                     </div>
@@ -160,11 +186,13 @@
                                                             @php
                                                                 $selectedTemaId = $unidad['objetivos'][$objetivoIndex]['tema_id'] ?? null;
                                                             @endphp
+                                                            @if($isCoordinador)
                                                             <button type="button"
                                                                 wire:click="openObjetivoModal('{{ $selectedTemaId }}')"
                                                                 class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                                                 <span class="material-icons text-[12px]">add</span> NUEVO
                                                             </button>
+                                                            @endif
                                                         </div>
 
                                                         @php
@@ -176,6 +204,9 @@
                                                             wire:model.live.debounce.250ms="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.objetivo_id"
                                                             placeholder="Seleccione un objetivo" class="text-sm w-full"
                                                             :disabled="empty($selectedTemaId)" required />
+                                                        @error("form.unidades.$index.objetivos.$objetivoIndex.objetivo_id")
+                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                        @enderror
                                                     </div>
                                                 </div>
 
@@ -210,6 +241,9 @@
                                                                         wire:model.live.debounce.250ms="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.contenidos.{{ $contenidoIndex }}.contenido_id"
                                                                         placeholder="Seleccione un contenido" class="text-sm w-full"
                                                                         :disabled="empty($selectedObjetivoId)" required />
+                                                                    @error("form.unidades.$index.objetivos.$objetivoIndex.contenidos.$contenidoIndex.contenido_id")
+                                                                        <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                    @enderror
                                                                 </div>
                                                                 @if (count($objetivo['contenidos']) > 1)
                                                                     <button type="button"
@@ -262,6 +296,9 @@
                                                             textField="titulo_tema"
                                                             wire:model.live.debounce.250ms="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.tema_id"
                                                             placeholder="Seleccione un tema" class="text-sm w-full" required />
+                                                        @error("form.unidades.$index.estrategias.$estrategiaIndex.tema_id")
+                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                        @enderror
 
                                                     </div>
 
@@ -298,6 +335,9 @@
                                                                         wire:model.live.debounce.250ms="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.recursos.{{ $recursoIndex }}.recurso_id"
                                                                         placeholder="Seleccione un recurso" class="text-sm w-full"
                                                                         required />
+                                                                    @error("form.unidades.$index.estrategias.$estrategiaIndex.recursos.$recursoIndex.recurso_id")
+                                                                        <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                    @enderror
                                                                 </div>
                                                                 @if (count($estrategia['recursos']) > 1)
                                                                     <button type="button"
@@ -381,6 +421,9 @@
                                                                         textField="nombre_tipo_evaluacion"
                                                                         wire:model.live.debounce.250ms="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.evaluacion_id"
                                                                         placeholder="Seleccione" class="text-xs w-full" required />
+                                                                    @error("form.unidades.$index.evaluaciones.$evaluacionIndex.evaluacion_id")
+                                                                        <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                    @enderror
 
                                                                 </div>
 
@@ -390,6 +433,9 @@
                                                                         textField="nombre_tecnica_evaluacion"
                                                                         wire:model.live.debounce.250ms="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.tecnica_id"
                                                                         placeholder="Seleccione" class="text-xs w-full" required />
+                                                                    @error("form.unidades.$index.evaluaciones.$evaluacionIndex.tecnica_id")
+                                                                        <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                    @enderror
 
                                                                 </div>
                                                             </div>
@@ -403,6 +449,9 @@
                                                                             textField="nombre"
                                                                             wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.forma_participacion"
                                                                             placeholder="Seleccione" class="text-xs w-full" required />
+                                                                        @error("form.unidades.$index.evaluaciones.$evaluacionIndex.forma_participacion")
+                                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                        @enderror
 
                                                                         @if(isset($evaluacion['forma_participacion']) && $evaluacion['forma_participacion'] == '2')
                                                                             <select 
@@ -457,6 +506,9 @@
                                                                 valueField="id_bibliografia" textField="nombre_bibliografia"
                                                                 wire:model.live.debounce.250ms="form.unidades.{{ $index }}.bibliografias.{{ $biblioIndex }}.bibliografia_id" 
                                                                 placeholder="Seleccione una referencia..." />
+                                                            @error("form.unidades.$index.bibliografias.$biblioIndex.bibliografia_id")
+                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                            @enderror
                                                         </div>
                                                         @if (count($unidad['bibliografias']) > 1)
                                                             <button type="button" 
@@ -474,36 +526,40 @@
                                         </div>
 
                                         {{-- Navegación entre acordeones --}}
-                                        <div class="flex justify-between items-center pt-4">
+                                        <div class="flex justify-between items-center pt-8 mt-8 border-t border-gray-100 dark:border-gray-800">
                                             <div>
                                                 @if ($index > 0)
-                                                    <button type="button" @click="openUnidad = {{ $index - 1 }}"
-                                                        class="inline-flex items-center gap-2 px-6 py-2 bg-[#f0f0f0] border border-[#767676] text-black rounded-lg text-sm font-bold shadow-sm hover:bg-gray-200 transition-all">
+                                                    <button type="button" @click="openUnidad = {{ $index - 1 }}; window.scrollTo({top: 0, behavior: 'smooth'})"
+                                                        class="inline-flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
                                                         <span class="material-icons text-sm">arrow_back</span> Unidad Anterior
                                                     </button>
                                                 @endif
                                             </div>
                                             <div>
                                                 @if ($index < count($form->unidades) - 1)
-                                                    <button type="button" @click="openUnidad = {{ $index + 1 }}"
-                                                        class="inline-flex items-center gap-2 px-6 py-2 bg-[#f0f0f0] border border-[#767676] text-black rounded-lg text-sm font-bold shadow-sm hover:bg-gray-200 transition-all">
+                                                    <button type="button" @click="openUnidad = {{ $index + 1 }}; window.scrollTo({top: 0, behavior: 'smooth'})"
+                                                        class="inline-flex items-center gap-2 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-blue-700 transition-all hover:-translate-y-0.5 active:translate-y-0">
                                                         Siguiente Unidad <span class="material-icons text-sm">arrow_forward</span>
                                                     </button>
                                                 @else
-                                                    <div class="text-xs text-gray-400 italic">Última unidad de planificación</div>
+                                                    <div class="flex flex-col items-end">
+                                                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Final del Proceso</span>
+                                                        <span class="text-xs text-gray-500 italic">Planificación completada</span>
+                                                    </div>
                                                 @endif
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                    @endforeach
+                        @endforeach
 
-                    <!-- Botón de Guardar -->
-                    <div class="flex justify-end">
+                    <!-- Botón de Guardar - Siempre visible al final o solo en la última página? -->
+                    {{-- Lo dejamos siempre visible pero más destacado --}}
+                    <div class="flex justify-end pt-4" x-show="openUnidad === {{ count($form->unidades) - 1 }}">
                         <button type="submit"
-                            class="inline-flex font-semibold items-center px-5 py-2.5 bg-[#f0f0f0] border border-[#767676] rounded-lg font-medium text-sm text-black uppercase tracking-widest hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150 disabled:bg-gray-300 disabled:opacity-75 disabled:cursor-not-allowed">
-                            <i class="fas fa-save mr-2"></i> GUARDAR PLANIFICACIÓN
+                            class="group inline-flex items-center gap-3 px-8 py-4 bg-green-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-green-700 focus:outline-none transition-all duration-300 shadow-xl hover:shadow-green-500/20 hover:-translate-y-1 active:scale-95">
+                            <i class="fas fa-save text-lg transition-transform group-hover:rotate-12"></i> 
+                            GUARDAR PLANIFICACIÓN COMPLETA
                         </button>
                     </div>
                 </div>
