@@ -67,6 +67,15 @@ class ExternalLoginController extends Controller
                 return redirect()->route('seleccionar-rol');
             }
 
+            // Verificar si hay calendario activo antes de permitir login directo
+            \App\Models\CalendarioAcademico::inactivarVencidos();
+            $repo = new \App\Repositories\Calendario\CalendarioCreateRepo();
+            if (!$repo->hayCalendarioActivo()) {
+                // Redirigir al flujo de selección de rol para mostrar alerta o formulario
+                session(['temp_cedula' => $data['cedula']]);
+                return redirect()->route('seleccionar-rol');
+            }
+
             // 6. Si solo tiene un rol, buscamos ese usuario específico y hacemos login
             $user = User::on('emulacion_sogac_2')
                 ->where('usu_cedula', $data['cedula'])

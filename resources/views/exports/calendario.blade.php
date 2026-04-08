@@ -18,8 +18,18 @@
             $endDate = \Carbon\Carbon::parse($calendario->dia_fin_calendario_academico)->endOfDay();
             $mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             
-            // Agrupar meses en filas de 3
-            $mesesChunks = array_chunk(range(1, 12), 3);
+            // Filtrar solo meses que tengan al menos un día dentro de la vigencia
+            $mesesValidos = [];
+            foreach (range(1, 12) as $mes) {
+                $primerDiaMes = \Carbon\Carbon::create($year, $mes, 1)->startOfDay();
+                $ultimoDiaMes = $primerDiaMes->copy()->endOfMonth()->endOfDay();
+                // El mes es válido si su rango se solapa con la vigencia del calendario
+                if ($primerDiaMes <= $endDate && $ultimoDiaMes >= $startDate) {
+                    $mesesValidos[] = $mes;
+                }
+            }
+            // Agrupar meses válidos en filas de 3
+            $mesesChunks = array_chunk($mesesValidos, 3);
             $eventosSorted = $eventos->sortBy('dia_inicio_evento')->values();
             $totalEventos = count($eventosSorted);
             $eventoIndex = 0;

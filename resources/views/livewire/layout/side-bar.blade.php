@@ -93,9 +93,9 @@
                                 </button>
                                 <ul x-show="subMenu === 3" x-collapse class="mt-0 space-y-0">
                                     @can('crear-recurso')
-                                        <li><a href="{{ route('recurso/crear') }}" class="sogat-sidebar-link !text-xs">Crear</a></li>
+                                        <li><a href="{{ route('recurso/crear') }}" class="sogat-sidebar-link !text-xs">Crear Recurso</a></li>
                                     @endcan
-                                    <li><a href="{{ route('recurso/listar') }}" class="sogat-sidebar-link !text-xs">Gestionar</a>
+                                    <li><a href="{{ route('recurso/listar') }}" class="sogat-sidebar-link !text-xs">Gestionar Recursos</a>
                                     </li>
                                 </ul>
                             </div>
@@ -111,9 +111,9 @@
                                 </button>
                                 <ul x-show="subMenu === 4" x-collapse class="mt-0 space-y-0">
                                     @can('crear-estrategia')
-                                        <li><a href="{{ route('estrategia/crear') }}" class="sogat-sidebar-link !text-xs">Crear</a></li>
+                                        <li><a href="{{ route('estrategia/crear') }}" class="sogat-sidebar-link !text-xs">Crear Estrategia</a></li>
                                     @endcan
-                                    <li><a href="{{ route('estrategia/listar') }}" class="sogat-sidebar-link !text-xs">Gestionar</a>
+                                    <li><a href="{{ route('estrategia/listar') }}" class="sogat-sidebar-link !text-xs">Gestionar Estrategias</a>
                                     </li>
                                 </ul>
                             </div>
@@ -131,10 +131,10 @@
                                 <ul x-show="subMenu === 6" x-collapse class="mt-0 space-y-0">
                                     @can('crear-evaluacion')
                                         <li><a href="{{ route('tecnica-evaluacion/crear') }}"
-                                                class="sogat-sidebar-link !text-xs">Crear</a></li>
+                                                class="sogat-sidebar-link !text-xs">Crear Técnica</a></li>
                                     @endcan
                                     <li><a href="{{ route('tecnica-evaluacion/listar') }}"
-                                            class="sogat-sidebar-link !text-xs">Gestionar</a>
+                                            class="sogat-sidebar-link !text-xs">Gestionar Técnicas</a>
                                     </li>
                                 </ul>
                             </div>
@@ -151,10 +151,10 @@
                                 <ul x-show="subMenu === 7" x-collapse class="mt-0 space-y-0">
                                     @can('crear-tipo-evaluacion')
                                         <li><a href="{{ route('tipo-evaluacion/crear') }}"
-                                                class="sogat-sidebar-link !text-xs">Crear</a></li>
+                                                class="sogat-sidebar-link !text-xs">Crear Tipo</a></li>
                                     @endcan
                                     <li><a href="{{ route('tipo-evaluacion/listar') }}"
-                                            class="sogat-sidebar-link !text-xs">Gestionar</a>
+                                            class="sogat-sidebar-link !text-xs">Gestionar Tipos</a>
                                     </li>
                                 </ul>
                             </div>
@@ -170,11 +170,11 @@
                                 </button>
                                 <ul x-show="subMenu === 2" x-collapse class="mt-0 space-y-0">
                                     @can('crear-bibliografia')
-                                        <li><a href="{{ route('bibliografia/crear') }}" class="sogat-sidebar-link !text-xs">Crear</a>
+                                        <li><a href="{{ route('bibliografia/crear') }}" class="sogat-sidebar-link !text-xs">Crear Bibliografía</a>
                                         </li>
                                     @endcan
                                     <li><a href="{{ route('bibliografia/listar') }}"
-                                            class="sogat-sidebar-link !text-xs">Gestionar</a></li>
+                                            class="sogat-sidebar-link !text-xs">Gestionar Bibliografía</a></li>
                                 </ul>
                             </div>
                         @endcan
@@ -192,12 +192,14 @@
                     <ul x-show="openMenu === 18" x-collapse class="mt-0 space-y-0">
                         @can('crear-calendario')
                             @if(!$hayCalendarioActivo)
-                            <li><a href="{{ route('calendario.create') }}" class="sogat-sidebar-link">Calendario</a></li>
+                            <li><a href="{{ route('calendario.create') }}" class="sogat-sidebar-link">Crear Calendario</a></li>
                             @endif
                         @endcan
                         <li><a href="{{ route('calendario.list') }}" class="sogat-sidebar-link">Gestionar Calendario</a></li>
                         @can('crear-calendario')
-                            <li><a href="{{ route('calendario.reporte') }}" target="_blank" class="sogat-sidebar-link">Imprimir Calendario</a></li>
+                            @if($hayCalendarioActivo)
+                                <li><a href="{{ route('calendario.reporte') }}" target="_blank" class="sogat-sidebar-link">Imprimir Calendario</a></li>
+                            @endif
                         @endcan
                     </ul>
                 </div>
@@ -243,9 +245,9 @@
                     </button>
                     <ul x-show="openMenu === 6" x-collapse class="mt-0 space-y-0">
                         @can('crear-planificacion')
-                            <li><a href="{{ route('planificacion/crear') }}" class="sogat-sidebar-link">Crear</a></li>
+                            <li><a href="{{ route('planificacion/crear') }}" class="sogat-sidebar-link">Crear Planificación</a></li>
                         @endcan
-                        <li><a href="{{ route('planificacion/listar') }}" class="sogat-sidebar-link">Gestionar</a></li>
+                        <li><a href="{{ route('planificacion/listar') }}" class="sogat-sidebar-link">Gestionar Planificaciones</a></li>
                     </ul>
                 </div>
             @endcan

@@ -49,7 +49,7 @@ class SideBar extends Component
         $roleCount = $user ? $user->obtenerRolesAsociados()->count() : 0;
         
         $hayCalendarioActivo = false;
-        if ($user && $user->can('crear-calendario')) {
+        if ($user && $user->can('listar-calendario')) {
             $repo = new \App\Repositories\Calendario\CalendarioCreateRepo();
             $hayCalendarioActivo = $repo->hayCalendarioActivo();
         }
