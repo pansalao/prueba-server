@@ -222,16 +222,11 @@
             @endcan
 
 
-            <!-- Roles (DAECE) -->
+            <!-- Permisos (DAECE) -->
             <div>
-                <button @click="openMenu === 17 ? openMenu = null : openMenu = 17" class="sogat-sidebar-item">
-                    <span>Roles</span>
-                    <img :src="openMenu === 17 ? '{{ asset('img/down.png') }}' : '{{ asset('img/left.png') }}'"
-                        class="w-5 h-5 ml-auto">
-                </button>
-                <ul x-show="openMenu === 17" x-collapse class="mt-0 space-y-0">
-                    <li><a href="{{ route('rol/listar') }}" class="sogat-sidebar-link">Listar Roles</a></li>
-                </ul>
+                <a href="{{ route('permiso/listar') }}" class="sogat-sidebar-item">
+                    Permisos
+                </a>
             </div>
 
 

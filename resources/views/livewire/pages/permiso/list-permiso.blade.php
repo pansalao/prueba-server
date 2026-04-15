@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-800 dark:text-gray-500 leading-tight uppercase text-center">
-            {{ __('Roles (DAECE)') }}
+            {{ __('Gestión de Permisos') }}
         </h2>
     </x-slot>
 
@@ -13,32 +13,30 @@
             <div class="sogat-table-container">
                 <div
                     class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between p-4 bg-white dark:bg-gray-800">
-                    <x-table.search-input model="busqueda" placeholder="Buscar rol..." debounce="300ms" />
+                    <x-table.search-input model="busqueda" placeholder="Buscar permiso..." debounce="300ms" />
                 </div>
 
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Código (ID)</th>
-                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Nombre del Rol
+                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Nombre del Permiso
                             </th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                                 Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if ($roles->isNotEmpty())
-                            @foreach ($roles as $rol)
-                                <tr wire:key="{{ $rol->rol_codigo }}"
+                        @if ($permisos->isNotEmpty())
+                            @foreach ($permisos as $permiso)
+                                <tr wire:key="{{ $permiso->rol_codigo }}"
                                     class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <td class="px-4 py-4 text-gray-900 dark:text-white">{{ $rol->rol_codigo }}</td>
                                     <td class="px-4 py-4 text-gray-900 dark:text-white font-semibold">
-                                        {{ $rol->rol_nombre }}
+                                        {{ $permiso->rol_nombre }}
                                     </td>
 
                                     <td class="px-4 py-4">
                                         <div class="flex items-center justify-end space-x-3">
-                                            <a href="{{ route('rol/update', $rol->rol_codigo) }}" wire:navigate
+                                            <a href="{{ route('permiso/update', $permiso->rol_codigo) }}" wire:navigate
                                                 class="flex items-center gap-1 bg-yellow-600 text-white text-xs font-medium px-2.5 py-0.5 rounded hover:bg-yellow-700 dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
                                                     class="w-4 h-4">
@@ -53,8 +51,8 @@
                             @endforeach
                         @else
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <td colspan="3" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                    {{ $busqueda ? 'No se encontraron roles' : 'No hay roles registrados' }}
+                                <td colspan="2" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                    {{ $busqueda ? 'No se encontraron permisos' : 'No hay permisos registrados' }}
                                 </td>
                             </tr>
                         @endif
@@ -72,7 +70,7 @@
                         <option value="25">25</option>
                     </select>
                 </div>
-                <div>{{ $roles->links() }}</div>
+                <div>{{ $permisos->links() }}</div>
             </div>
         </div>
     </div>

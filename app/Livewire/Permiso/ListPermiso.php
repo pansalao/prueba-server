@@ -1,33 +1,31 @@
 <?php
 
-namespace App\Livewire\Rol;
+namespace App\Livewire\Permiso;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Repositories\Rol\RolIndexRepo;
+use App\Repositories\Permiso\PermisoIndexRepo;
 use Illuminate\Support\Str;
 
-class ListRol extends Component
+class ListPermiso extends Component
 {
     use WithPagination;
 
     public $busqueda = '';
     public $paginacion = 5;
 
-    protected $rolRepository;
+    protected $permisoRepository;
 
     /**
      * Inicialización del repositorio. 
-     * Usamos boot() en lugar de __construct() para asegurar compatibilidad con Livewire 3.
      */
     public function boot()
     {
-        $this->rolRepository = new RolIndexRepo();
+        $this->permisoRepository = new PermisoIndexRepo();
     }
 
     /**
-     * Orquestador de la sincronización: 
-     * Lee rutas, procesa texto y pide al repositorio que guarde en BD.
+     * Orquestador de la sincronización de las rutas del sistema como permisos.
      */
     private function sincronizarPermisos()
     {
@@ -65,49 +63,35 @@ class ListRol extends Component
 
                 $accionSlug = $partes[1] ?? 'index';
 
-                // Transformación de texto (Lógica de Negocio)
                 $moduloNombre = Str::title(str_replace('-', ' ', $moduloSlug));
                 $accionNombre = $accionesTraducidas[$accionSlug] ?? Str::title(str_replace('-', ' ', $accionSlug));
 
-                // Forzamos el uso de ' de ' para asegurar la agrupación de módulos con nombres compuestos
                 if (!str_ends_with(strtolower($accionNombre), ' de')) {
                     $accionNombre .= " de";
                 }
 
                 $nombrePermiso = trim("{$accionNombre} {$moduloNombre}");
-
                 $permisosEncontrados[] = $nombrePermiso;
 
-                // Delegar la persistencia al repositorio
-                $this->rolRepository->upsertPermiso($nombrePermiso);
-
-                // Guardamos el nombre del módulo en un array temporal para luego asignarle permisos que no dependen de rutas
+                $this->permisoRepository->upsertPermiso($nombrePermiso);
                 $modulosEncontrados[$moduloNombre] = true;
             }
 
-            // Una vez que tenemos todos los módulos, generamos los permisos "virtuales" que no provienen de rutas
             foreach (array_keys($modulosEncontrados) as $moduloNombre) {
-                // Generamos el permiso de Activación / Inactivación (Cabiar Estatus)
                 $permisoEstatus = "Cambiar Estatus de {$moduloNombre}";
-
-                // Lo añadimos a la lista para que no sea marcado como obsoleto
                 $permisosEncontrados[] = $permisoEstatus;
-
-                // Lo guardamos en BD
-                $this->rolRepository->upsertPermiso($permisoEstatus);
+                $this->permisoRepository->upsertPermiso($permisoEstatus);
             }
 
-            // Delegar la limpieza al repositorio
-            $this->rolRepository->inactivarObsoletos($permisosEncontrados);
+            $this->permisoRepository->inactivarObsoletos($permisosEncontrados);
 
         } catch (\Exception $e) {
-            // Silencioso para no afectar la experiencia de usuario
+            // Silencioso
         }
     }
 
     public function render()
     {
-        // Sincronizamos antes de listar
         $this->sincronizarPermisos();
 
         $paginacionCorrecta = [5, 10, 25, 50];
@@ -115,8 +99,8 @@ class ListRol extends Component
             $this->paginacion = 5;
         }
 
-        $roles = $this->rolRepository->listar($this->busqueda, $this->paginacion);
+        $permisos = $this->permisoRepository->listar($this->busqueda, $this->paginacion);
 
-        return view('livewire.pages.rol.list-rol', compact('roles'));
+        return view('livewire.pages.permiso.list-permiso', compact('permisos'));
     }
 }

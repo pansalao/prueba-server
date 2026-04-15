@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Repositories\Rol;
+namespace App\Repositories\Permiso;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class RolIndexRepo
+class PermisoIndexRepo
 {
     /**
-     * Consulta pura para listar roles desde la base de datos externa.
+     * Consulta pura para listar permisos (basados en roles del sistema externo).
      */
     public function listar($busqueda = '', $paginacion = 5)
     {

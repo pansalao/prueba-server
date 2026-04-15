@@ -23,19 +23,25 @@
     <body class="font-sogat text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
             <div>
-                <a href="/" wire:navigate>
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
+                <img src="{{ asset('assets/img/android-chrome-512x512.png') }}" alt="Mi Logo" class="rounded-full w-20 h-20 fill-current text-gray-500">
             </div>
+            <div class="w-full sm:max-w-md mt-6 bg-white dark:bg-gray-800 shadow-[0px_0px_15px_#000000] overflow-hidden sm:rounded-[15px]">
+                <div class="px-6 py-4">
+                    {{ $slot }}
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-[0px_0px_15px_#000000] overflow-hidden sm:rounded-[15px] border-t-4 border-sogat-blue">
-                {{ $slot }}
-
-                @if(!Route::is('seleccionar-rol'))
-                <div class="mt-4 text-sm text-gray-700 dark:text-gray-300">
-                    Los campos con <span class="text-red-500 font-bold">*</span> son obligatorios
+                    @if(!Route::is('seleccionar-rol'))
+                        <div class="mt-4 text-sm text-gray-700 dark:text-gray-300">
+                            Los campos con <span class="text-red-500 font-bold">*</span> son obligatorios
+                        </div>
+                    @endif
                 </div>
-                @endif
+
+                <footer class="bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 py-3 text-center transition-colors duration-300">
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-tighter">
+                        Todos los derechos reservados © 2026 UPTP - CRÉDITOS UNIDAD DE SISTEMAS / DESARROLLO DE
+                        SOFTWARE.
+                    </p>
+                </footer>
             </div>
         </div>
     </body>

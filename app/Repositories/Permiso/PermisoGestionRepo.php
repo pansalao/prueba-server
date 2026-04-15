@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Repositories\Rol;
+namespace App\Repositories\Permiso;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class RolPermisoRepo
+class PermisoGestionRepo
 {
-    public function getRol($rolId)
+    public function getPermitible($id)
     {
         return DB::connection('external_db')
             ->table('rol')
-            ->where('rol_codigo', $rolId)
+            ->where('rol_codigo', $id)
             ->first();
     }
 
@@ -23,21 +23,21 @@ class RolPermisoRepo
             ->get();
     }
 
-    public function getRolePermissions($rolId)
+    public function getPermitiblePermissions($id)
     {
         return DB::table('rol_permiso')
-            ->where('id_rol', $rolId)
+            ->where('id_rol', $id)
             ->where('estatus', '1')
             ->pluck('id_permiso')
             ->toArray();
     }
 
-    public function saveRolePermissions($rolId, $selectedPermissions)
+    public function savePermitiblePermissions($id, $selectedPermissions)
     {
         DB::beginTransaction();
         try {
             // Desactivar los permisos que ya no están seleccionados
-            $queryToDeactivate = \App\Models\RolPermiso::where('id_rol', $rolId);
+            $queryToDeactivate = \App\Models\RolPermiso::where('id_rol', $id);
             if (!empty($selectedPermissions)) {
                 $queryToDeactivate->whereNotIn('id_permiso', $selectedPermissions);
             }
@@ -51,7 +51,7 @@ class RolPermisoRepo
             // Insertar o activar los permisos seleccionados
             if (!empty($selectedPermissions)) {
                 foreach ($selectedPermissions as $idPermiso) {
-                    $rp = \App\Models\RolPermiso::where('id_rol', $rolId)
+                    $rp = \App\Models\RolPermiso::where('id_rol', $id)
                         ->where('id_permiso', $idPermiso)
                         ->first();
 
@@ -64,7 +64,7 @@ class RolPermisoRepo
                         }
                     } else {
                         \App\Models\RolPermiso::create([
-                            'id_rol' => $rolId,
+                            'id_rol' => $id,
                             'id_permiso' => $idPermiso,
                             'estatus' => '1',
                             'fecha_creacion' => Carbon::now()

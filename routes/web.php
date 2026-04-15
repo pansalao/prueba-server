@@ -156,9 +156,9 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
     Route::get('calendario/show/{id}', ShowCalendario::class)->middleware('can:ver-calendario')->name('calendario.show');
 
 
-    // Módulo de Roles (DAECE)
-    Route::get('rol/list', \App\Livewire\Rol\ListRol::class)->name('rol/listar');
-    Route::get('rol/update/{rolId}', \App\Livewire\Rol\UpdateRolPermisos::class)->name('rol/update');
+    // Módulo de Permisos (DAECE)
+    Route::get('permiso/list', \App\Livewire\Permiso\ListPermiso::class)->name('permiso/listar');
+    Route::get('permiso/update/{permisoId}', \App\Livewire\Permiso\UpdatePermiso::class)->name('permiso/update');
 
 
     // Rutas para Bitácora

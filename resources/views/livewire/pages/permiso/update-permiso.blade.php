@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-800 dark:text-gray-500 leading-tight uppercase text-center">
-            {{ __('Asignación de Permisos del Rol') }}
+            {{ __('Asignación de Permisos') }}
         </h2>
     </x-slot>
 
@@ -14,13 +14,9 @@
                     <div>
                         <h3
                             class="text-xl font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight flex items-center gap-2">
-                            <span class="material-icons text-[#265dcf]">manage_accounts</span>
-                            Rol: {{ $rol->rol_nombre }}
+                            <span class="material-icons text-black dark:text-gray-300">manage_accounts</span>
+                            Permiso para: {{ $elemento->rol_nombre }}
                         </h3>
-                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-1 uppercase">
-                            Código: {{ $rol->rol_codigo }} | Estatus:
-                            {{ $rol->rol_estatus == 'A' || $rol->rol_estatus == 1 ? 'Activo' : 'Inactivo' }}
-                        </p>
                     </div>
                 </div>
 
@@ -60,7 +56,7 @@
                                                 <div class="relative flex items-center">
                                                     <input type="checkbox" wire:model.defer="selectedPermisos"
                                                         value="{{ $permiso['id'] }}"
-                                                        class="w-5 h-5 text-[#265dcf] border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 transition-all cursor-pointer peer">
+                                                        class="w-5 h-5 text-black border-gray-300 rounded focus:ring-gray-500 dark:bg-gray-700 dark:border-gray-600 transition-all cursor-pointer peer">
                                                 </div>
                                                 <div class="flex flex-col">
                                                     <span
@@ -82,7 +78,7 @@
 
                 <!-- Botones de Acción -->
                 <div class="flex justify-end gap-4 mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <a href="{{ route('rol/listar') }}" wire:navigate
+                    <a href="{{ route('permiso/listar') }}" wire:navigate
                         class="inline-flex font-semibold items-center px-4 py-2 bg-[#f0f0f0] border border-[#767676] rounded-lg text-sm text-black uppercase tracking-widest hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150 shadow-sm">
                         Cancelar
                     </a>
