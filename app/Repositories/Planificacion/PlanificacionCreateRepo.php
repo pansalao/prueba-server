@@ -248,11 +248,10 @@ class PlanificacionCreateRepo
                 }
 
                 foreach ($unidad['estrategias'] as $estrategia) {
-                    if (!empty($estrategia['tema_id']) && !empty($estrategia['actividad'])) {
-
+                    if (!empty($estrategia['tecnica_actividad_id']) && !empty($estrategia['actividad'])) {
                         $detalleEstrategia = \App\Models\DetalleEstrategia::create([
                             'id_unidad_corte' => $unidadId,
-                            'id_tema_unidad' => $estrategia['tema_id'],
+                            'id_tecnica_actividad' => $estrategia['tecnica_actividad_id'],
                             'actividad' => $estrategia['actividad'],
                             'fecha_creacion' => now(),
                             'estatus' => '1',

@@ -11,7 +11,8 @@ class CreatePlanificacion extends Component
 {
     public $docente_id, $docenteNombre, $proposito, $mallaNombre, $lapsoNombre;
     public $isCoordinador = false;
-    public Collection $tecnica, $recursosMaestros, $evaluaciones, $bibliografiasMaestras, $asignaciones;
+    public $openUnidad = 0;
+    public Collection $tecnica, $recursosMaestros, $evaluaciones, $bibliografiasMaestras, $asignaciones, $tecnicasActividad;
     public \App\Livewire\Forms\Planificacion\CreatePlanificacionForm $form;
     public array $temasPorUnidad = [];
     protected $planificacionRepository;
@@ -112,6 +113,7 @@ class CreatePlanificacion extends Component
         $this->evaluaciones = $this->planificacionRepository->select_evaluaciones();
         $this->recursosMaestros = $this->planificacionRepository->select_recursos();
         $this->bibliografiasMaestras = $this->planificacionRepository->select_bibliografias();
+        $this->tecnicasActividad = $this->planificacionRepository->select_tecnica_actividad();
 
         // Cargar asignaciones: Si tiene permiso de edición (como un coordinador) ve todas, si es docente solo las suyas
         if (Gate::allows('editar-planificacion')) {
@@ -179,7 +181,7 @@ class CreatePlanificacion extends Component
                     'contenidos' => [['contenido_id' => '']]
                 ]
             ],
-            'estrategias' => [['tema_id' => '', 'actividad' => '', 'recursos' => [['recurso_id' => '']]]],
+            'estrategias' => [['tecnica_actividad_id' => '', 'actividad' => '', 'recursos' => [['recurso_id' => '']]]],
             'evaluaciones' => [['fecha_evaluacion' => '', 'evaluacion_id' => '', 'ponderacion' => 5, 'tecnica_id' => '', 'forma_participacion' => '', 'integrantes' => null]],
             'bibliografias' => [['bibliografia_id' => '']],
             'indicadores_logro' => ''
@@ -224,7 +226,7 @@ class CreatePlanificacion extends Component
                     'forma_participacion' => '',
                     'integrantes' => null
                 ],
-                'estrategias' => ['tema_id' => '', 'actividad' => '', 'recursos' => [['recurso_id' => '']]],
+                'estrategias' => ['tecnica_actividad_id' => '', 'actividad' => '', 'recursos' => [['recurso_id' => '']]],
                 // 'bibliografias' => ['bibliografia_id' => ''] // This was for global, now handled above
             ];
             if (isset($defaultTemplates[$arrayName])) {
@@ -292,11 +294,33 @@ class CreatePlanificacion extends Component
 
             session()->flash('message', 'Planificación guardada correctamente.');
             $this->form->reset(['unidades', 'id_profesor_asignado']);
+            $this->openUnidad = 0;
             $this->inicializarUnidades();
+            $this->dispatch('scroll-to-top');
         } catch (\Exception $e) {
             session()->flash('error', 'Error al guardar la planificación: ' . $e->getMessage());
         }
     }
+
+    public function validarYAvanzar($index)
+    {
+        // Validar toda la forma antes de permitir avanzar para asegurar integridad total
+        // de la unidad actual que se está intentando dejar.
+        $this->form->validate();
+
+        // Si sobrevive al validate, avanzamos
+        $this->openUnidad = $index + 1;
+        $this->dispatch('scroll-to-top');
+    }
+
+    public function unidadAnterior($index)
+    {
+        if ($index > 0) {
+            $this->openUnidad = $index - 1;
+            $this->dispatch('scroll-to-top');
+        }
+    }
+
     public function openObjetivoModal($temaId)
     {
         if (!$this->isCoordinador) {
