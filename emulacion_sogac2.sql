@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-03-2026 a las 01:26:26
+-- Tiempo de generación: 19-04-2026 a las 20:31:32
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `emulacion_sogac_2`
+-- Base de datos: `emulacion_sogac_esta_1`
 --
 
 -- --------------------------------------------------------
@@ -423,11 +423,11 @@ CREATE TABLE `seccion_unidad_docente` (
 --
 
 INSERT INTO `seccion_unidad_docente` (`sud_codigo`, `sud_capacidad`, `sud_nro_inscritos`, `sud_cod_seccion`, `sud_ced_docente`, `sud_cod_unidad`, `sud_estatus`, `sud_condicion`, `sud_nameplan`) VALUES
-(60992, 35, 0, 631, '------------', 5, 'A', 'A', NULL),
-(60993, 35, 0, 631, '------------', 4, 'A', 'A', NULL),
-(60994, 35, 0, 631, '------------', 3, 'A', 'A', NULL),
-(60995, 35, 0, 631, '------------', 2, 'A', 'A', NULL),
-(60996, 35, 0, 631, '------------', 1, 'A', 'A', NULL);
+(60992, 35, 0, 631, '31009367', 5, 'A', 'A', NULL),
+(60993, 35, 0, 631, '31009367', 4, 'A', 'A', NULL),
+(60994, 35, 0, 631, '31009367', 3, 'A', 'A', NULL),
+(60995, 35, 0, 631, '31009367', 2, 'A', 'A', NULL),
+(60996, 35, 0, 631, '31009367', 1, 'A', 'A', NULL);
 
 -- --------------------------------------------------------
 

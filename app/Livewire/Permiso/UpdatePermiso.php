@@ -59,7 +59,7 @@ class UpdatePermiso extends Component
             }
 
             $modules[$module][] = [
-                'id' => $p->id_permiso,
+                'id' => (string) $p->id_permiso,
                 'action' => $action,
                 'full_name' => $p->nombre_permiso,
                 'estatus' => $p->estatus
@@ -69,6 +69,31 @@ class UpdatePermiso extends Component
         ksort($modules);
 
         return $modules;
+    }
+
+    public function toggleModule($moduleName)
+    {
+        if (!isset($this->modulosPermisos[$moduleName])) {
+            return;
+        }
+
+        $moduleIds = array_column($this->modulosPermisos[$moduleName], 'id');
+        $allSelected = true;
+
+        foreach ($moduleIds as $id) {
+            if (!in_array($id, $this->selectedPermisos)) {
+                $allSelected = false;
+                break;
+            }
+        }
+
+        if ($allSelected) {
+            // Remove all IDs of this module
+            $this->selectedPermisos = array_values(array_diff($this->selectedPermisos, $moduleIds));
+        } else {
+            // Select all in this module
+            $this->selectedPermisos = array_values(array_unique(array_merge($this->selectedPermisos, $moduleIds)));
+        }
     }
 
     public function savePermisos()

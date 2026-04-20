@@ -31,6 +31,16 @@
                                 class="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                                 @click="openModule = openModule === '{{ Str::slug($moduleName) }}' ? null : '{{ Str::slug($moduleName) }}'">
                                 <div class="flex items-center gap-3">
+                                    @php
+                                        $moduleIds = array_column($permisos, 'id');
+                                        $isFull = !empty($moduleIds) && empty(array_diff($moduleIds, $selectedPermisos));
+                                    @endphp
+                                    <div @click.stop>
+                                        <input type="checkbox" 
+                                            wire:click="toggleModule('{{ $moduleName }}')"
+                                            {{ $isFull ? 'checked' : '' }}
+                                            class="w-5 h-5 text-black border-gray-300 rounded focus:ring-gray-500 dark:bg-gray-700 dark:border-gray-600 transition-all cursor-pointer">
+                                    </div>
                                     <h3
                                         class="text-lg font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">
                                         {{ $moduleName }}

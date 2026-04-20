@@ -125,6 +125,7 @@
 
     @livewireScripts
     @livewire('livewire-ui-modal')
+    @livewire('session-timeout')
 </body>
 
 </html>

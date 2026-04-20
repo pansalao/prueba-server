@@ -130,10 +130,10 @@ class PlanificacionCreateRepo
             'p.per_nombres as name',
             'p.per_apellidos as apellido'
         )
+            ->distinct()
             ->get()
             ->map(function ($asignacion) {
-                $docente = "{$asignacion->name} {$asignacion->apellido}";
-                $asignacion->descripcion_completa = "{$asignacion->nombre_unidad_curricular} - Sección {$asignacion->nombre_seccion} | Docente: {$docente}";
+                $asignacion->descripcion_completa = "{$asignacion->nombre_unidad_curricular} - Sección {$asignacion->nombre_seccion}";
                 return $asignacion;
             });
     }
@@ -210,7 +210,7 @@ class PlanificacionCreateRepo
         ]);
     }
 
-    public function savePlanificacionTransaccion($idProfesorAsignado, $unidades)
+    public function savePlanificacionTransaccion($idProfesorAsignado, $unidades, $tiposSeccion = [])
     {
         DB::beginTransaction();
 
@@ -219,6 +219,7 @@ class PlanificacionCreateRepo
                 'id_profesor_asignado' => $idProfesorAsignado,
                 'fecha_creacion' => now(),
                 'estatus' => '2', // Pendiente por defecto
+                'tipo_planificacion' => json_encode($tiposSeccion), // Almacenar los tipos de clase/sección (Regular, PER, Repitencia)
             ];
 
             $planificacion = \App\Models\Planificacion::create($planificacionData);

@@ -10,6 +10,7 @@ class CreatePlanificacionForm extends Form
 {
     public $id_profesor_asignado;
     public $unidades = [];
+    public $tipos_seccion = [];
 
     public function getTotalPonderacionForUnidad($unidadIndex)
     {
@@ -21,6 +22,7 @@ class CreatePlanificacionForm extends Form
     {
         $rules = [
             'id_profesor_asignado' => 'required|exists:emulacion_sogac_2.seccion_unidad_docente,sud_codigo',
+            'tipos_seccion' => 'required|array|min:1',
         ];
 
         foreach ($this->unidades as $index => $unidad) {
@@ -156,6 +158,8 @@ class CreatePlanificacionForm extends Form
 
         $messages['id_profesor_asignado.required'] = 'Debe seleccionar una Unidad Curricular.';
         $messages['id_profesor_asignado.exists'] = 'La asignación seleccionada no es válida.';
+        $messages['tipos_seccion.required'] = 'Debe seleccionar al menos un tipo de sección (Regular, PER o Repitencia).';
+        $messages['tipos_seccion.min'] = 'Debe seleccionar al menos un tipo de sección (Regular, PER o Repitencia).';
 
         $messages['unidades.*.recursos.*.recurso_id.required'] = 'Debe seleccionar un recurso.';
         $messages['unidades.*.objetivos.*.tema_id.required'] = 'Debe seleccionar un tema.';

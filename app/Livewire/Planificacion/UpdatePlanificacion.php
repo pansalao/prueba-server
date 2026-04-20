@@ -35,6 +35,7 @@ class UpdatePlanificacion extends Component
     public $nombre_seccion;
     public $nombre_lapso;
     public $nombre_malla;
+    public $docente_rol;
 
     // Datos editables que vienen del formulario
     public UpdatePlanificacionForm $form;
@@ -98,6 +99,7 @@ class UpdatePlanificacion extends Component
         $this->nombre_unidad_curricular = $planificacion['nombre_unidad_curricular'];
         $this->nombre_seccion = $planificacion['nombre_seccion'];
         $this->nombre_lapso = $planificacion['nombre_lapso'];
+        $this->docente_rol = $planificacion['docente_rol'] ?? 'Docente';
 
         // Obtener Malla (usando el id_profesor_asignado que está en la DB o el id_detalle_profesor_asignado)
         // El Repo viewRepo ya debería darnos esto, pero si no, lo buscamos

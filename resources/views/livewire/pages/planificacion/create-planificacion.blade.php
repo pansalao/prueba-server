@@ -19,50 +19,81 @@
         <form wire:submit.prevent="savePlanificacion" novalidate>
             <div class="space-y-4">
 
-                <div class="grid grid-cols-1 gap-6 mb-6">
-                    {{-- Selección de Unidad Curricular --}}
-                    <div class="min-w-0">
-                        <x-select label="Unidad Curricular" :options="$asignaciones"
-                            valueField="id_detalle_profesor_asignado" textField="descripcion_completa"
-                            wire:model.live="form.id_profesor_asignado" placeholder="Seleccione una asignación"
-                            selectClass="truncate max-w-full" required />
-
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-6">
+                    <div class="bg-gray-50 dark:bg-gray-900/50 px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                                <span class="material-icons">person</span>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">{{ $docenteRol }}</p>
+                                <p class="text-base font-black text-gray-800 dark:text-gray-200 mt-0.5">{{ $docenteNombre }}</p>
+                            </div>
+                        </div>
                     </div>
 
-                    {{-- Propósito de la Unidad Curricular, Malla y Lapso --}}
-                    @if($form->id_profesor_asignado)
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                            @if($mallaNombre)
-                                <div class="p-4 bg-gray-50 dark:bg-gray-700 border-l-4 border-gray-400 rounded-lg shadow-sm">
-                                    <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-tight">
-                                        Malla Curricular</h4>
-                                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ $mallaNombre }}</p>
-                                </div>
-                            @endif
-                            @if($lapsoNombre)
-                                <div class="p-4 bg-gray-50 dark:bg-gray-700 border-l-4 border-gray-400 rounded-lg shadow-sm">
-                                    <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-tight">
-                                        Lapso Académico</h4>
-                                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ $lapsoNombre }}</p>
-                                </div>
-                            @endif
+                    <div class="p-6">
+                        {{-- Selección de Unidad Curricular --}}
+                        <div class="max-w-4xl mx-auto">
+                            <x-select label="Unidad Curricular a Planificar" :options="$asignaciones"
+                                valueField="id_detalle_profesor_asignado" textField="descripcion_completa"
+                                wire:model.live="form.id_profesor_asignado" placeholder="Seleccione una asignatura..."
+                                selectClass="font-medium text-gray-700 dark:text-gray-300 w-full" required />
                         </div>
 
-                        @if($proposito)
-                            <div class="p-4 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 rounded-lg shadow-sm mt-4">
-                                <div class="flex items-start gap-3">
-                                    <span class="material-icons text-blue-600 dark:text-blue-400">info</span>
-                                    <div>
-                                        <h4 class="text-sm font-bold text-blue-800 dark:text-blue-200 uppercase tracking-tight">
-                                            Propósito de la Unidad Curricular</h4>
-                                        <p class="mt-1 text-sm text-blue-700 dark:text-blue-300 leading-relaxed italic">
-                                            "{{ $proposito }}"
-                                        </p>
-                                    </div>
+                        {{-- Propósito de la Unidad Curricular, Malla y Lapso --}}
+                        @if($form->id_profesor_asignado)
+                            <div class="max-w-4xl mx-auto mt-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="p-4 bg-gray-50/80 dark:bg-gray-800/80 border border-gray-200/60 dark:border-gray-700/60 rounded-xl transition-all">
+                                            <h4 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                                <span class="material-icons text-sm text-indigo-500">people_outline</span> Tipo de Sección a Planificar <span class="text-red-500">*</span>
+                                            </h4>
+                                            <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+                                                <label class="flex items-center gap-2 cursor-pointer group">
+                                                    <input type="checkbox" wire:model.live="form.tipos_seccion" value="Regular" class="w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Regular</span>
+                                                </label>
+                                                <label class="flex items-center gap-2 cursor-pointer group">
+                                                    <input type="checkbox" wire:model.live="form.tipos_seccion" value="PER" class="w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">PER</span>
+                                                </label>
+                                                <label class="flex items-center gap-2 cursor-pointer group">
+                                                    <input type="checkbox" wire:model.live="form.tipos_seccion" value="Repitencia" class="w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Repitencia</span>
+                                                </label>
+                                            </div>
+                                            @error('form.tipos_seccion') <span class="text-xs text-red-500 mt-2 block font-semibold">{{ $message }}</span> @enderror
+                                        </div>
+                                    @if($lapsoNombre)
+                                        <div class="p-4 bg-gray-50/80 dark:bg-gray-800/80 border border-gray-200/60 dark:border-gray-700/60 rounded-xl flex items-center gap-4 transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
+                                            <div class="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 shadow-sm border border-teal-100 dark:border-teal-800/30">
+                                                <span class="material-icons text-xl">calendar_month</span>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Lapso Académico</h4>
+                                                <p class="text-sm font-bold text-gray-800 dark:text-gray-200 mt-0.5">{{ $lapsoNombre }}</p>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
+
+                                @if($proposito)
+                                    <div class="mt-4 p-5 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-xl flex gap-4 items-start">
+                                        <div class="shrink-0 mt-0.5">
+                                            <span class="material-icons text-blue-500 dark:text-blue-400">flag</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase tracking-widest mb-1.5">Propósito de la Unidad Curricular</h4>
+                                            <p class="text-sm text-blue-900 dark:text-blue-200/80 leading-relaxed font-medium">
+                                                {{ $proposito }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         @endif
-                    @endif
+                    </div>
                 </div>
 
                 <div class="space-y-6" x-data="{ openUnidad: @entangle('openUnidad') }">
@@ -142,348 +173,269 @@
                                 </div>
                                 </div>
 
-                                <div class="p-8 space-y-10 flex-grow">
+                                <div x-data="{ openSection: 'tematica' }" class="p-8 space-y-4 flex-grow">
 
-                                    {{-- Contenidos agrupados por Objetivo --}}
-                                    <div class="space-y-6">
-                                        <div class="flex items-center justify-between">
-                                            <h4
-                                                class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                    {{-- Contenidos agrupados por tematica --}}
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'tematica' ? '' : 'tematica'">
+                                            <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                                <span class="material-icons text-blue-500">menu_book</span>
                                                 Temática General
                                             </h4>
-                                            <button type="button" wire:click="addItem({{ $index }}, 'objetivos')"
-                                                class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm">
-                                                <span class="material-icons text-sm">add</span>
-                                                AÑADIR TEMA
-                                            </button>
+                                            <div class="flex items-center gap-4">
+                                                <button type="button" wire:click.stop="addItem({{ $index }}, 'objetivos')"
+                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors">
+                                                    <span class="material-icons text-[12px]">add</span>
+                                                    AÑADIR TEMA
+                                                </button>
+                                                <span class="material-icons transition-transform duration-200" :class="openSection === 'tematica' ? 'rotate-180' : ''">expand_more</span>
+                                            </div>
                                         </div>
-
-                                        @foreach ($unidad['objetivos'] as $objetivoIndex => $objetivo)
-                                            <div
-                                                class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 space-y-4">
-
-                                                {{-- Selección de Tema y Objetivo --}}
-                                                <div class="grid grid-cols-1 gap-4">
-                                                    {{-- Columna de Tema --}}
-                                                    <div class="space-y-2">
-                                                        <div class="flex items-center justify-between">
-                                                            <label
-                                                                class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Tema</label>
-                                                            @if (count($unidad['objetivos']) > 1)
-                                                                <button type="button"
-                                                                    wire:click="removeItem({{ $index }}, 'objetivos', {{ $objetivoIndex }})"
-                                                                    class="text-gray-400 hover:text-red-500 transition-colors text-[10px] font-bold uppercase flex items-center gap-1">
-                                                                    <span class="material-icons text-xs">delete</span> ELIMINAR
-                                                                    OBJETIVO
-                                                                </button>
-                                                            @endif
-                                                        </div>
-                                                        <x-select :options="$temasUnidad" valueField="id_tema_unidad"
-                                                            textField="titulo_tema"
-                                                            wire:model.live.debounce.250ms="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.tema_id"
-                                                            placeholder="Seleccione un tema" class="text-sm w-full" required />
-                                                        @error("form.unidades.$index.objetivos.$objetivoIndex.tema_id")
-                                                            <span
-                                                                class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                        @enderror
-
-
-                                                    </div>
-
-                                                    {{-- Columna de Objetivo --}}
-                                                    <div class="space-y-2">
-                                                        <div class="flex items-center justify-between">
-                                                            <label
-                                                                class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Objetivo</label>
-                                                            @php
-                                                                $selectedTemaId = $unidad['objetivos'][$objetivoIndex]['tema_id'] ?? null;
-                                                            @endphp
-                                                            @if($isCoordinador)
-                                                                <button type="button"
-                                                                    wire:click="openObjetivoModal('{{ $selectedTemaId }}')"
-                                                                    class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
-                                                                    <span class="material-icons text-[12px]">add</span> NUEVO
-                                                                </button>
-                                                            @endif
-                                                        </div>
-
-                                                        @php
-                                                            $opcionesObjetivo = $todosLosObjetivos->where('id_tema_unidad', $selectedTemaId);
-                                                        @endphp
-
-                                                        <x-select :options="$opcionesObjetivo" valueField="id_objetivo"
-                                                            textField="titulo_objetivo"
-                                                            wire:model.live.debounce.250ms="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.objetivo_id"
-                                                            placeholder="Seleccione un objetivo" class="text-sm w-full"
-                                                            :disabled="empty($selectedTemaId)" required />
-                                                        @error("form.unidades.$index.objetivos.$objetivoIndex.objetivo_id")
-                                                            <span
-                                                                class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-
-                                                {{-- Contedor de Contenidos para este Objetivo --}}
-                                                <div
-                                                    class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-                                                    <div class="flex items-center justify-between mb-3">
-                                                        <label
-                                                            class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Contenidos
-                                                            del Objetivo</label>
-                                                        @php
-                                                            $selectedObjetivoId = $unidad['objetivos'][$objetivoIndex]['objetivo_id'] ?? null;
-                                                        @endphp
-                                                        <button type="button"
-                                                            wire:click="addItem({{ $index }}, 'contenidos', {{ $objetivoIndex }})"
-                                                            @if(empty($selectedObjetivoId)) disabled @endif
-                                                            class="inline-flex items-center gap-1 text-[10px] border border-[#767676] px-2 py-1 rounded-lg font-bold transition-colors shadow-sm uppercase {{ empty($selectedObjetivoId) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#f0f0f0] text-black hover:bg-gray-200' }}">
-                                                            <span class="material-icons text-xs">add</span> Agregar Contenido
-                                                        </button>
-                                                    </div>
-
-                                                    <div class="space-y-3">
-                                                        @foreach ($objetivo['contenidos'] as $contenidoIndex => $contenido)
-                                                            <div class="flex items-start gap-2">
-                                                                <div class="flex-grow">
-                                                                    @php
-                                                                        $selectedObjetivoId = $unidad['objetivos'][$objetivoIndex]['objetivo_id'] ?? null;
-                                                                        $opcionesContenido = $todosLosContenidos->where('id_objetivo', $selectedObjetivoId);
-                                                                    @endphp
-                                                                    <x-select :options="$opcionesContenido" valueField="id_contenido"
-                                                                        textField="titulo_contenido"
-                                                                        wire:model.live.debounce.250ms="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.contenidos.{{ $contenidoIndex }}.contenido_id"
-                                                                        placeholder="Seleccione un contenido" class="text-sm w-full"
-                                                                        :disabled="empty($selectedObjetivoId)" required />
-                                                                    @error("form.unidades.$index.objetivos.$objetivoIndex.contenidos.$contenidoIndex.contenido_id")
-                                                                        <span
-                                                                            class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                                    @enderror
-                                                                </div>
-                                                                @if (count($objetivo['contenidos']) > 1)
-                                                                    <button type="button"
-                                                                        wire:click="removeItem({{ $index }}, 'contenidos', {{ $contenidoIndex }}, {{ $objetivoIndex }})"
-                                                                        class="mt-2 text-gray-400 hover:text-red-500 transition-colors">
-                                                                        <span class="material-icons text-sm">delete</span>
+                                        <div x-show="openSection === 'tematica'" x-collapse class="p-4 space-y-6">
+                                            @foreach ($unidad['objetivos'] as $objetivoIndex => $objetivo)
+                                                <div class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 space-y-4">
+                                                    <div class="grid grid-cols-1 gap-4">
+                                                        <div class="space-y-2">
+                                                            <div class="flex items-center justify-between">
+                                                                <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Tema</label>
+                                                                @if (count($unidad['objetivos']) > 1)
+                                                                    <button type="button" wire:click="removeItem({{ $index }}, 'objetivos', {{ $objetivoIndex }})"
+                                                                        class="text-gray-400 hover:text-red-500 transition-colors text-[10px] font-bold uppercase flex items-center gap-1">
+                                                                        <span class="material-icons text-xs">delete</span> ELIMINAR OBJETIVO
                                                                     </button>
                                                                 @endif
                                                             </div>
-                                                        @endforeach
+                                                            <x-select :options="$temasUnidad" valueField="id_tema_unidad" textField="titulo_tema"
+                                                                wire:model.live.debounce.250ms="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.tema_id"
+                                                                placeholder="Seleccione un tema" class="text-sm w-full" required />
+                                                            @error("form.unidades.$index.objetivos.$objetivoIndex.tema_id")
+                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="space-y-2">
+                                                            <div class="flex items-center justify-between">
+                                                                <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Objetivo</label>
+                                                                @php $selectedTemaId = $unidad['objetivos'][$objetivoIndex]['tema_id'] ?? null; @endphp
+                                                                @if($isCoordinador)
+                                                                    <button type="button" wire:click="openObjetivoModal('{{ $selectedTemaId }}')"
+                                                                        class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
+                                                                        <span class="material-icons text-[12px]">add</span> NUEVO
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+                                                            @php $opcionesObjetivo = $todosLosObjetivos->where('id_tema_unidad', $selectedTemaId); @endphp
+                                                            <x-select :options="$opcionesObjetivo" valueField="id_objetivo" textField="titulo_objetivo"
+                                                                wire:model.live.debounce.250ms="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.objetivo_id"
+                                                                placeholder="Seleccione un objetivo" class="text-sm w-full" :disabled="empty($selectedTemaId)" required />
+                                                            @error("form.unidades.$index.objetivos.$objetivoIndex.objetivo_id")
+                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-
-
-
-                                    </div>
-
-                                    {{-- Estrategias Pedagógicas --}}
-                                    <div class="space-y-6 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                        <div class="flex items-center justify-between">
-                                            <h4
-                                                class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                                Estrategias Pedagógicas
-                                            </h4>
-
-                                        </div>
-
-                                        @foreach ($unidad['estrategias'] as $estrategiaIndex => $estrategia)
-                                            <div
-                                                class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 space-y-4">
-                                                <div class="flex items-center justify-end">
-                                                    @if (count($unidad['estrategias']) > 1)
-                                                        <button type="button"
-                                                            wire:click="removeItem({{ $index }}, 'estrategias', {{ $estrategiaIndex }})"
-                                                            class="text-gray-400 hover:text-red-500 transition-colors text-[10px] font-bold uppercase flex items-center gap-1">
-                                                            <span class="material-icons text-xs">delete</span> ELIMINAR
-                                                        </button>
-                                                    @endif
-                                                </div>
-
-                                                <div class="grid grid-cols-1 gap-4">
-                                                    {{-- Tema Select --}}
-                                                    <div class="space-y-2">
-                                                        <label
-                                                            class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Estrategia
-                                                            o Actividad</label>
-                                                        <x-select :options="$tecnicasActividad" valueField="id_tecnica_actividad"
-                                                            textField="nombre_tecnica_actividad"
-                                                            wire:model.live.debounce.250ms="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.tecnica_actividad_id"
-                                                            placeholder="Seleccione..." class="text-sm w-full" required />
-                                                        @error("form.unidades.$index.estrategias.$estrategiaIndex.tecnica_actividad_id")
-                                                            <span
-                                                                class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                        @enderror
-
-                                                    </div>
-
-                                                    {{-- Actividad Textarea --}}
-                                                    <div class="space-y-2">
-                                                        <label
-                                                            class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Actividad</label>
-                                                        <textarea
-                                                            wire:model.live.debounce.500ms="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.actividad"
-                                                            class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-sm"
-                                                            rows="3" placeholder="Describa la actividad..."></textarea>
-                                                        @error("form.unidades.$index.estrategias.$estrategiaIndex.actividad")
-                                                            <span
-                                                                class="text-red-500 text-xs font-bold block mt-1">{{ $message }}</span>
-                                                        @enderror
-
-                                                    </div>
-
-                                                    {{-- Recursos --}}
-                                                    <div class="space-y-2">
-                                                        <div class="flex items-center justify-between">
-                                                            <label
-                                                                class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Recursos</label>
-                                                            <button type="button"
-                                                                wire:click="addItem({{ $index }}, 'estrategia_recursos', {{ $estrategiaIndex }})"
-                                                                class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
-                                                                <span class="material-icons text-xs">add</span> AÑADIR
+                                                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                                                        <div class="flex items-center justify-between mb-3">
+                                                            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Contenidos del Objetivo</label>
+                                                            @php $selectedObjetivoId = $unidad['objetivos'][$objetivoIndex]['objetivo_id'] ?? null; @endphp
+                                                            <button type="button" wire:click="addItem({{ $index }}, 'contenidos', {{ $objetivoIndex }})"
+                                                                @if(empty($selectedObjetivoId)) disabled @endif
+                                                                class="inline-flex items-center gap-1 text-[10px] border border-[#767676] px-2 py-1 rounded-lg font-bold transition-colors shadow-sm uppercase {{ empty($selectedObjetivoId) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#f0f0f0] text-black hover:bg-gray-200' }}">
+                                                                <span class="material-icons text-xs">add</span> Agregar Contenido
                                                             </button>
                                                         </div>
-                                                        @foreach ($estrategia['recursos'] as $recursoIndex => $recurso)
-                                                            <div class="flex items-center gap-2">
-                                                                <div class="flex-grow">
-                                                                    <x-select :options="$recursosMaestros" valueField="id_recurso"
-                                                                        textField="nombre_recurso"
-                                                                        wire:model.live.debounce.250ms="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.recursos.{{ $recursoIndex }}.recurso_id"
-                                                                        placeholder="Seleccione un recurso" class="text-sm w-full"
-                                                                        required />
-                                                                    @error("form.unidades.$index.estrategias.$estrategiaIndex.recursos.$recursoIndex.recurso_id")
-                                                                        <span
-                                                                            class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                                    @enderror
+                                                        <div class="space-y-3">
+                                                            @foreach ($objetivo['contenidos'] as $contenidoIndex => $contenido)
+                                                                <div class="flex items-start gap-2">
+                                                                    <div class="flex-grow">
+                                                                        @php
+                                                                            $selectedObjetivoId = $unidad['objetivos'][$objetivoIndex]['objetivo_id'] ?? null;
+                                                                            $opcionesContenido = $todosLosContenidos->where('id_objetivo', $selectedObjetivoId);
+                                                                        @endphp
+                                                                        <x-select :options="$opcionesContenido" valueField="id_contenido" textField="titulo_contenido"
+                                                                            wire:model.live.debounce.250ms="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.contenidos.{{ $contenidoIndex }}.contenido_id"
+                                                                            placeholder="Seleccione un contenido" class="text-sm w-full" :disabled="empty($selectedObjetivoId)" required />
+                                                                        @error("form.unidades.$index.objetivos.$objetivoIndex.contenidos.$contenidoIndex.contenido_id")
+                                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                        @enderror
+                                                                    </div>
+                                                                    @if (count($objetivo['contenidos']) > 1)
+                                                                        <button type="button" wire:click="removeItem({{ $index }}, 'contenidos', {{ $contenidoIndex }}, {{ $objetivoIndex }})"
+                                                                            class="mt-2 text-gray-400 hover:text-red-500 transition-colors">
+                                                                            <span class="material-icons text-sm">delete</span>
+                                                                        </button>
+                                                                    @endif
                                                                 </div>
-                                                                @if (count($estrategia['recursos']) > 1)
-                                                                    <button type="button"
-                                                                        wire:click="removeItem({{ $index }}, 'estrategia_recursos', {{ $recursoIndex }}, {{ $estrategiaIndex }})"
-                                                                        class="text-gray-400 hover:text-red-500 transition-colors">
-                                                                        <span class="material-icons text-sm">delete</span>
-                                                                    </button>
-                                                                @endif
-                                                            </div>
-
-                                                        @endforeach
+                                                            @endforeach
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-
-                                    {{-- Indicadores de Logros --}}
-                                    <div class="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                        <h4
-                                            class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Indicadores de Logros
-                                        </h4>
-                                        <div
-                                            class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700">
-                                            <textarea
-                                                wire:model.live.debounce.500ms="form.unidades.{{ $index }}.indicadores_logro"
-                                                class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-sm"
-                                                rows="3"
-                                                placeholder="Describa los indicadores de logros para esta unidad..."></textarea>
-                                            @error("form.unidades.$index.indicadores_logro")
-                                                <span class="text-red-500 text-xs font-bold block mt-1">{{ $message }}</span>
-                                            @enderror
+                                            @endforeach
                                         </div>
                                     </div>
 
-                                    {{-- Plan de Evaluación --}}
-                                    <div class="space-y-4">
-                                        <div class="flex items-center justify-between">
-                                            <h4
-                                                class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                    {{-- Estrategias Pedagógicas Section --}}
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'estrategias' ? '' : 'estrategias'">
+                                            <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                                <span class="material-icons text-green-500">psychology</span>
+                                                Estrategias Pedagógicas
+                                            </h4>
+                                            <div class="flex items-center gap-4">
+                                                <button type="button" wire:click.stop="addItem({{ $index }}, 'estrategias')"
+                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-green-50 dark:hover:bg-green-900 transition-colors">
+                                                    <span class="material-icons text-[12px]">add</span>
+                                                    AÑADIR ESTRATEGIA
+                                                </button>
+                                                <span class="material-icons transition-transform duration-200" :class="openSection === 'estrategias' ? 'rotate-180' : ''">expand_more</span>
+                                            </div>
+                                        </div>
+                                        <div x-show="openSection === 'estrategias'" x-collapse class="p-4 space-y-6">
+                                            @foreach ($unidad['estrategias'] as $estrategiaIndex => $estrategia)
+                                                <div class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 space-y-4">
+                                                    <div class="flex items-center justify-end">
+                                                        @if (count($unidad['estrategias']) > 1)
+                                                            <button type="button" wire:click="removeItem({{ $index }}, 'estrategias', {{ $estrategiaIndex }})"
+                                                                class="text-gray-400 hover:text-red-500 transition-colors text-[10px] font-bold uppercase flex items-center gap-1">
+                                                                <span class="material-icons text-xs">delete</span> ELIMINAR ESTRATEGIA
+                                                            </button>
+                                                        @endif
+                                                    </div>
+                                                    <div class="grid grid-cols-1 gap-4">
+                                                        <div class="space-y-2">
+                                                            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Estrategia o Actividad</label>
+                                                            <x-select :options="$tecnicasActividad" valueField="id_tecnica_actividad" textField="nombre_tecnica_actividad"
+                                                                wire:model.live.debounce.250ms="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.tecnica_actividad_id"
+                                                                placeholder="Seleccione..." class="text-sm w-full" required />
+                                                            @error("form.unidades.$index.estrategias.$estrategiaIndex.tecnica_actividad_id")
+                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="space-y-2">
+                                                            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Actividad</label>
+                                                            <textarea wire:model.live.debounce.500ms="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.actividad"
+                                                                class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-sm"
+                                                                rows="3" placeholder="Describa la actividad..."></textarea>
+                                                            @error("form.unidades.$index.estrategias.$estrategiaIndex.actividad")
+                                                                <span class="text-red-500 text-xs font-bold block mt-1">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="space-y-2">
+                                                            <div class="flex items-center justify-between">
+                                                                <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Recursos</label>
+                                                                <button type="button" wire:click="addItem({{ $index }}, 'estrategia_recursos', {{ $estrategiaIndex }})"
+                                                                    class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
+                                                                    <span class="material-icons text-xs">add</span> AÑADIR
+                                                                </button>
+                                                            </div>
+                                                            @foreach ($estrategia['recursos'] as $recursoIndex => $recurso)
+                                                                <div class="flex items-center gap-2">
+                                                                    <div class="flex-grow">
+                                                                        <x-select :options="$recursosMaestros" valueField="id_recurso" textField="nombre_recurso"
+                                                                            wire:model.live.debounce.250ms="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.recursos.{{ $recursoIndex }}.recurso_id"
+                                                                            placeholder="Seleccione un recurso" class="text-sm w-full" required />
+                                                                        @error("form.unidades.$index.estrategias.$estrategiaIndex.recursos.$recursoIndex.recurso_id")
+                                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                        @enderror
+                                                                    </div>
+                                                                    @if (count($estrategia['recursos']) > 1)
+                                                                        <button type="button" wire:click="removeItem({{ $index }}, 'estrategia_recursos', {{ $recursoIndex }}, {{ $estrategiaIndex }})"
+                                                                            class="text-gray-400 hover:text-red-500 transition-colors">
+                                                                            <span class="material-icons text-sm">delete</span>
+                                                                        </button>
+                                                                    @endif
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- Indicadores de Logros Section --}}
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'indicadores' ? '' : 'indicadores'">
+                                            <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                                <span class="material-icons text-orange-500">assignment_turned_in</span>
+                                                Indicadores de Logros
+                                            </h4>
+                                            <span class="material-icons transition-transform duration-200" :class="openSection === 'indicadores' ? 'rotate-180' : ''">expand_more</span>
+                                        </div>
+                                        <div x-show="openSection === 'indicadores'" x-collapse class="p-4 space-y-4">
+                                            <div class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700">
+                                                <textarea wire:model.live.debounce.500ms="form.unidades.{{ $index }}.indicadores_logro"
+                                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-sm"
+                                                    rows="3" placeholder="Describa los indicadores de logros para esta unidad..."></textarea>
+                                                @error("form.unidades.$index.indicadores_logro")
+                                                    <span class="text-red-500 text-xs font-bold block mt-1">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Plan de Evaluación Section --}}
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'evaluacion' ? '' : 'evaluacion'">
+                                            <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                                <span class="material-icons text-red-500">event_available</span>
                                                 Plan de Evaluación
                                             </h4>
-                                            <button type="button" wire:click="addItem({{ $index }}, 'evaluaciones')"
-                                                class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
-                                                <span class="material-icons text-sm">add</span>
-                                                AÑADIR EVALUACIÓN
-                                            </button>
+                                            <div class="flex items-center gap-4">
+                                                <button type="button" wire:click.stop="addItem({{ $index }}, 'evaluaciones')"
+                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-red-50 dark:hover:bg-red-900 transition-colors">
+                                                    <span class="material-icons text-[12px]">add</span>
+                                                    AÑADIR EVALUACIÓN
+                                                </button>
+                                                <span class="material-icons transition-transform duration-200" :class="openSection === 'evaluacion' ? 'rotate-180' : ''">expand_more</span>
+                                            </div>
                                         </div>
-
-                                        <div class="space-y-4">
+                                        <div x-show="openSection === 'evaluacion'" x-collapse class="p-4 space-y-4">
                                             @foreach ($unidad['evaluaciones'] as $evaluacionIndex => $evaluacion)
-                                                <div
-                                                    class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm relative group">
-                                                    {{-- Botón Eliminar --}}
+                                                <div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm relative group">
                                                     @if (count($unidad['evaluaciones']) > 1)
-                                                        <button type="button"
-                                                            wire:click="removeItem({{ $index }}, 'evaluaciones', {{ $evaluacionIndex }})"
+                                                        <button type="button" wire:click="removeItem({{ $index }}, 'evaluaciones', {{ $evaluacionIndex }})"
                                                             class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors">
                                                             <span class="material-icons text-sm">delete</span>
                                                         </button>
                                                     @endif
-
                                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                        {{-- Fila 1: Fecha, Evaluación, Técnica --}}
                                                         <div class="space-y-1">
-                                                            <label
-                                                                class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Fecha
-                                                                <span class="text-red-500">*</span></label>
-                                                            <x-text-input type="date"
-                                                                wire:model.live.debounce.250ms="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.fecha_evaluacion"
-                                                                class="w-full text-xs" required />
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Fecha <span class="text-red-500">*</span></label>
+                                                            <x-text-input type="date" wire:model.live.debounce.250ms="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.fecha_evaluacion" class="w-full text-xs" required />
                                                             @error("form.unidades.$index.evaluaciones.$evaluacionIndex.fecha_evaluacion")
-                                                                <span
-                                                                    class="text-red-500 text-[10px] font-bold block">{{ $message }}</span>
+                                                                <span class="text-red-500 text-[10px] font-bold block">{{ $message }}</span>
                                                             @enderror
                                                         </div>
-
                                                         <div class="space-y-1">
-                                                            <label
-                                                                class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Evaluación
-                                                                <span class="text-red-500">*</span></label>
-                                                            <x-select :options="$evaluaciones" valueField="id_tipo_evaluacion"
-                                                                textField="nombre_tipo_evaluacion"
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Evaluación <span class="text-red-500">*</span></label>
+                                                            <x-select :options="$evaluaciones" valueField="id_tipo_evaluacion" textField="nombre_tipo_evaluacion"
                                                                 wire:model.live.debounce.250ms="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.evaluacion_id"
                                                                 placeholder="Seleccione" class="text-xs w-full" required />
                                                             @error("form.unidades.$index.evaluaciones.$evaluacionIndex.evaluacion_id")
-                                                                <span
-                                                                    class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
                                                             @enderror
-
                                                         </div>
-
                                                         <div class="space-y-1">
-                                                            <label
-                                                                class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Técnica
-                                                                <span class="text-red-500">*</span></label>
-                                                            <x-select :options="$tecnica" valueField="id_tecnica_evaluacion"
-                                                                textField="nombre_tecnica_evaluacion"
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Técnica <span class="text-red-500">*</span></label>
+                                                            <x-select :options="$tecnica" valueField="id_tecnica_evaluacion" textField="nombre_tecnica_evaluacion"
                                                                 wire:model.live.debounce.250ms="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.tecnica_id"
                                                                 placeholder="Seleccione" class="text-xs w-full" required />
                                                             @error("form.unidades.$index.evaluaciones.$evaluacionIndex.tecnica_id")
-                                                                <span
-                                                                    class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
                                                             @enderror
-
                                                         </div>
                                                     </div>
-
-                                                    <div
-                                                        class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                                        {{-- Fila 2: Participación, Pond. (%) --}}
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                                                         <div class="space-y-1">
-                                                            <label
-                                                                class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Participación
-                                                                <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Participación <span class="text-red-500">*</span></label>
                                                             <div class="flex gap-2">
-                                                                <x-select :options="$formasParticipacion" valueField="id"
-                                                                    textField="nombre"
+                                                                <x-select :options="$formasParticipacion" valueField="id" textField="nombre"
                                                                     wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.forma_participacion"
                                                                     placeholder="Seleccione" class="text-xs w-full" required />
                                                                 @error("form.unidades.$index.evaluaciones.$evaluacionIndex.forma_participacion")
-                                                                    <span
-                                                                        class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                                    <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
                                                                 @enderror
-
                                                                 @if(isset($evaluacion['forma_participacion']) && $evaluacion['forma_participacion'] == '2')
-                                                                    <select
-                                                                        wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.integrantes"
+                                                                    <select wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.integrantes"
                                                                         class="text-xs rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 w-24">
                                                                         <option value="">N° Integrantes</option>
                                                                         @for($i = 2; $i <= 10; $i++)
@@ -492,100 +444,83 @@
                                                                     </select>
                                                                 @endif
                                                             </div>
-
                                                         </div>
-
                                                         <div class="space-y-1">
-                                                            <label
-                                                                class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase text-center block">Pond.
-                                                                (%) <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase text-center block">Pond. (%) <span class="text-red-500">*</span></label>
                                                             <div class="flex justify-center">
-                                                                <input type="number" step="1" min="5" max="25"
-                                                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                                                <input type="number" step="1" min="5" max="25" onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                                                                     wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.ponderacion"
                                                                     class="w-20 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 p-1.5 text-gray-700 dark:text-gray-300 text-sm font-bold text-center">
                                                             </div>
                                                             @error("form.unidades.$index.evaluaciones.$evaluacionIndex.ponderacion")
-                                                                <span
-                                                                    class="text-red-500 text-[10px] font-bold block text-center">{{ $message }}</span>
+                                                                <span class="text-red-500 text-[10px] font-bold block text-center">{{ $message }}</span>
                                                             @enderror
                                                         </div>
                                                     </div>
                                                 </div>
                                             @endforeach
                                         </div>
-                                    </div>
-
-                                    {{-- Sección: Referencias Bibliográficas (Por Unidad) --}}
-                                    <div class="mt-8">
-                                        <div class="flex justify-between items-center mb-4">
-                                            <h4
-                                                class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                    </div>                                            {{-- Referencias Bibliográficas Section --}}
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'bibliografias' ? '' : 'bibliografias'">
+                                            <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                                <span class="material-icons text-purple-500">library_books</span>
                                                 Referencias Bibliográficas
                                             </h4>
-                                            <button type="button" wire:click="addItem({{ $index }}, 'bibliografias')"
-                                                class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
-                                                <span class="material-icons text-sm">add</span>
-                                                AÑADIR BIBLIOGRAFÍA
-                                            </button>
+                                            <div class="flex items-center gap-4">
+                                                <button type="button" wire:click.stop="addItem({{ $index }}, 'bibliografias')"
+                                                    class="inline-flex items-center gap-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors">
+                                                    <span class="material-icons text-[12px]">add</span>
+                                                    AÑADIR BIBLIOGRAFÍA
+                                                </button>
+                                                <span class="material-icons transition-transform duration-200" :class="openSection === 'bibliografias' ? 'rotate-180' : ''">expand_more</span>
+                                            </div>
                                         </div>
-
-                                        <div class="space-y-4">
+                                        <div x-show="openSection === 'bibliografias'" x-collapse class="p-4 space-y-4">
                                             @foreach ($unidad['bibliografias'] as $biblioIndex => $bibliografia)
-                                                <div
-                                                    class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+                                                <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
                                                     <div class="flex-grow min-w-0">
-                                                        <x-select label="Seleccionar Bibliografía" required
-                                                            :options="$bibliografiasMaestras" valueField="id_bibliografia"
-                                                            textField="nombre_bibliografia"
+                                                        <x-select label="Seleccionar Bibliografía" required :options="$bibliografiasMaestras" valueField="id_bibliografia" textField="nombre_bibliografia"
                                                             wire:model.live.debounce.250ms="form.unidades.{{ $index }}.bibliografias.{{ $biblioIndex }}.bibliografia_id"
                                                             placeholder="Seleccione una referencia..." />
                                                         @error("form.unidades.$index.bibliografias.$biblioIndex.bibliografia_id")
-                                                            <span
-                                                                class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
+                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
                                                         @enderror
                                                     </div>
                                                     @if (count($unidad['bibliografias']) > 1)
-                                                        <button type="button"
-                                                            wire:click="removeItem({{ $index }}, 'bibliografias', {{ $biblioIndex }})"
-                                                            class="text-gray-400 hover:text-red-500 transition-colors"
-                                                            title="Eliminar referencia">
+                                                        <button type="button" wire:click="removeItem({{ $index }}, 'bibliografias', {{ $biblioIndex }})"
+                                                            class="text-gray-400 hover:text-red-500 transition-colors" title="Eliminar referencia">
                                                             <span class="material-icons text-sm">delete</span>
                                                         </button>
                                                     @endif
                                                 </div>
-                                                {{-- Mostrar error si existe --}}
-
                                             @endforeach
                                         </div>
                                     </div>
+                                </div>
 
-                                    {{-- Navegación entre acordeones --}}
-                                    <div
-                                        class="flex justify-between items-center pt-8 mt-8 border-t border-gray-100 dark:border-gray-800">
-                                        <div>
-                                            @if ($index > 0)
-                                                <button type="button" wire:click="unidadAnterior({{ $index }})"
-                                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
-                                                    <span class="material-icons text-sm">arrow_back</span> Unidad Anterior
-                                                </button>
-                                            @endif
-                                        </div>
-                                        <div>
-                                            @if ($index < count($form->unidades) - 1)
-                                                <button type="button" wire:click="validarYAvanzar({{ $index }})"
-                                                    class="inline-flex items-center gap-2 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-blue-700 transition-all hover:-translate-y-0.5 active:translate-y-0">
-                                                    Siguiente Unidad <span class="material-icons text-sm">arrow_forward</span>
-                                                </button>
-                                            @else
-                                                <div class="flex flex-col items-end">
-                                                    <span
-                                                        class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Final
-                                                        del Proceso</span>
-                                                    <span class="text-xs text-gray-500 italic">Planificación completada</span>
-                                                </div>
-                                            @endif
-                                        </div>
+                                {{-- Navegación entre acordeones --}}
+                                <div class="flex justify-between items-center pt-8 mt-8 border-t border-gray-100 dark:border-gray-800">
+                                    <div>
+                                        @if ($index > 0)
+                                            <button type="button" wire:click="unidadAnterior({{ $index }})"
+                                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                                                <span class="material-icons text-sm">arrow_back</span> Unidad Anterior
+                                            </button>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        @if ($index < count($form->unidades) - 1)
+                                            <button type="button" wire:click="validarYAvanzar({{ $index }})"
+                                                class="inline-flex items-center gap-2 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-blue-700 transition-all hover:-translate-y-0.5 active:translate-y-0">
+                                                Siguiente Unidad <span class="material-icons text-sm">arrow_forward</span>
+                                            </button>
+                                        @else
+                                            <div class="flex flex-col items-end">
+                                                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Final del Proceso</span>
+                                                <span class="text-xs text-gray-500 italic">Planificación completada</span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -601,7 +536,7 @@
                         </button>
                     </div>
                 </div>
-
+            </div>
         </form>
     </div>
 

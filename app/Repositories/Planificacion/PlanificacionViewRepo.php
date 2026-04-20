@@ -24,12 +24,14 @@ class PlanificacionViewRepo
             ->join("$dbSogc.malla as ma", 'uc.ucu_cod_malla', '=', 'ma.mal_codigo')
             ->join("$dbSogc.programa as pr", 'ma.mal_cod_programa', '=', 'pr.pro_codigo')
             ->join("$dbSogc.trayecto as tr", 'uc.ucu_cod_tuc', '=', 'tr.tra_codigo')
+            ->join("$dbSogc.rol as r", 'u.usu_cod_rol', '=', 'r.rol_codigo')
             ->select(
                 'p.id_planificacion as planificacion_id',
                 'p.estatus',
                 'u.usu_codigo as docente_id',
                 'per.per_nombres as docente_nombre',
                 'per.per_apellidos as docente_apellido',
+                'r.rol_nombre as docente_rol',
                 'u.usu_cedula as cedula',
                 'uc.ucu_codigo as id_unidad_curricular',
                 'uc.ucu_nombre as nombre_unidad_curricular',

@@ -112,11 +112,30 @@
                                     <div class="mt-2">
                                         @if($bitacora->nuevos)
                                             @php
-                                                $datosNuevos = is_array($bitacora->nuevos) ? $bitacora->nuevos : json_decode($bitacora->nuevos, true);
-                                                $jsonNuevos = json_encode($datosNuevos ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                                                $datosAnterioresAux = !empty($bitacora->anteriores) ? (is_array($bitacora->anteriores) ? $bitacora->anteriores : json_decode($bitacora->anteriores, true) ?? []) : [];
+                                                $datosNuevosAux = is_array($bitacora->nuevos) ? $bitacora->nuevos : json_decode($bitacora->nuevos, true) ?? [];
+                                                $datosCompletos = array_merge($datosAnterioresAux, $datosNuevosAux);
+
+                                                $htmlNuevos = "{\n";
+                                                $total = count($datosCompletos);
+                                                $i = 0;
+                                                foreach ($datosCompletos as $key => $value) {
+                                                    $i++;
+                                                    // Es una actualización si existe en los nuevos y también había valores anteriores
+                                                    $isUpdated = array_key_exists($key, $datosNuevosAux) && !empty($datosAnterioresAux);
+                                                    $comma = $i < $total ? ',' : '';
+                                                    $encodedValue = json_encode($value, JSON_UNESCAPED_UNICODE);
+                                                    
+                                                    if ($isUpdated) {
+                                                        $htmlNuevos .= "    <span class=\"bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-400 font-bold px-1 rounded\">\"{$key}\": {$encodedValue}{$comma}</span>\n";
+                                                    } else {
+                                                        $htmlNuevos .= "    \"{$key}\": {$encodedValue}{$comma}\n";
+                                                    }
+                                                }
+                                                $htmlNuevos .= "}";
                                             @endphp
                                             <pre
-                                                class="bg-gray-50 dark:bg-gray-900 rounded-md p-4 overflow-x-auto text-sm font-mono text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm"><span class="text-blue-600 dark:text-blue-400 font-bold">{{ $bitacora->tabla }}</span> {{ $jsonNuevos }}</pre>
+                                                class="bg-gray-50 dark:bg-gray-900 rounded-md p-4 overflow-x-auto text-sm font-mono text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm"><span class="text-blue-600 dark:text-blue-400 font-bold">{{ $bitacora->tabla }}</span> {!! $htmlNuevos !!}</pre>
                                         @else
                                             <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">No aplicable o nulo
                                             </p>

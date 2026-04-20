@@ -22,15 +22,15 @@
                 {{-- Header / Información General --}}
                 <div class="flex justify-between items-start border-b pb-4 mb-4 dark:border-gray-700">
                     <div>
+                        <p class="text-base font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide">
+                            {{ $planificacion->docente_rol ?? 'Docente' }}: {{ $planificacion->docente_nombre ?? '' }} {{ $planificacion->docente_apellido ?? '' }}
+                        </p>
                         <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight break-words overflow-hidden">
-                            {{ $planificacion->nombre_unidad_curricular ?? 'Unidad Curricular' }}
+                            {{ $planificacion->nombre_unidad_curricular ?? 'Unidad Curricular' }} - Sección {{ $planificacion->nombre_seccion ?? '' }}
                         </h3>
                         <div class="flex flex-col gap-1 mt-1">
-                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Docente: {{ $planificacion->docente_nombre ?? '' }} {{ $planificacion->docente_apellido ?? '' }} - C.I: {{ $planificacion->cedula ?? '' }}
-                            </p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
-                                Sección: {{ $planificacion->nombre_seccion ?? '' }}
+                                C.I: {{ $planificacion->cedula ?? '' }}
                             </p>
                             <p class="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
                                 Periodo: {{ $planificacion->nombre_lapso ?? 'N/A' }}

@@ -9,7 +9,7 @@ use Carbon\Carbon;
 
 class CreatePlanificacion extends Component
 {
-    public $docente_id, $docenteNombre, $proposito, $mallaNombre, $lapsoNombre;
+    public $docente_id, $docenteNombre, $docenteRol, $proposito, $mallaNombre, $lapsoNombre;
     public $isCoordinador = false;
     public $openUnidad = 0;
     public Collection $tecnica, $recursosMaestros, $evaluaciones, $bibliografiasMaestras, $asignaciones, $tecnicasActividad;
@@ -92,6 +92,10 @@ class CreatePlanificacion extends Component
 
                     $lapso = $this->planificacionRepository->getLapsoAcademicoByAsignacion($value);
                     $this->lapsoNombre = $lapso ? $lapso->lap_nombre : 'No especificado';
+
+                    // Obtener nombre y rol del docente
+                    $this->docenteNombre = "{$asignacion->name} {$asignacion->apellido}";
+                    $this->docenteRol = 'Docente';
                 }
             }
         } else {
@@ -101,6 +105,7 @@ class CreatePlanificacion extends Component
             $this->proposito = '';
             $this->mallaNombre = '';
             $this->lapsoNombre = '';
+            $this->verifyDocenteRole(); // Reset to current user if no assignment selected
         }
 
         // Reiniciar los contenidos seleccionados en las unidades porque cambiaron las opciones disponibles
@@ -145,7 +150,9 @@ class CreatePlanificacion extends Component
     {
         // Allow based on permissions (crear-planificacion or editar-planificacion)
         if (Auth::check() && (Gate::allows('crear-planificacion') || Gate::allows('editar-planificacion'))) {
-            $this->docenteNombre = Auth::user()->name;
+            $user = Auth::user();
+            $this->docenteNombre = $user->name;
+            $this->docenteRol = $user->rol->rol_nombre ?? 'Docente';
         } else {
             session()->flash('error', 'Acceso denegado.');
         }
@@ -289,11 +296,12 @@ class CreatePlanificacion extends Component
         try {
             $this->planificacionRepository->savePlanificacionTransaccion(
                 $this->form->id_profesor_asignado,
-                $this->form->unidades
+                $this->form->unidades,
+                $this->form->tipos_seccion
             );
 
             session()->flash('message', 'Planificación guardada correctamente.');
-            $this->form->reset(['unidades', 'id_profesor_asignado']);
+            $this->form->reset(['unidades', 'id_profesor_asignado', 'tipos_seccion']);
             $this->openUnidad = 0;
             $this->inicializarUnidades();
             $this->dispatch('scroll-to-top');
