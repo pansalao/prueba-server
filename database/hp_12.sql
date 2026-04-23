@@ -199,7 +199,7 @@ CREATE TABLE `detalle_recurso` (
 CREATE TABLE `evento` (
   `id_evento` int(11) NOT NULL,
   `id_color` int(11) DEFAULT NULL,
-  `leyenda_evento` varchar(100) DEFAULT NULL,
+  `nombre_evento` varchar(100) DEFAULT NULL,
   `tipo_evento` enum('1','2','3') DEFAULT NULL,
   `estatus` enum('1','2','3') DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

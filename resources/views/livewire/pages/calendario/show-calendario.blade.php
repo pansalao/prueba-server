@@ -50,8 +50,47 @@
                     </div>
                 </div>
 
+                {{-- Associated Events --}}
+                <div class="mt-8 border-t pt-4 dark:border-gray-700">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 uppercase">Eventos en esta Semana</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th class="px-4 py-3">Evento</th>
+                                    <th class="px-4 py-3 text-center">Color</th>
+                                    <th class="px-4 py-3">Inicio</th>
+                                    <th class="px-4 py-3">Fin</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($calendario->detalles as $detalle)
+                                    <tr class="border-b dark:border-gray-700">
+                                        <td class="px-4 py-3 font-semibold text-gray-900 dark:text-white">
+                                            {{ $detalle->evento->descripcion_evento ?? 'Sin descripción' }}
+                                        </td>
+                                        <td class="px-4 py-3 text-center">
+                                            @if($detalle->evento && $detalle->evento->color)
+                                                <div class="w-4 h-4 mx-auto rounded-full" style="background-color: {{ $detalle->evento->color }}"></div>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3">{{ \Carbon\Carbon::parse($detalle->dia_inicio_detalle_evento)->format('d/m/Y') }}</td>
+                                        <td class="px-4 py-3">{{ \Carbon\Carbon::parse($detalle->dia_fin_detalle_evento)->format('d/m/Y') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-8 text-center text-gray-500">No hay eventos vinculados a esta semana.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 {{-- Acciones --}}
-                <div class="flex justify-end gap-4 pt-4">
+                <div class="flex justify-end gap-4 pt-8">
                     <a href="{{ route('calendario.list') }}" wire:navigate>
                         <x-danger-button type="button" class="flex items-center gap-1">
                             <span class="material-symbols-outlined text-sm">arrow_back</span>

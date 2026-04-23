@@ -17,39 +17,50 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
 
                         {{-- Descripción --}}
-                        <div>
-                            <x-input-label value="Descripción:" />
+                        <div class="col-span-1 sm:col-span-2 lg:col-span-3">
+                            <x-input-label value="Nombre del Evento:" />
                             <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold break-words overflow-hidden">
-                                {{ $evento->descripcion_evento }}
+                                {{ $evento->nombre_evento }}
                             </p>
                         </div>
 
-                        {{-- Fecha Inicio --}}
+                        {{-- Tipo de Evento --}}
                         <div>
-                            <x-input-label value="Fecha de Inicio:" />
-                            <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">
-                                {{ \Carbon\Carbon::parse($evento->dia_inicio_evento)->format('d/m/Y') }}
+                            <x-input-label value="Tipo de Evento:" />
+                            <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                {{ $evento->tipo_evento_nombre }}
                             </p>
                         </div>
 
-                        {{-- Fecha Fin --}}
+                        {{-- Color --}}
                         <div>
-                            <x-input-label value="Fecha de Fin:" />
-                            <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">
-                                {{ \Carbon\Carbon::parse($evento->dia_fin_evento)->format('d/m/Y') }}
-                            </p>
-                        </div>
-
-                        {{-- Tipo --}}
-                        <div>
-                            <x-input-label value="Tipo:" />
-                            <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">
-                                @if($evento->tipo_evento == '1') Feriado
-                                @elseif($evento->tipo_evento == '2') Actividad Académica
-                                @else Otro
+                            <x-input-label value="Color Asignado:" />
+                            <div class="flex items-center gap-3">
+                                @if($evento->color_rel)
+                                    <div class="w-7 h-7 rounded-full border border-gray-400 shadow-sm" style="background-color: {{ $evento->color_rel->codigo_color }}"></div>
+                                    <p class="text-gray-700 dark:text-gray-300 font-semibold text-lg">{{ $evento->color_rel->nombre_color }}</p>
+                                @else
+                                    <div class="w-7 h-7 rounded-full border border-gray-400 shadow-sm" style="background-color: {{ $evento->color }}"></div>
+                                    <p class="text-gray-700 dark:text-gray-300 font-semibold italic">Color Predeterminado</p>
                                 @endif
-                            </p>
+                            </div>
                         </div>
+
+                        {{-- Fechas --}}
+                        @if($evento->detalles->first())
+                            <div>
+                                <x-input-label value="Fecha de Inicio:" />
+                                <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                    {{ \Carbon\Carbon::parse($evento->detalles->first()->dia_inicio_detalle_evento)->format('d/m/Y') }}
+                                </p>
+                            </div>
+                            <div>
+                                <x-input-label value="Fecha de Fin:" />
+                                <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                    {{ \Carbon\Carbon::parse($evento->detalles->first()->dia_fin_detalle_evento)->format('d/m/Y') }}
+                                </p>
+                            </div>
+                        @endif
 
                         {{-- Estatus --}}
                         <div>

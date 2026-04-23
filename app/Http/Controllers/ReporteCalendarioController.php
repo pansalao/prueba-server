@@ -29,27 +29,34 @@ class ReporteCalendarioController extends Controller
 
         // Obtener días con eventos para este año
         $eventosRaw = DB::table('evento')
-            ->whereYear('dia_inicio_evento', $year)
-            ->where('estatus', 1)
+            ->join('detalle_evento', 'evento.id_evento', '=', 'detalle_evento.id_evento')
+            ->leftJoin('color', 'evento.id_color', '=', 'color.id_color')
+            ->select(
+                'evento.id_evento',
+                'evento.nombre_evento as descripcion_evento',
+                'detalle_evento.dia_inicio_detalle_evento as dia_inicio_evento',
+                'detalle_evento.dia_fin_detalle_evento as dia_fin_evento',
+                'color.codigo_color'
+            )
+            ->where('detalle_evento.id_calendario_academico', $calendario->id_calendario_academico)
+            ->where('evento.estatus', 1)
             ->get();
 
         $eventDays = [];
         $eventColors = [];
         $palette = [
-            '#007BFF', '#28A745', '#DC3545', '#FD7E14', '#6610F2', 
-            '#E83E8C', '#20C997', '#17A2B8', '#FFC107', '#6F42C1',
-            '#004085', '#155724', '#721C24', '#856404', '#0C5460'
+            '#007BFF', '#28A745', '#DC3545', '#FD7E14', '#6610F2'
         ];
 
-        foreach($eventosRaw as $index => $eventoItem) {
-            // Asignar color único al evento (si hay muchos repetirá paleta)
-            $color = $palette[$index % count($palette)];
+        foreach ($eventosRaw as $index => $eventoItem) {
+            // Priorizar el color de la BD, si no tiene, usar paleta
+            $color = $eventoItem->codigo_color ?? $palette[$index % count($palette)];
             $eventColors[$eventoItem->id_evento] = $color;
 
             $start = Carbon::parse($eventoItem->dia_inicio_evento);
             $end = Carbon::parse($eventoItem->dia_fin_evento);
-            
-            while($start <= $end) {
+
+            while ($start <= $end) {
                 if ($start->year == $year) {
                     $eventDays[$start->format('Y-m-d')] = $eventoItem->id_evento;
                 }

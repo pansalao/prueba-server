@@ -8,21 +8,24 @@ class EventoIndexRepo
 {
     public function listar($busqueda = '', $paginacion = 5)
     {
-        $eventos = DB::table('evento')
-            ->leftJoin('calendario_academico', 'evento.id_calendario', '=', 'calendario_academico.id_calendario_academico')
+        $eventos = DB::table('evento as e')
+            ->leftJoin('detalle_evento as de', 'e.id_evento', '=', 'de.id_evento')
+            ->leftJoin('calendario_academico as c', 'de.id_calendario_academico', '=', 'c.id_calendario_academico')
+            ->leftJoin('color as col', 'e.id_color', '=', 'col.id_color')
             ->select(
-                'evento.id_evento',
-                'evento.id_calendario',
-                'evento.descripcion_evento',
-                'evento.dia_inicio_evento',
-                'evento.dia_fin_evento',
-                'evento.tipo_evento',
-                'evento.estatus'
+                'e.id_evento',
+                'de.id_calendario_academico as id_calendario',
+                'e.nombre_evento as descripcion_evento',
+                'de.dia_inicio_detalle_evento as dia_inicio_evento',
+                'de.dia_fin_detalle_evento as dia_fin_evento',
+                'col.codigo_color as color',
+                'e.tipo_evento',
+                'e.estatus'
             )
             ->when($busqueda, function ($consulta, $busqueda) {
-                $consulta->where('evento.descripcion_evento', 'LIKE', '%' . $busqueda . '%');
+                $consulta->where('e.nombre_evento', 'LIKE', '%' . $busqueda . '%');
             })
-            ->orderBy('evento.dia_inicio_evento', 'desc')
+            ->orderBy('de.dia_inicio_detalle_evento', 'desc')
             ->paginate($paginacion);
 
         return $eventos;

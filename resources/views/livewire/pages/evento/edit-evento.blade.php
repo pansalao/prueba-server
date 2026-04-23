@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-800 dark:text-gray-500 leading-tight uppercase text-center">
-            {{ __('Registrar Evento') }}
+            {{ __('Editar Evento') }}
         </h2>
     </x-slot>
 
@@ -84,8 +84,11 @@
             </div>
 
             <div class="flex items-center justify-end gap-4">
+                <a href="{{ route('evento/listar') }}" wire:navigate class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm font-medium">
+                    {{ __('Cancelar') }}
+                </a>
                 <x-primary-button type="submit" wire:loading.attr="disabled">
-                    {{ __('Guardar Evento') }}
+                    {{ __('Actualizar Evento') }}
                 </x-primary-button>
             </div>
         </form>

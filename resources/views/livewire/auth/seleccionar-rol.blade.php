@@ -114,6 +114,7 @@
                                             selectedEventEnd: '',
                                             eventoNombre: '',
                                             eventoTipo: '1',
+                                            eventoSeleccionado: '',
                                             clickCount: 0,
                                             eventosAlpine: @entangle('eventosRegistrados'),
                                             tooltip: { visible: false, x: 0, y: 0, content: null },
@@ -279,7 +280,8 @@
                                                 this.selectedEventStart = '';
                                                 this.selectedEventEnd = '';
                                                 this.eventoNombre = '';
-                                                this.eventoTipo = 'Feriado Nacional';
+                                                this.eventoTipo = '1';
+                                                this.eventoSeleccionado = '';
                                                 this.clickCount = 0;
                                             },
                                             guardarEvento() {
@@ -359,21 +361,16 @@
 
                                     <div class="space-y-5">
                                         <div>
-                                            <label
-                                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre
-                                                del Evento</label>
-                                            <input type="text" x-model="eventoNombre"
-                                                class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 shadow-sm"
-                                                placeholder="Ej. Día del Trabajador">
-                                        </div>
-                                        <div>
-                                            <label
-                                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tipo
-                                                de Evento</label>
-                                            <select x-model="eventoTipo"
+                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Seleccionar Evento</label>
+                                            <select x-model="eventoSeleccionado" x-on:change="eventoNombre = $event.target.options[$event.target.selectedIndex].text; eventoTipo = $event.target.value"
                                                 class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 shadow-sm">
+                                                <option value="" disabled selected>-- Seleccione un Evento --</option>
+                                                <option value="2">Inscripciones</option>
+                                                <option value="2">Inicio de Clases</option>
+                                                <option value="2">Cierre de Notas</option>
+                                                <option value="2">Fin de Clases</option>
                                                 <option value="1">Feriado Nacional</option>
-                                                <option value="2">Administrativo / Académico</option>
+                                                <option value="2">Actividad Administrativa</option>
                                                 <option value="3">Otros Eventos</option>
                                             </select>
                                         </div>

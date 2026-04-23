@@ -11,12 +11,12 @@ class CalendarioViewRepo
     {
         CalendarioAcademico::inactivarVencidos();
 
-        $calendario = DB::table('calendario_academico')
+        $calendario = CalendarioAcademico::with(['detalles.evento'])
             ->where('id_calendario_academico', $id)
             ->first();
 
         if ($calendario) {
-            CalendarioAcademico::logMostrar(CalendarioAcademico::find($id));
+            CalendarioAcademico::logMostrar($calendario);
         }
 
         return $calendario;

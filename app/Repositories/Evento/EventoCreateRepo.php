@@ -9,35 +9,21 @@ class EventoCreateRepo
 {
     public function crear(array $data)
     {
-        if (empty($data['id_calendario'])) {
-            $ultimo = DB::table('calendario_academico')
-                ->where('estatus', 1)
-                ->orderBy('id_calendario_academico', 'desc')
-                ->first();
-            
-            if (!$ultimo) {
-                throw new \Exception('No se puede registrar el evento porque no existe un calendario académico configurado.');
-            }
-            $data['id_calendario'] = $ultimo->id_calendario_academico;
-        }
-
+        // Solo creamos el maestro del evento (plantilla)
         $evento = \App\Models\Evento::create([
-            'id_calendario' => $data['id_calendario'],
-            'dia_inicio_evento' => $data['dia_inicio_evento'],
-            'dia_fin_evento' => $data['dia_fin_evento'],
-            'descripcion_evento' => $data['descripcion_evento'],
-            'tipo_evento' => $data['tipo_evento'],
+            'nombre_evento' => $data['descripcion_evento'],
+            'tipo_evento' => $data['tipo_evento'] ?? null,
+            'id_color' => $data['id_color'] ?? null,
             'estatus' => '1',
         ]);
 
-        return $evento->getKey();
+        return $evento->id_evento;
     }
 
-    public function existeEventoConDescripcion(string $descripcion, ?int $idCalendario): bool
+    public function existeEventoConDescripcion(string $descripcion): bool
     {
         return DB::table('evento')
-            ->where('id_calendario', $idCalendario)
-            ->where('descripcion_evento', $descripcion)
+            ->where('nombre_evento', $descripcion)
             ->where('estatus', '!=', '3')
             ->exists();
     }
