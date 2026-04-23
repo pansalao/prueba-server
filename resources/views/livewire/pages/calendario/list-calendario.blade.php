@@ -26,7 +26,7 @@
                                 <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                                     Estatus</th>
                             @endcan
-                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">Reporte</th>
+                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">Acciones</th>
 
                         </tr>
                     </thead>
