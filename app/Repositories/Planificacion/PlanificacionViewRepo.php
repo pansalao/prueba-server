@@ -43,7 +43,8 @@ class PlanificacionViewRepo
                 'la.lap_fecha_inicio as lapso_fecha_inicio',
                 'la.lap_fecha_fin as lapso_fecha_fin',
                 'pr.pro_nombre as nombre_pnf',
-                'tr.tra_nombre as trayecto_unidad_curricular'
+                'tr.tra_nombre as trayecto_unidad_curricular',
+                'p.archivo_contrato'
             )
             ->where('p.id_planificacion', $planificacionId)
             ->first();

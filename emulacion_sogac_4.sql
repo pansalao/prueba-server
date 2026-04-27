@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 19-04-2026 a las 20:31:32
+-- Tiempo de generación: 26-04-2026 a las 16:26:37
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `emulacion_sogac_esta_1`
+-- Base de datos: `emulacion_sogac_2`
 --
 
 -- --------------------------------------------------------
@@ -369,7 +369,8 @@ INSERT INTO `rol` (`rol_codigo`, `rol_nombre`, `rol_estatus`, `rol_cod_programa`
 (4, 'ESTUDIANTE', 'A', 0, 0),
 (11, 'COORDINADOR PNFINF', 'A', 0, 0),
 (28, 'ÁREA ACADÉMICA', 'A', 0, 0),
-(30, 'COORDINADOR PNFDYL', 'A', 0, 0);
+(30, 'COORDINADOR PNFDYL', 'A', 0, 0),
+(31, 'VICERRECTOR', 'A', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -539,7 +540,13 @@ INSERT INTO `usuario` (`usu_codigo`, `usu_nombre`, `usu_pegunta_1`, `usu_pegunta
 (43324, '21564176PNFINF', 'Nombre de su abuela materna', 'Nombre de su mascota', '42af0f0ba2c2b29f6bc29a95b842b1135708cf2df2c7632bb6fdbc8db92f0e0a', '72632ed44e223f4279a97001cbccd6f76cb6efe1a19bf5275ab68fc9e63e3fc2', 11, 'A', '21564176', '$2y$10$2D7zaCCNeND3yPVYPxuUsuMfIUuAHAWtOTufMF0IyhR6JXydvVj6O', 0, '2026-02-20'),
 (43325, '31009367PNFINF', 'Cuál es su mejor amigo de la infancia', 'Nombre de su mascota', '426d9b35f1c46ee8fceaae333c10c03ec5c34c0be862e0aadb81458f1572a7ec', '520246a74b5b5f941facfda1772e30345528a6f62ebd203614bb2cf457bc07ea', 11, 'A', '31009367', '$2y$10$62c3DZWg5nnUs05KS9mm.O9Xyk5qkKI859C1w.prjaTq7twAEnQNW', 0, NULL),
 (43326, '31659136PNFINF', 'Cuál es su mejor amigo de la infancia', 'Cuál es su lugar favorito', 'e03c402eb711c9f259e8bedc4d923c2ac02b0910a04cda97ad407de9e2e570ca', 'f36a259aa7248d1e630a2086f9cbfc49065c0601a4a77fc0705fca5ce67bf196', 11, 'A', '31659136', '$2y$10$AoE37ZtTL9RXMsF8t.kmo.zqlrUbeLclk4Zr4Gt/3yAI3XXwFAaxW', 0, NULL),
-(43327, '31009367EST', 'Pregunta 1', 'Pregunta 2', 'Respuesta 1', 'Respuesta 2', 4, 'A', '31009367', '$2y$10$62c3DZWg5nnUs05KS9mm.O9Xyk5qkKI859C1w.prjaTq7twAEnQNW', 0, '2026-03-23');
+(43327, '31009367EST', 'Pregunta 1', 'Pregunta 2', 'Respuesta 1', 'Respuesta 2', 4, 'A', '31009367', '$2y$10$62c3DZWg5nnUs05KS9mm.O9Xyk5qkKI859C1w.prjaTq7twAEnQNW', 0, '2026-03-23'),
+(43328, '21564176VICE', 'Nombre de su abuela materna', 'Nombre de su mascota', '42af0f0ba2c2b29f6bc29a95b842b1135708cf2df2c7632bb6fdbc8db92f0e0a', '72632ed44e223f4279a97001cbccd6f76cb6efe1a19bf5275ab68fc9e63e3fc2', 31, 'A', '21564176', '$2y$10$qUTnyjIfD4Wllb2K08ZIJ.5V1tOaGv0T8wEGFJXyjUBT7oU6xuVG.', 0, '2026-04-25'),
+(43329, '31659136VICE', 'Cuál es su mejor amigo de la infancia', 'Cuál es su lugar favorito', 'e03c402eb711c9f259e8bedc4d923c2ac02b0910a04cda97ad407de9e2e570ca', 'f36a259aa7248d1e630a2086f9cbfc49065c0601a4a77fc0705fca5ce67bf196', 31, 'A', '31659136', '$2y$10$AoE37ZtTL9RXMsF8t.kmo.zqlrUbeLclk4Zr4Gt/3yAI3XXwFAaxW', 0, '2026-04-25'),
+(43331, '31009367VICE', 'Cuál es su mejor amigo de la infancia', 'Nombre de su mascota', '426d9b35f1c46ee8fceaae333c10c03ec5c34c0be862e0aadb81458f1572a7ec', '520246a74b5b5f941facfda1772e30345528a6f62ebd203614bb2cf457bc07ea', 31, 'A', '31009367', '$2y$10$62c3DZWg5nnUs05KS9mm.O9Xyk5qkKI859C1w.prjaTq7twAEnQNW', 0, '2026-04-25'),
+(43332, '31114131VICE', 'Cuál es su postre favorito', 'Nombre de su mascota', 'b47907a8021e3730a6ba0d6681bcdbd4f29c9de3ac8c3668cf35e4b078ed98b8', 'b47907a8021e3730a6ba0d6681bcdbd4f29c9de3ac8c3668cf35e4b078ed98b8', 31, 'A', '31114131', '$2y$10$1aU6afels2wF4ufRTJ7QJ.JCOvdriP0EgwN6ef3AHlk7znAu3wdY.', 0, '2026-04-25'),
+(43334, '21564176EST', 'Nombre de su abuela materna', 'Nombre de su mascota', '42af0f0ba2c2b29f6bc29a95b842b1135708cf2df2c7632bb6fdbc8db92f0e0a', '72632ed44e223f4279a97001cbccd6f76cb6efe1a19bf5275ab68fc9e63e3fc2', 4, 'A', '21564176', '$2y$10$qUTnyjIfD4Wllb2K08ZIJ.5V1tOaGv0T8wEGFJXyjUBT7oU6xuVG.', 0, '2026-04-26'),
+(43335, '31659136EST', 'Cuál es su mejor amigo de la infancia', 'Cuál es su lugar favorito', 'e03c402eb711c9f259e8bedc4d923c2ac02b0910a04cda97ad407de9e2e570ca', 'f36a259aa7248d1e630a2086f9cbfc49065c0601a4a77fc0705fca5ce67bf196', 4, 'A', '31659136', '$2y$10$AoE37ZtTL9RXMsF8t.kmo.zqlrUbeLclk4Zr4Gt/3yAI3XXwFAaxW', 0, '2026-04-26');
 
 --
 -- Índices para tablas volcadas
@@ -703,7 +710,7 @@ ALTER TABLE `programa`
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
-  MODIFY `rol_codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `rol_codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT de la tabla `seccion`
@@ -739,7 +746,7 @@ ALTER TABLE `unidad_curricular`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `usu_codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43328;
+  MODIFY `usu_codigo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43336;
 
 --
 -- Restricciones para tablas volcadas

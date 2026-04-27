@@ -39,10 +39,16 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <a href="{{ route('planificacion.reporte.detalle', $planificacionId) }}" target="_blank"
-                            class="flex items-center gap-2 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-bold py-1.5 px-3 rounded shadow transition-all duration-200 hover:bg-gray-200"
+                            class="flex items-center gap-2 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-bold py-1.5 px-3 rounded shadow transition-all duration-200 hover:bg-gray-200 whitespace-nowrap"
                             title="Ver Plan de Curso en PDF (Nueva pestaña)">
                             <span class="material-icons text-black text-base">picture_as_pdf</span>
                             PDF
+                        </a>
+                        <a href="{{ asset('documentos/acuerdo_aprendizaje.pdf') }}" target="_blank"
+                            class="flex items-center gap-2 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-bold py-1.5 px-3 rounded shadow transition-all duration-200 hover:bg-gray-200 whitespace-nowrap"
+                            title="Ver Acuerdo de Aprendizaje (Nueva pestaña)">
+                            <span class="material-icons text-black text-base">assignment</span>
+                            ACUERDO DE APRENDIZAJE
                         </a>
                         <span class="px-3 py-1 rounded-full text-sm font-semibold
                             @if (($planificacion->estatus ?? 0) == 1) bg-green-100 text-green-800
@@ -319,6 +325,74 @@
                     </div>
 
 
+
+                    {{-- Sección de Carga de Contrato de Estudiantes (Solo para Planificación Aprobada y para el Docente) --}}
+                    @if (($planificacion->estatus ?? 0) == 1)
+                        <div class="mt-10 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-2xl">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                                    <span class="material-icons">draw</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+                                        Contrato de los Estudiantes
+                                    </h3>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Cargue aquí el contrato firmado por los estudiantes (PDF o Imagen).</p>
+                                </div>
+                            </div>
+
+                            <form wire:submit.prevent="saveContrato" class="space-y-4">
+                                <div class="flex flex-col sm:flex-row items-center gap-4">
+                                    <div class="flex-1 w-full">
+                                        <input type="file" wire:model="contratoEstudiantes" id="contratoEstudiantes"
+                                            class="block w-full text-sm text-gray-500 dark:text-gray-400
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-xl file:border-0
+                                            file:text-sm file:font-black
+                                            file:bg-blue-600 file:text-white
+                                            hover:file:bg-blue-700
+                                            transition-all cursor-pointer"
+                                            accept=".pdf,image/*">
+                                        @error('contratoEstudiantes') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    @if ($contratoEstudiantes)
+                                        <button type="submit"
+                                            class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-green-700 transition-all hover:-translate-y-0.5">
+                                            <span class="material-icons text-sm">cloud_upload</span>
+                                            SUBIR CONTRATO
+                                        </button>
+                                    @endif
+                                </div>
+
+                                <div wire:loading wire:target="contratoEstudiantes" class="text-sm text-blue-600 font-bold">
+                                    <span class="flex items-center gap-2">
+                                        <svg class="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Cargando archivo...
+                                    </span>
+                                </div>
+                            </form>
+
+                            @if ($contratoPath)
+                                <div class="mt-6 flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
+                                            <span class="material-icons text-base">check_circle</span>
+                                        </div>
+                                        <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Archivo de contrato ya cargado</span>
+                                    </div>
+                                    <a href="{{ Storage::url($contratoPath) }}" target="_blank"
+                                        class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-bold text-sm transition-colors">
+                                        <span class="material-icons text-sm">visibility</span>
+                                        VER CONTRATO CARGADO
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
 
                     {{-- Footer con Botones de Acción --}}
                     <div class="mt-8 flex justify-end space-x-3 pt-4 border-t dark:border-gray-700">

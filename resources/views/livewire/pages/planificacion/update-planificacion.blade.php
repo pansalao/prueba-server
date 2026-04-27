@@ -476,24 +476,20 @@
                                     <div class="flex items-center gap-3">
                                         @if ($index > 0)
                                             <button type="button" wire:click="unidadAnterior({{ $index }})"
-                                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                                                class="inline-flex items-center gap-2 px-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
                                                 <span class="material-icons text-sm">arrow_back</span> Unidad Anterior
                                             </button>
                                         @endif
                                         <button type="button" wire:click="saveProgress({{ $index }})"
-                                            class="w-full sm:w-auto px-6 py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-bold text-sm tracking-wide shadow-sm flex items-center justify-center gap-2">
-                                            <span class="material-icons text-lg">save</span>
-                                            GUARDAR Y SALIR
+                                            class="inline-flex items-center gap-2 px-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                                            <span class="material-icons text-sm">save</span> GUARDAR Y SALIR
                                         </button>
                                     </div>
                                     <div>
                                         @if ($index === count($form->unidades) - 1)
                                             <button type="button" wire:click="savePlanificacion"
-                                                class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transform hover:-translate-y-0.5 transition-all font-bold text-sm tracking-wide">
-                                                <span class="flex items-center justify-center gap-2">
-                                                    <span class="material-icons text-lg">check_circle</span>
-                                                    ACTUALIZAR PLANIFICACIÓN
-                                                </span>
+                                                class="inline-flex items-center gap-2 px-8 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-sm">
+                                                <span class="material-icons text-sm">check_circle</span> ACTUALIZAR PLANIFICACIÓN
                                             </button>
                                         @else
                                             <button type="button" x-on:click="openUnidad = {{ $index + 1 }}; setTimeout(() => $el.closest('.sogat-card').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)"
