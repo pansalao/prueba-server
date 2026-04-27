@@ -8,6 +8,10 @@ use App\Repositories\Planificacion\PlanificacionViewRepo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Planificacion;
+use Illuminate\Support\Facades\DB;
 
 class ShowPlanificacion extends Component
 {
@@ -15,6 +19,10 @@ class ShowPlanificacion extends Component
     public $planificacion;
     public $motivosRechazoCortes = [];
     public $mostrarMotivoRechazoCorte = [];
+    public $contratoEstudiantes;
+    public $contratoPath;
+
+    use WithFileUploads;
 
     protected $planificacionIndexRepo;
     protected $planificacionViewRepo;
@@ -47,6 +55,33 @@ class ShowPlanificacion extends Component
             $this->motivosRechazoCortes[$unidad->detalle_id] = $unidad->ultimo_motivo_rechazo ?? '';
             return $unidad;
         })->toArray();
+
+        // Cargar el path del contrato si existe
+        $this->contratoPath = $this->planificacion->archivo_contrato ?? null;
+    }
+
+    public function saveContrato()
+    {
+        $this->validate([
+            'contratoEstudiantes' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
+        ]);
+
+        try {
+            $path = $this->contratoEstudiantes->store('contratos', 'public');
+            
+            // Guardar en la base de datos
+            DB::table('planificacion')
+                ->where('id_planificacion', $this->planificacionId)
+                ->update(['archivo_contrato' => $path]);
+
+            $this->contratoPath = $path;
+            $this->contratoEstudiantes = null;
+
+            session()->flash('message', 'El contrato de los estudiantes se ha subido correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al subir contrato: ' . $e->getMessage());
+            session()->flash('error', 'Hubo un error al subir el archivo.');
+        }
     }
 
 

@@ -22,16 +22,14 @@
 
         <!-- Filtros -->
         <div class="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
-                <div class="flex justify-center">
-                    <a href="{{ route('planificacion.reporte.general', ['search' => $this->search]) }}" 
-                        target="_blank"
-                        class="inline-flex font-bold items-center px-4 py-2 bg-[#f0f0f0] border border-[#767676] rounded-lg text-sm text-black uppercase tracking-widest hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150 shadow-sm gap-2"
-                        title="Ver reporte general en PDF (Nueva pestaña)">
-                        <span class="material-icons text-black text-xl">picture_as_pdf</span>
-                        Reporte PDF
-                    </a>
-                </div>
+            <div class="flex flex-wrap items-center gap-4">
+                <a href="{{ route('planificacion.reporte.general', ['search' => $this->search]) }}" 
+                    target="_blank"
+                    class="inline-flex font-bold items-center px-4 py-2 bg-[#f0f0f0] border border-[#767676] rounded-lg text-sm text-black uppercase tracking-widest hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150 shadow-sm gap-2 whitespace-nowrap"
+                    title="Ver reporte general en PDF (Nueva pestaña)">
+                    <span class="material-icons text-black text-xl">picture_as_pdf</span>
+                    Reporte PDF
+                </a>
             </div>
         </div>
 

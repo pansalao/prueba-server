@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 19-04-2026 a las 20:31:45
+-- Tiempo de generación: 26-04-2026 a las 16:28:13
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `hp_11`
+-- Base de datos: `hp_12`
 --
 
 -- --------------------------------------------------------
@@ -240,7 +240,64 @@ INSERT INTO `bitacora` (`id_bitacora`, `id_usuario`, `modulo_afectado_bitacora`,
 (178, 1, 'CalendarioAcademico', 'calendario_academico', '13', 'CREAR', NULL, '{\"semana_calendario_academico\":13,\"dia_inicio_calendario_academico\":\"2026-04-01\",\"dia_fin_calendario_academico\":\"2026-06-30\",\"fecha_creacion\":\"2026-04-19T17:00:31.648598Z\",\"estatus\":\"1\",\"id_calendario_academico\":13}', '127.0.0.1', '2026-04-19 21:00:31', '1'),
 (179, 1, 'Evento', 'evento', '2', 'CREAR', NULL, '{\"id_calendario\":13,\"dia_inicio_evento\":\"2026-04-01\",\"dia_fin_evento\":\"2026-04-09\",\"descripcion_evento\":\"pop\",\"tipo_evento\":\"Cierre de Notas\",\"fecha_creacion\":\"2026-04-19T17:00:31.658766Z\",\"estatus\":\"1\",\"id_evento\":2}', '127.0.0.1', '2026-04-19 21:00:31', '1'),
 (180, 1, 'Evento', 'evento', '3', 'CREAR', NULL, '{\"id_calendario\":13,\"dia_inicio_evento\":\"2026-05-15\",\"dia_fin_evento\":\"2026-05-15\",\"descripcion_evento\":\"ki\",\"tipo_evento\":\"Otro\",\"fecha_creacion\":\"2026-04-19T17:00:31.667185Z\",\"estatus\":\"1\",\"id_evento\":3}', '127.0.0.1', '2026-04-19 21:00:31', '1'),
-(181, 0, 'Seguridad', 'users', '43325', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-04-19 21:00:33', '1');
+(181, 0, 'Seguridad', 'users', '43325', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-04-19 21:00:33', '1'),
+(182, 0, 'Seguridad', 'users', '39114', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-04-23 00:28:22', '1'),
+(183, 39114, 'Recurso', 'recurso', '2', 'CREAR', NULL, '{\"nombre_recurso\":\"Maikol\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:48:55.904386Z\",\"fecha_actualizacion\":\"2026-04-22T21:48:55.904418Z\",\"id_recurso\":2}', '127.0.0.1', '2026-04-23 01:48:55', '1'),
+(184, 39114, 'Recurso', 'recurso', '3', 'CREAR', NULL, '{\"nombre_recurso\":\"hola\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:51:47.456620Z\",\"fecha_actualizacion\":\"2026-04-22T21:51:47.456635Z\",\"id_recurso\":3}', '127.0.0.1', '2026-04-23 01:51:47', '1'),
+(185, 39114, 'Roles (Permisos)', 'rol_permiso', '75', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"57\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:10.957578Z\",\"id_rol_permiso\":75}', '127.0.0.1', '2026-04-23 01:54:10', '1'),
+(186, 39114, 'Roles (Permisos)', 'rol_permiso', '76', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"2\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:10.990541Z\",\"id_rol_permiso\":76}', '127.0.0.1', '2026-04-23 01:54:10', '1'),
+(187, 39114, 'Roles (Permisos)', 'rol_permiso', '77', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"59\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:10.994211Z\",\"id_rol_permiso\":77}', '127.0.0.1', '2026-04-23 01:54:10', '1'),
+(188, 39114, 'Roles (Permisos)', 'rol_permiso', '78', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"8\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:10.998054Z\",\"id_rol_permiso\":78}', '127.0.0.1', '2026-04-23 01:54:10', '1'),
+(189, 39114, 'Roles (Permisos)', 'rol_permiso', '79', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"9\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.006278Z\",\"id_rol_permiso\":79}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(190, 39114, 'Roles (Permisos)', 'rol_permiso', '80', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"7\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.186444Z\",\"id_rol_permiso\":80}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(191, 39114, 'Roles (Permisos)', 'rol_permiso', '81', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"10\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.189574Z\",\"id_rol_permiso\":81}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(192, 39114, 'Roles (Permisos)', 'rol_permiso', '82', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"74\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.193003Z\",\"id_rol_permiso\":82}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(193, 39114, 'Roles (Permisos)', 'rol_permiso', '83', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"73\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.196913Z\",\"id_rol_permiso\":83}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(194, 39114, 'Roles (Permisos)', 'rol_permiso', '84', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"72\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.200487Z\",\"id_rol_permiso\":84}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(195, 39114, 'Roles (Permisos)', 'rol_permiso', '85', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"56\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.204304Z\",\"id_rol_permiso\":85}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(196, 39114, 'Roles (Permisos)', 'rol_permiso', '86', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"1\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.207797Z\",\"id_rol_permiso\":86}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(197, 39114, 'Roles (Permisos)', 'rol_permiso', '87', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"63\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.222413Z\",\"id_rol_permiso\":87}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(198, 39114, 'Roles (Permisos)', 'rol_permiso', '88', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"21\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.225678Z\",\"id_rol_permiso\":88}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(199, 39114, 'Roles (Permisos)', 'rol_permiso', '89', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"22\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.229140Z\",\"id_rol_permiso\":89}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(200, 39114, 'Roles (Permisos)', 'rol_permiso', '90', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"20\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.232508Z\",\"id_rol_permiso\":90}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(201, 39114, 'Roles (Permisos)', 'rol_permiso', '91', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"23\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.235849Z\",\"id_rol_permiso\":91}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(202, 39114, 'Roles (Permisos)', 'rol_permiso', '92', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"58\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.312185Z\",\"id_rol_permiso\":92}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(203, 39114, 'Roles (Permisos)', 'rol_permiso', '93', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"4\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.320154Z\",\"id_rol_permiso\":93}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(204, 39114, 'Roles (Permisos)', 'rol_permiso', '94', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"5\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.323282Z\",\"id_rol_permiso\":94}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(205, 39114, 'Roles (Permisos)', 'rol_permiso', '95', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"3\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.326677Z\",\"id_rol_permiso\":95}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(206, 39114, 'Roles (Permisos)', 'rol_permiso', '96', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"6\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.329978Z\",\"id_rol_permiso\":96}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(207, 39114, 'Roles (Permisos)', 'rol_permiso', '13', 'MODIFICAR', '{\"id_rol_permiso\":13,\"id_permiso\":62,\"id_rol\":3,\"fecha_creacion\":\"2026-03-24 00:58:45\",\"fecha_actualizacion\":\"2026-04-07 11:36:33\",\"estatus\":\"3\"}', '{\"fecha_actualizacion\":\"2026-04-22T21:54:11.333230Z\",\"estatus\":\"1\"}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(208, 39114, 'Roles (Permisos)', 'rol_permiso', '14', 'MODIFICAR', '{\"id_rol_permiso\":14,\"id_permiso\":49,\"id_rol\":3,\"fecha_creacion\":\"2026-03-24 00:58:45\",\"fecha_actualizacion\":\"2026-04-07 11:36:33\",\"estatus\":\"3\"}', '{\"fecha_actualizacion\":\"2026-04-22T21:54:11.336920Z\",\"estatus\":\"1\"}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(209, 39114, 'Roles (Permisos)', 'rol_permiso', '16', 'MODIFICAR', '{\"id_rol_permiso\":16,\"id_permiso\":48,\"id_rol\":3,\"fecha_creacion\":\"2026-03-24 00:58:45\",\"fecha_actualizacion\":\"2026-04-07 11:36:33\",\"estatus\":\"3\"}', '{\"fecha_actualizacion\":\"2026-04-22T21:54:11.340542Z\",\"estatus\":\"1\"}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(210, 39114, 'Roles (Permisos)', 'rol_permiso', '17', 'MODIFICAR', '{\"id_rol_permiso\":17,\"id_permiso\":19,\"id_rol\":3,\"fecha_creacion\":\"2026-03-24 00:58:45\",\"fecha_actualizacion\":\"2026-04-07 11:36:33\",\"estatus\":\"3\"}', '{\"fecha_actualizacion\":\"2026-04-22T21:54:11.352203Z\",\"estatus\":\"1\"}', '127.0.0.1', '2026-04-23 01:54:11', '1');
+INSERT INTO `bitacora` (`id_bitacora`, `id_usuario`, `modulo_afectado_bitacora`, `tabla_afectada_bitacora`, `id_registro_afectado_bitacora`, `accion_bitacora`, `valores_anteriores_bitacora`, `valores_nuevos_bitacora`, `ip_origen_bitacora`, `fecha_creacion`, `estatus`) VALUES
+(211, 39114, 'Roles (Permisos)', 'rol_permiso', '18', 'MODIFICAR', '{\"id_rol_permiso\":18,\"id_permiso\":51,\"id_rol\":3,\"fecha_creacion\":\"2026-03-24 00:58:45\",\"fecha_actualizacion\":\"2026-04-07 11:36:33\",\"estatus\":\"3\"}', '{\"fecha_actualizacion\":\"2026-04-22T21:54:11.355780Z\",\"estatus\":\"1\"}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(212, 39114, 'Roles (Permisos)', 'rol_permiso', '97', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"71\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.359513Z\",\"id_rol_permiso\":97}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(213, 39114, 'Roles (Permisos)', 'rol_permiso', '98', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"54\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.362904Z\",\"id_rol_permiso\":98}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(214, 39114, 'Roles (Permisos)', 'rol_permiso', '99', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"55\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.366400Z\",\"id_rol_permiso\":99}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(215, 39114, 'Roles (Permisos)', 'rol_permiso', '100', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"64\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.369750Z\",\"id_rol_permiso\":100}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(216, 39114, 'Roles (Permisos)', 'rol_permiso', '101', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"25\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.372923Z\",\"id_rol_permiso\":101}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(217, 39114, 'Roles (Permisos)', 'rol_permiso', '102', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"26\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.379180Z\",\"id_rol_permiso\":102}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(218, 39114, 'Roles (Permisos)', 'rol_permiso', '103', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"24\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.387490Z\",\"id_rol_permiso\":103}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(219, 39114, 'Roles (Permisos)', 'rol_permiso', '104', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"27\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.390671Z\",\"id_rol_permiso\":104}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(220, 39114, 'Roles (Permisos)', 'rol_permiso', '105', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"60\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.393984Z\",\"id_rol_permiso\":105}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(221, 39114, 'Roles (Permisos)', 'rol_permiso', '106', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"11\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.397358Z\",\"id_rol_permiso\":106}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(222, 39114, 'Roles (Permisos)', 'rol_permiso', '107', 'CREAR', NULL, '{\"id_rol\":\"3\",\"id_permiso\":\"12\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T21:54:11.400649Z\",\"id_rol_permiso\":107}', '127.0.0.1', '2026-04-23 01:54:11', '1'),
+(223, 39114, 'Estrategia', 'tecnica_actividad', '2', 'CREAR', NULL, '{\"nombre_tecnica_actividad\":\"tigresabbb\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T22:00:16.869471Z\",\"fecha_actualizacion\":\"2026-04-22T22:00:16.869488Z\",\"id_tecnica_actividad\":2}', '127.0.0.1', '2026-04-23 02:00:16', '1'),
+(224, 39114, 'Recurso', 'recurso', '4', 'CREAR', NULL, '{\"nombre_recurso\":\"mantequilla\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T22:00:32.880824Z\",\"fecha_actualizacion\":\"2026-04-22T22:00:32.880841Z\",\"id_recurso\":4}', '127.0.0.1', '2026-04-23 02:00:32', '1'),
+(225, 39114, 'Estrategia', 'tecnica_actividad', '3', 'CREAR', NULL, '{\"nombre_tecnica_actividad\":\"manteca\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T22:04:47.154244Z\",\"fecha_actualizacion\":\"2026-04-22T22:04:47.154270Z\",\"id_tecnica_actividad\":3}', '127.0.0.1', '2026-04-23 02:04:47', '1'),
+(226, 39114, 'Recurso', 'recurso', '5', 'CREAR', NULL, '{\"nombre_recurso\":\"arepa\",\"estatus\":\"1\",\"fecha_creacion\":\"2026-04-22T22:06:20.757016Z\",\"fecha_actualizacion\":\"2026-04-22T22:06:20.757031Z\",\"id_recurso\":5}', '127.0.0.1', '2026-04-23 02:06:20', '1'),
+(227, 39114, 'Contenido', 'contenido', '2', 'CREAR', NULL, '{\"titulo_contenido\":\"html css php js\",\"fecha_creacion\":\"2026-04-22T22:22:26.328864Z\",\"estatus\":\"1\",\"id_contenido\":2}', '127.0.0.1', '2026-04-23 02:22:26', '1'),
+(228, 0, 'Seguridad', 'users', '39114', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-04-26 02:11:26', '1'),
+(229, 0, 'Seguridad', 'users', '39114', 'LOGOUT', NULL, NULL, '127.0.0.1', '2026-04-26 03:36:28', '1'),
+(230, 0, 'Seguridad', 'users', '39114', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-04-26 03:37:03', '1'),
+(231, 0, 'Seguridad', 'users', '39114', 'LOGOUT', NULL, NULL, '127.0.0.1', '2026-04-26 04:04:08', '1'),
+(232, 0, 'Seguridad', 'users', '39114', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-04-26 04:05:52', '1'),
+(233, 39114, 'CalendarioAcademico', 'calendario_academico', '12', 'MOSTRAR', '{\"id_calendario_academico\":12,\"semana_calendario_academico\":9,\"dia_inicio_calendario_academico\":\"2026-04-01\",\"dia_fin_calendario_academico\":\"2026-05-31\",\"fecha_creacion\":\"2026-04-19 16:55:42\",\"estatus\":\"3\"}', NULL, '127.0.0.1', '2026-04-26 04:13:50', '1'),
+(234, 39114, 'CalendarioAcademico', 'calendario_academico', '13', 'MOSTRAR', '{\"id_calendario_academico\":13,\"semana_calendario_academico\":13,\"dia_inicio_calendario_academico\":\"2026-04-01\",\"dia_fin_calendario_academico\":\"2026-06-30\",\"fecha_creacion\":\"2026-04-19 17:00:31\",\"estatus\":\"1\"}', NULL, '127.0.0.1', '2026-04-26 04:14:04', '1'),
+(235, 0, 'Seguridad', 'users', '39114', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-04-26 08:10:53', '1'),
+(236, 0, 'Seguridad', 'users', '39114', 'LOGOUT', NULL, NULL, '127.0.0.1', '2026-04-26 08:25:52', '1'),
+(237, 0, 'Seguridad', 'users', '39114', 'LOGIN', NULL, NULL, '127.0.0.1', '2026-04-26 08:27:37', '1');
 
 -- --------------------------------------------------------
 
@@ -308,7 +365,8 @@ CREATE TABLE `contenido` (
 --
 
 INSERT INTO `contenido` (`id_contenido`, `titulo_contenido`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 'kfhfihfajiaiiad', '2026-04-18 00:07:49', NULL, '1');
+(1, 'kfhfihfajiaiiad', '2026-04-18 00:07:49', NULL, '1'),
+(2, 'html css php js', '2026-04-23 02:22:26', NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -381,7 +439,8 @@ CREATE TABLE `detalle_objetivo` (
 --
 
 INSERT INTO `detalle_objetivo` (`id_detalle_objetivo`, `id_contenido`, `id_objetivo`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 1, 1, '2026-04-18 00:07:49', NULL, '1');
+(1, 1, 1, '2026-04-18 00:07:49', NULL, '1'),
+(2, 2, 1, '2026-04-23 02:22:26', NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -587,14 +646,14 @@ INSERT INTO `permiso` (`id_permiso`, `nombre_permiso`, `fecha_creacion`, `fecha_
 (43, 'Ver Detalles de Tipo Evaluacion', '2026-03-24 04:55:38', NULL, '1'),
 (44, 'Listar de Evento', '2026-03-24 04:55:38', NULL, '1'),
 (45, 'Crear de Evento', '2026-03-24 04:55:38', NULL, '1'),
-(46, 'Editar de Evento', '2026-03-24 04:55:38', NULL, '1'),
+(46, 'Editar de Evento', '2026-03-24 04:55:38', '2026-04-25 23:57:10', '3'),
 (47, 'Ver Detalles de Evento', '2026-03-24 04:55:38', NULL, '1'),
 (48, 'Listar de Calendario', '2026-03-24 04:55:38', NULL, '1'),
 (49, 'Crear de Calendario', '2026-03-24 04:55:38', NULL, '1'),
-(50, 'Editar de Calendario', '2026-03-24 04:55:38', NULL, '1'),
+(50, 'Editar de Calendario', '2026-03-24 04:55:38', '2026-04-25 23:57:10', '3'),
 (51, 'Ver Detalles de Calendario', '2026-03-24 04:55:38', NULL, '1'),
-(52, 'Listar de Rol', '2026-03-24 04:55:38', '2026-04-15 18:18:35', '3'),
-(53, 'Editar de Rol', '2026-03-24 04:55:38', '2026-04-15 18:18:35', '3'),
+(52, 'Listar de Rol', '2026-03-24 04:55:38', '2026-04-25 23:57:10', '3'),
+(53, 'Editar de Rol', '2026-03-24 04:55:38', '2026-04-25 23:57:10', '3'),
 (54, 'Listar de Bitacora', '2026-03-24 04:55:38', NULL, '1'),
 (55, 'Ver Detalles de Bitacora', '2026-03-24 04:55:38', NULL, '1'),
 (56, 'Cambiar Estatus de Perfil', '2026-03-24 04:55:38', NULL, '1'),
@@ -611,11 +670,11 @@ INSERT INTO `permiso` (`id_permiso`, `nombre_permiso`, `fecha_creacion`, `fecha_
 (67, 'Cambiar Estatus de Tecnica Evaluacion', '2026-03-24 04:55:38', NULL, '1'),
 (68, 'Cambiar Estatus de Tipo Evaluacion', '2026-03-24 04:55:38', NULL, '1'),
 (69, 'Cambiar Estatus de Evento', '2026-03-24 04:55:38', NULL, '1'),
-(70, 'Cambiar Estatus de Rol', '2026-03-24 04:55:38', '2026-04-15 18:18:35', '3'),
+(70, 'Cambiar Estatus de Rol', '2026-03-24 04:55:38', '2026-04-25 23:57:10', '3'),
 (71, 'Cambiar Estatus de Bitacora', '2026-03-24 04:55:38', NULL, '1'),
-(72, 'Listar de Permiso', '2026-04-15 22:18:35', NULL, '1'),
-(73, 'Editar de Permiso', '2026-04-15 22:18:35', NULL, '1'),
-(74, 'Cambiar Estatus de Permiso', '2026-04-15 22:18:35', NULL, '1');
+(72, 'Listar de Permiso', '2026-04-15 22:18:35', '2026-04-22 21:53:29', '1'),
+(73, 'Editar de Permiso', '2026-04-15 22:18:35', '2026-04-22 21:53:30', '1'),
+(74, 'Cambiar Estatus de Permiso', '2026-04-15 22:18:35', '2026-04-22 21:53:30', '1');
 
 -- --------------------------------------------------------
 
@@ -652,7 +711,11 @@ CREATE TABLE `recurso` (
 --
 
 INSERT INTO `recurso` (`id_recurso`, `nombre_recurso`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 'dsdd', '2026-04-07 16:01:56', '2026-04-07 16:01:56', '1');
+(1, 'dsdd', '2026-04-07 16:01:56', '2026-04-07 16:01:56', '1'),
+(2, 'Maikol', '2026-04-23 01:48:55', '2026-04-23 01:48:55', '1'),
+(3, 'hola', '2026-04-23 01:51:47', '2026-04-23 01:51:47', '1'),
+(4, 'mantequilla', '2026-04-23 02:00:32', '2026-04-23 02:00:32', '1'),
+(5, 'arepa', '2026-04-23 02:06:20', '2026-04-23 02:06:20', '1');
 
 -- --------------------------------------------------------
 
@@ -674,9 +737,120 @@ CREATE TABLE `rol_permiso` (
 --
 
 INSERT INTO `rol_permiso` (`id_rol_permiso`, `id_permiso`, `id_rol`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
+(139, 44, 31, '2026-04-25 23:56:13', NULL, '1'),
+(140, 45, 31, '2026-04-25 23:56:13', NULL, '1'),
+(141, 46, 31, '2026-04-25 23:56:13', '2026-04-26 04:03:44', '3'),
+(142, 47, 31, '2026-04-25 23:56:13', NULL, '1'),
+(143, 48, 31, '2026-04-25 23:56:13', NULL, '1'),
+(144, 49, 31, '2026-04-25 23:56:13', NULL, '1'),
+(145, 50, 31, '2026-04-25 23:56:13', '2026-04-26 04:03:44', '3'),
+(146, 51, 31, '2026-04-25 23:56:13', NULL, '1'),
+(147, 52, 31, '2026-04-25 23:56:13', '2026-04-26 04:03:44', '3'),
+(148, 53, 31, '2026-04-25 23:56:13', '2026-04-26 04:03:44', '3'),
+(149, 62, 31, '2026-04-25 23:56:13', NULL, '1'),
+(150, 69, 31, '2026-04-25 23:56:13', NULL, '1'),
+(151, 70, 31, '2026-04-25 23:56:13', '2026-04-26 04:03:44', '3'),
+(152, 72, 31, '2026-04-25 23:56:13', NULL, '1'),
+(153, 73, 31, '2026-04-25 23:56:13', NULL, '1'),
+(154, 74, 31, '2026-04-25 23:56:13', NULL, '1'),
+(170, 3, 11, '2026-04-25 23:56:13', NULL, '1'),
+(171, 4, 11, '2026-04-25 23:56:13', NULL, '1'),
+(172, 5, 11, '2026-04-25 23:56:13', NULL, '1'),
+(173, 6, 11, '2026-04-25 23:56:13', NULL, '1'),
+(174, 7, 11, '2026-04-25 23:56:13', NULL, '1'),
+(175, 8, 11, '2026-04-25 23:56:13', NULL, '1'),
+(176, 9, 11, '2026-04-25 23:56:13', NULL, '1'),
+(177, 10, 11, '2026-04-25 23:56:13', NULL, '1'),
+(178, 13, 11, '2026-04-25 23:56:13', NULL, '1'),
+(179, 16, 11, '2026-04-25 23:56:13', NULL, '1'),
+(180, 17, 11, '2026-04-25 23:56:13', NULL, '1'),
+(181, 18, 11, '2026-04-25 23:56:13', NULL, '1'),
+(182, 20, 11, '2026-04-25 23:56:13', NULL, '1'),
+(183, 21, 11, '2026-04-25 23:56:13', NULL, '1'),
+(184, 22, 11, '2026-04-25 23:56:13', NULL, '1'),
+(185, 23, 11, '2026-04-25 23:56:13', NULL, '1'),
+(186, 58, 11, '2026-04-25 23:56:13', NULL, '1'),
+(187, 59, 11, '2026-04-25 23:56:13', NULL, '1'),
+(188, 61, 11, '2026-04-25 23:56:13', NULL, '1'),
+(189, 63, 11, '2026-04-25 23:56:13', NULL, '1'),
+(201, 3, 30, '2026-04-25 23:56:13', NULL, '1'),
+(202, 4, 30, '2026-04-25 23:56:13', NULL, '1'),
+(203, 5, 30, '2026-04-25 23:56:13', NULL, '1'),
+(204, 6, 30, '2026-04-25 23:56:13', NULL, '1'),
+(205, 7, 30, '2026-04-25 23:56:13', NULL, '1'),
+(206, 8, 30, '2026-04-25 23:56:13', NULL, '1'),
+(207, 9, 30, '2026-04-25 23:56:13', NULL, '1'),
+(208, 10, 30, '2026-04-25 23:56:13', NULL, '1'),
+(209, 13, 30, '2026-04-25 23:56:13', NULL, '1'),
+(210, 16, 30, '2026-04-25 23:56:13', NULL, '1'),
+(211, 17, 30, '2026-04-25 23:56:13', NULL, '1'),
+(212, 18, 30, '2026-04-25 23:56:13', NULL, '1'),
+(213, 20, 30, '2026-04-25 23:56:13', NULL, '1'),
+(214, 21, 30, '2026-04-25 23:56:13', NULL, '1'),
+(215, 22, 30, '2026-04-25 23:56:13', NULL, '1'),
+(216, 23, 30, '2026-04-25 23:56:13', NULL, '1'),
+(217, 58, 30, '2026-04-25 23:56:13', NULL, '1'),
+(218, 59, 30, '2026-04-25 23:56:13', NULL, '1'),
+(219, 61, 30, '2026-04-25 23:56:13', NULL, '1'),
+(220, 63, 30, '2026-04-25 23:56:13', NULL, '1'),
+(232, 13, 3, '2026-04-25 23:56:13', NULL, '1'),
+(233, 14, 3, '2026-04-25 23:56:13', NULL, '1'),
+(234, 15, 3, '2026-04-25 23:56:13', NULL, '1'),
+(235, 16, 3, '2026-04-25 23:56:13', NULL, '1'),
+(236, 17, 3, '2026-04-25 23:56:13', NULL, '1'),
+(237, 18, 3, '2026-04-25 23:56:13', NULL, '1'),
+(238, 24, 3, '2026-04-25 23:56:13', NULL, '1'),
+(239, 25, 3, '2026-04-25 23:56:13', NULL, '1'),
+(240, 26, 3, '2026-04-25 23:56:13', NULL, '1'),
+(241, 27, 3, '2026-04-25 23:56:13', NULL, '1'),
+(242, 28, 3, '2026-04-25 23:56:13', NULL, '1'),
+(243, 29, 3, '2026-04-25 23:56:13', NULL, '1'),
+(244, 30, 3, '2026-04-25 23:56:13', NULL, '1'),
+(245, 31, 3, '2026-04-25 23:56:13', NULL, '1'),
+(246, 32, 3, '2026-04-25 23:56:13', NULL, '1'),
+(247, 33, 3, '2026-04-25 23:56:13', NULL, '1'),
+(248, 34, 3, '2026-04-25 23:56:13', NULL, '1'),
+(249, 35, 3, '2026-04-25 23:56:13', NULL, '1'),
+(250, 36, 3, '2026-04-25 23:56:13', NULL, '1'),
+(251, 37, 3, '2026-04-25 23:56:13', NULL, '1'),
+(252, 38, 3, '2026-04-25 23:56:13', NULL, '1'),
+(253, 39, 3, '2026-04-25 23:56:13', NULL, '1'),
+(254, 40, 3, '2026-04-25 23:56:13', NULL, '1'),
+(255, 41, 3, '2026-04-25 23:56:13', NULL, '1'),
+(256, 42, 3, '2026-04-25 23:56:13', NULL, '1'),
+(257, 43, 3, '2026-04-25 23:56:13', NULL, '1'),
+(258, 61, 3, '2026-04-25 23:56:13', NULL, '1'),
+(259, 64, 3, '2026-04-25 23:56:13', NULL, '1'),
+(260, 65, 3, '2026-04-25 23:56:13', NULL, '1'),
+(261, 66, 3, '2026-04-25 23:56:13', NULL, '1'),
+(262, 67, 3, '2026-04-25 23:56:13', NULL, '1'),
+(263, 68, 3, '2026-04-25 23:56:13', NULL, '1'),
+(325, 13, 4, '2026-04-26 04:22:45', NULL, '1'),
+(326, 16, 4, '2026-04-26 04:22:45', NULL, '1');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `rol_permiso_backup`
+--
+
+CREATE TABLE `rol_permiso_backup` (
+  `id_rol_permiso` int(11) NOT NULL DEFAULT 0,
+  `id_permiso` int(11) DEFAULT NULL,
+  `id_rol` int(11) DEFAULT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_actualizacion` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `estatus` enum('1','2','3') DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `rol_permiso_backup`
+--
+
+INSERT INTO `rol_permiso_backup` (`id_rol_permiso`, `id_permiso`, `id_rol`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
 (1, 69, 3, '2026-03-24 04:58:45', '2026-04-15 19:29:02', '1'),
 (2, 45, 3, '2026-03-24 04:58:45', '2026-04-15 19:29:02', '1'),
-(3, 46, 3, '2026-03-24 04:58:45', '2026-04-15 19:29:02', '1'),
+(3, 46, 3, '2026-03-24 04:58:45', '2026-04-26 03:45:32', '3'),
 (4, 44, 3, '2026-03-24 04:58:45', '2026-04-15 19:29:02', '1'),
 (5, 47, 3, '2026-03-24 04:58:45', '2026-04-15 19:29:02', '1'),
 (6, 61, 3, '2026-03-24 04:58:45', NULL, '1'),
@@ -686,12 +860,12 @@ INSERT INTO `rol_permiso` (`id_rol_permiso`, `id_permiso`, `id_rol`, `fecha_crea
 (10, 18, 3, '2026-03-24 04:58:45', NULL, '1'),
 (11, 17, 3, '2026-03-24 04:58:45', NULL, '1'),
 (12, 16, 3, '2026-03-24 04:58:45', NULL, '1'),
-(13, 62, 3, '2026-03-24 04:58:45', '2026-04-07 15:36:33', '3'),
-(14, 49, 3, '2026-03-24 04:58:45', '2026-04-07 15:36:33', '3'),
-(15, 50, 3, '2026-03-24 04:58:45', '2026-04-07 15:36:33', '3'),
-(16, 48, 3, '2026-03-24 04:58:45', '2026-04-07 15:36:33', '3'),
-(17, 19, 3, '2026-03-24 04:58:45', '2026-04-07 15:36:33', '3'),
-(18, 51, 3, '2026-03-24 04:58:45', '2026-04-07 15:36:33', '3'),
+(13, 62, 3, '2026-03-24 04:58:45', '2026-04-23 01:54:11', '1'),
+(14, 49, 3, '2026-03-24 04:58:45', '2026-04-23 01:54:11', '1'),
+(15, 50, 3, '2026-03-24 04:58:45', '2026-04-26 03:45:32', '3'),
+(16, 48, 3, '2026-03-24 04:58:45', '2026-04-23 01:54:11', '1'),
+(17, 19, 3, '2026-03-24 04:58:45', '2026-04-23 01:54:11', '1'),
+(18, 51, 3, '2026-03-24 04:58:45', '2026-04-23 01:54:11', '1'),
 (19, 61, 4, '2026-03-25 05:30:31', '2026-04-11 02:57:37', '1'),
 (20, 14, 4, '2026-03-25 05:30:31', '2026-04-11 02:57:37', '1'),
 (21, 15, 4, '2026-03-25 05:30:31', '2026-04-11 02:57:37', '1'),
@@ -701,7 +875,7 @@ INSERT INTO `rol_permiso` (`id_rol_permiso`, `id_permiso`, `id_rol`, `fecha_crea
 (25, 16, 4, '2026-03-25 05:30:31', NULL, '1'),
 (26, 62, 4, '2026-03-28 15:50:50', NULL, '1'),
 (27, 49, 4, '2026-03-28 15:50:50', NULL, '1'),
-(28, 50, 4, '2026-03-28 15:50:50', NULL, '1'),
+(28, 50, 4, '2026-03-28 15:50:50', '2026-04-26 03:45:32', '3'),
 (29, 48, 4, '2026-03-28 15:50:50', NULL, '1'),
 (30, 19, 4, '2026-03-28 15:50:50', NULL, '1'),
 (31, 51, 4, '2026-03-28 15:50:50', NULL, '1'),
@@ -734,7 +908,7 @@ INSERT INTO `rol_permiso` (`id_rol_permiso`, `id_permiso`, `id_rol`, `fecha_crea
 (58, 10, 11, '2026-04-07 15:49:15', NULL, '1'),
 (59, 62, 11, '2026-04-08 01:12:40', NULL, '1'),
 (60, 49, 11, '2026-04-08 01:12:40', NULL, '1'),
-(61, 50, 11, '2026-04-08 01:12:40', NULL, '1'),
+(61, 50, 11, '2026-04-08 01:12:40', '2026-04-26 03:45:32', '3'),
 (62, 48, 11, '2026-04-08 01:12:40', NULL, '1'),
 (63, 19, 11, '2026-04-08 01:12:40', NULL, '1'),
 (64, 51, 11, '2026-04-08 01:12:40', NULL, '1'),
@@ -745,9 +919,58 @@ INSERT INTO `rol_permiso` (`id_rol_permiso`, `id_permiso`, `id_rol`, `fecha_crea
 (69, 6, 11, '2026-04-18 00:07:08', NULL, '1'),
 (70, 69, 11, '2026-04-19 20:57:03', NULL, '1'),
 (71, 45, 11, '2026-04-19 20:57:03', NULL, '1'),
-(72, 46, 11, '2026-04-19 20:57:03', NULL, '1'),
+(72, 46, 11, '2026-04-19 20:57:03', '2026-04-26 03:45:32', '3'),
 (73, 44, 11, '2026-04-19 20:57:03', NULL, '1'),
-(74, 47, 11, '2026-04-19 20:57:03', NULL, '1');
+(74, 47, 11, '2026-04-19 20:57:03', NULL, '1'),
+(75, 57, 3, '2026-04-23 01:54:10', NULL, '1'),
+(76, 2, 3, '2026-04-23 01:54:10', NULL, '1'),
+(77, 59, 3, '2026-04-23 01:54:10', NULL, '1'),
+(78, 8, 3, '2026-04-23 01:54:10', NULL, '1'),
+(79, 9, 3, '2026-04-23 01:54:11', NULL, '1'),
+(80, 7, 3, '2026-04-23 01:54:11', NULL, '1'),
+(81, 10, 3, '2026-04-23 01:54:11', NULL, '1'),
+(82, 74, 3, '2026-04-23 01:54:11', NULL, '1'),
+(83, 73, 3, '2026-04-23 01:54:11', NULL, '1'),
+(84, 72, 3, '2026-04-23 01:54:11', NULL, '1'),
+(85, 56, 3, '2026-04-23 01:54:11', NULL, '1'),
+(86, 1, 3, '2026-04-23 01:54:11', NULL, '1'),
+(87, 63, 3, '2026-04-23 01:54:11', NULL, '1'),
+(88, 21, 3, '2026-04-23 01:54:11', NULL, '1'),
+(89, 22, 3, '2026-04-23 01:54:11', NULL, '1'),
+(90, 20, 3, '2026-04-23 01:54:11', NULL, '1'),
+(91, 23, 3, '2026-04-23 01:54:11', NULL, '1'),
+(92, 58, 3, '2026-04-23 01:54:11', NULL, '1'),
+(93, 4, 3, '2026-04-23 01:54:11', NULL, '1'),
+(94, 5, 3, '2026-04-23 01:54:11', NULL, '1'),
+(95, 3, 3, '2026-04-23 01:54:11', NULL, '1'),
+(96, 6, 3, '2026-04-23 01:54:11', NULL, '1'),
+(97, 71, 3, '2026-04-23 01:54:11', NULL, '1'),
+(98, 54, 3, '2026-04-23 01:54:11', NULL, '1'),
+(99, 55, 3, '2026-04-23 01:54:11', NULL, '1'),
+(100, 64, 3, '2026-04-23 01:54:11', NULL, '1'),
+(101, 25, 3, '2026-04-23 01:54:11', NULL, '1'),
+(102, 26, 3, '2026-04-23 01:54:11', NULL, '1'),
+(103, 24, 3, '2026-04-23 01:54:11', NULL, '1'),
+(104, 27, 3, '2026-04-23 01:54:11', NULL, '1'),
+(105, 60, 3, '2026-04-23 01:54:11', NULL, '1'),
+(106, 11, 3, '2026-04-23 01:54:11', NULL, '1'),
+(107, 12, 3, '2026-04-23 01:54:11', NULL, '1'),
+(108, 44, 31, '2026-04-25 23:38:06', NULL, '1'),
+(109, 45, 31, '2026-04-25 23:38:06', NULL, '1'),
+(110, 46, 31, '2026-04-25 23:38:06', '2026-04-25 23:48:29', '1'),
+(111, 47, 31, '2026-04-25 23:38:06', NULL, '1'),
+(112, 48, 31, '2026-04-25 23:38:06', NULL, '1'),
+(113, 49, 31, '2026-04-25 23:38:06', NULL, '1'),
+(114, 50, 31, '2026-04-25 23:38:06', '2026-04-25 23:48:29', '1'),
+(115, 51, 31, '2026-04-25 23:38:06', NULL, '1'),
+(116, 52, 31, '2026-04-25 23:38:06', '2026-04-25 23:48:29', '1'),
+(117, 53, 31, '2026-04-25 23:38:06', '2026-04-25 23:48:29', '1'),
+(118, 62, 31, '2026-04-25 23:38:06', NULL, '1'),
+(119, 69, 31, '2026-04-25 23:38:06', NULL, '1'),
+(120, 70, 31, '2026-04-25 23:38:06', '2026-04-25 23:48:29', '1'),
+(121, 72, 31, '2026-04-25 23:38:06', NULL, '1'),
+(122, 73, 31, '2026-04-25 23:38:06', NULL, '1'),
+(123, 74, 31, '2026-04-25 23:38:06', NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -769,7 +992,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('2Sb0OoMeRGLYhbGv9tsObmWmR2dXgXMR98twyPBT', 43325, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiWW1nQXFxNExRODRpczhrc3pCQmRVVzE1NHBHUU9MTGJVTVQ4NGRLYSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzM6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9ldmVudG8vbGlzdCI7fXM6MTE6ImFjdGl2ZV9yb2xlIjtpOjExO3M6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjQzMzI1O30=', 1776618074);
+('VdQDLaJ0TnLblPm4CiXgswntrihRc6iW9rqoFXHS', 39114, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiVkJFQTBpYllsYXNueWlPcWxQaEl5MmNyT1VhNXpodHFzWWxxa280WiI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjM5OiJodHRwOi8vbG9jYWxob3N0OjgwMDAvZXN0cmF0ZWdpYS9jcmVhdGUiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjExOiJhY3RpdmVfcm9sZSI7aTozO3M6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjM5MTE0O30=', 1777181454),
+('x64ga6jJbJT9t7Q093Tkzum8X285ipb4TwthRmTF', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibjNmcHlMU0VrZlUxNmtsa3IwRTY1NlZnMUtOaE9rcUd4QUFGVnVNOCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCI7fX0=', 1777177555);
 
 -- --------------------------------------------------------
 
@@ -790,7 +1014,9 @@ CREATE TABLE `tecnica_actividad` (
 --
 
 INSERT INTO `tecnica_actividad` (`id_tecnica_actividad`, `nombre_tecnica_actividad`, `fecha_creacion`, `fecha_actualizacion`, `estatus`) VALUES
-(1, 'pppppppppp', '2026-04-18 00:14:28', '2026-04-18 00:14:28', '1');
+(1, 'pppppppppp', '2026-04-18 00:14:28', '2026-04-18 00:14:28', '1'),
+(2, 'tigresabbb', '2026-04-23 02:00:16', '2026-04-23 02:00:16', '1'),
+(3, 'manteca', '2026-04-23 02:04:47', '2026-04-23 02:04:47', '1');
 
 -- --------------------------------------------------------
 
@@ -1069,7 +1295,7 @@ ALTER TABLE `bibliografia`
 -- AUTO_INCREMENT de la tabla `bitacora`
 --
 ALTER TABLE `bitacora`
-  MODIFY `id_bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=182;
+  MODIFY `id_bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=238;
 
 --
 -- AUTO_INCREMENT de la tabla `calendario_academico`
@@ -1081,7 +1307,7 @@ ALTER TABLE `calendario_academico`
 -- AUTO_INCREMENT de la tabla `contenido`
 --
 ALTER TABLE `contenido`
-  MODIFY `id_contenido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_contenido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_bibliografia`
@@ -1105,7 +1331,7 @@ ALTER TABLE `detalle_evaluacion`
 -- AUTO_INCREMENT de la tabla `detalle_objetivo`
 --
 ALTER TABLE `detalle_objetivo`
-  MODIFY `id_detalle_objetivo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_detalle_objetivo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_recurso`
@@ -1165,19 +1391,19 @@ ALTER TABLE `planificacion`
 -- AUTO_INCREMENT de la tabla `recurso`
 --
 ALTER TABLE `recurso`
-  MODIFY `id_recurso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_recurso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `rol_permiso`
 --
 ALTER TABLE `rol_permiso`
-  MODIFY `id_rol_permiso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
+  MODIFY `id_rol_permiso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=327;
 
 --
 -- AUTO_INCREMENT de la tabla `tecnica_actividad`
 --
 ALTER TABLE `tecnica_actividad`
-  MODIFY `id_tecnica_actividad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_tecnica_actividad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `tecnica_evaluacion`

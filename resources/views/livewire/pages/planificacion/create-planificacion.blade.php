@@ -529,14 +529,14 @@
                                     <div class="flex items-center gap-3">
                                         @if ($index > 0)
                                             <button type="button" wire:click="unidadAnterior({{ $index }})"
-                                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                                                class="inline-flex items-center gap-2 px-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
                                                 <span class="material-icons text-sm">arrow_back</span> Unidad Anterior
                                             </button>
                                         @endif
                                         <button type="button" wire:click="saveProgress({{ $index }})"
-                                            class="inline-flex items-center gap-2 px-6 py-2.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800/50 rounded-xl text-sm font-bold shadow-sm hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-all"
+                                            class="inline-flex items-center gap-2 px-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
                                             title="Guardar progreso actual para continuar luego">
-                                            <span class="material-icons text-sm">save</span> Guardar Progreso
+                                            <span class="material-icons text-sm">save</span> GUARDAR Y SALIR
                                         </button>
                                     </div>
                                     <div>
