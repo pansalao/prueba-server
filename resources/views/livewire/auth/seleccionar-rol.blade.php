@@ -399,19 +399,7 @@
 
                             <div class="flex justify-center flex-col items-center">
 
-                                {{-- Indicador de fecha de inicio seleccionada (visible solo al esperar segundo clic) --}}
-                                <template x-if="clickCount === 1 && selectedEventStart">
-                                    <div class="mb-4 flex items-center gap-3 px-5 py-3 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-400 dark:border-blue-500 shadow-sm animate-pulse">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                                        </svg>
-                                        <span class="text-sm font-bold text-blue-700 dark:text-blue-300">
-                                            Inicio guardado: <span x-text="selectedEventStart" class="font-mono"></span>
-                                        </span>
-                                        <span class="text-xs text-blue-500 dark:text-blue-400">— Ahora haz clic en la fecha de fin</span>
-                                        <button @click="clickCount = 0; selectedEventStart = '';" class="ml-auto text-blue-400 hover:text-blue-600 text-xs underline">Cancelar</button>
-                                    </div>
-                                </template>
+
 
                                 <div wire:ignore x-ref="calendar" class="sogat-datepicker-container w-full"></div>
                             </div>
@@ -533,6 +521,19 @@
                     @endif
 
                     <style>
+                        /* ── Quitar resaltado del día actual ─────────────────────────── */
+                        .vanilla-calendar-day__btn_today,
+                        .vc-day_today,
+                        [class*="day__btn_today"],
+                        [class*="day_today"] {
+                            background-color: transparent !important;
+                            color: inherit !important;
+                            border: none !important;
+                            font-weight: inherit !important;
+                            border-radius: inherit !important;
+                            box-shadow: none !important;
+                        }
+
                         /* Custom Vanilla Calendar tweaks */
                         .sogat-datepicker-container.vanilla-calendar,
                         .sogat-datepicker-container.vc {
