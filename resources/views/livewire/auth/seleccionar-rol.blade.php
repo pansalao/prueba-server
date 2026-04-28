@@ -150,6 +150,7 @@
                                                                         },
                                                                         visibility: {
                                                                             daysOutside: false,
+                                                                            today: false,
                                                                             theme: isDark ? 'dark' : 'light'
                                                                         }
                                                                     },
@@ -529,9 +530,15 @@
                             background-color: transparent !important;
                             color: inherit !important;
                             border: none !important;
-                            font-weight: inherit !important;
-                            border-radius: inherit !important;
                             box-shadow: none !important;
+                        }
+
+                        /* ── Asegurar que los días desactivados se vean iguales ────────── */
+                        .vanilla-calendar-day__btn_disabled,
+                        .vc-day_disabled {
+                            opacity: 0.3 !important;
+                            color: #999 !important;
+                            background-color: transparent !important;
                         }
 
                         /* Custom Vanilla Calendar tweaks */

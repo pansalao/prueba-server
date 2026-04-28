@@ -127,6 +127,7 @@ class SeleccionarRol extends Component
     public function retrocederPaso1()
     {
         $this->paso = 1;
+        $this->eventosRegistrados = []; // Limpiar eventos registrados al volver al paso 1
     }
 
     /**
