@@ -153,13 +153,12 @@ class SeleccionarRol extends Component
             return;
         }
 
-        // Verificar nuevamente que no exista calendario activo (evitar duplicados)
-        $repo = new CalendarioCreateRepo();
+        /* $repo = new CalendarioCreateRepo();
         if ($repo->hayCalendarioActivo()) {
             session()->flash('error', 'Ya existe un calendario activo configurado.');
             $this->hayCalendarioActivo = true;
             return;
-        }
+        } */
 
         try {
             $this->form->validate();

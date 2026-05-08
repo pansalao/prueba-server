@@ -1,17 +1,32 @@
 <div>
     <x-slot name="header">
-        <h2 class="font-bold text-xl text-gray-800 dark:text-gray-500 leading-tight uppercase text-center">
-            @if($sistemaInactivo)
-                {{ __('Sistema Inactivo') }}
-            @elseif(!$hayCalendarioActivo && $tieneRol3)
-                {{ __('Configurar Calendario Académico') }}
-            @else
-                {{ __('Selección de Perfil') }}
-            @endif
-        </h2>
+        <!-- Logo Header (Sintillo) -->
+        <div class="bg-white dark:bg-gray-800 px-8 py-2 flex items-center transition-colors duration-300">
+            <div class="flex items-center w-full">
+                <img src="{{ asset('img/logo_viejo-Photoroom.png') }}" alt="SOGAT Sintillo"
+                    class="w-full h-auto max-h-[100px] object-contain">
+            </div>
+        </div>
+
+        <!-- Línea SOGAT (decoración) -->
+        <div class="flex justify-center">
+            <div class="sogat-hr !my-0"></div>
+        </div>
+
+        <div class="pt-6 pb-2">
+            <h2 class="font-bold text-xl text-gray-800 dark:text-gray-200 leading-tight uppercase text-center tracking-wide">
+                @if($sistemaInactivo)
+                    {{ __('Sistema Inactivo') }}
+                @elseif(!$hayCalendarioActivo && $tieneRol3)
+                    {{ __('Configurar Calendario Académico') }}
+                @else
+                    {{ __('Bienvenido al sistema de planificaciones') }}
+                @endif
+            </h2>
+        </div>
     </x-slot>
 
-    <div class="pt-8 pb-12 w-full">
+    <div class="pt-2 pb-12 w-full">
         <div class="w-full max-w-[1200px] mx-auto sm:px-6 lg:px-8 transition-all duration-300">
 
             {{-- Mensajes flash --}}
