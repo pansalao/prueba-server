@@ -11,7 +11,7 @@ class CreateCalendarioForm extends Form
     public $dia_inicio_calendario_academico = '';
     public $dia_fin_calendario_academico = '';
 
-    protected function rules()
+    public function rules()
     {
         return [
             'dia_inicio_calendario_academico' => [
@@ -32,7 +32,7 @@ class CreateCalendarioForm extends Form
         ];
     }
 
-    protected function messages()
+    public function messages()
     {
         return [
             'dia_inicio_calendario_academico.required' => 'La fecha de inicio es obligatoria.',

@@ -35,28 +35,14 @@
             }
 
             .sogat-datepicker-container {
-                --vanilla-calendar-columns: 1 !important;
-                --vc-grid-columns: 1 !important;
-            }
-
-            @media (min-width: 768px) {
-                .sogat-datepicker-container {
-                    --vanilla-calendar-columns: 2 !important;
-                    --vc-grid-columns: 2 !important;
-                }
-            }
-
-            @media (min-width: 1024px) {
-                .sogat-datepicker-container {
-                    --vanilla-calendar-columns: 3 !important;
-                    --vc-grid-columns: 3 !important;
-                }
+                width: 100%;
             }
 
             .sogat-datepicker-container .vanilla-calendar-grid {
                 display: grid !important;
                 gap: 1.5rem;
-                grid-template-columns: repeat(var(--vanilla-calendar-columns, 1), 1fr) !important;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+                justify-items: center !important;
             }
 
             .sogat-datepicker-container .vanilla-calendar-content {
@@ -115,7 +101,8 @@
                 }">
 
             {{-- Acordeón 1: Fechas --}}
-            <div class="border-2 {{ $errors->has('form.dia_inicio_calendario_academico') || $errors->has('form.dia_fin_calendario_academico') ? 'border-sogat-red shadow-[0_0_10px_rgba(160,0,0,0.1)]' : 'border-gray-200 dark:border-gray-700 shadow-sm' }} rounded-xl transition-all duration-300">
+            <div
+                class="border-2 {{ $errors->has('form.dia_inicio_calendario_academico') || $errors->has('form.dia_fin_calendario_academico') ? 'border-sogat-red shadow-[0_0_10px_rgba(160,0,0,0.1)]' : 'border-gray-200 dark:border-gray-700 shadow-sm' }} rounded-xl transition-all duration-300">
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 transition-colors">
                     <h4
                         class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
@@ -155,7 +142,8 @@
             </div>
 
             {{-- Acordeón 2: Eventos --}}
-            <div class="border-2 {{ $errors->has('eventosRegistrados') ? 'border-sogat-red shadow-[0_0_10px_rgba(160,0,0,0.1)]' : 'border-gray-200 dark:border-gray-700 shadow-sm' }} rounded-xl transition-all duration-300">
+            <div
+                class="border-2 {{ $errors->has('eventosRegistrados') ? 'border-sogat-red shadow-[0_0_10px_rgba(160,0,0,0.1)]' : 'border-gray-200 dark:border-gray-700 shadow-sm' }} rounded-xl transition-all duration-300">
                 <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 transition-colors">
                     <h4
                         class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
@@ -402,28 +390,31 @@
                                 }" class="space-y-6 pt-4">
 
                             {{-- Tooltip --}}
-                            <div x-show="tooltip.visible" x-cloak
-                                @mouseenter="clearTimeout(tooltipTimeout)"
+                            <div x-show="tooltip.visible" x-cloak @mouseenter="clearTimeout(tooltipTimeout)"
                                 @mouseleave="tooltipTimeout = setTimeout(() => { tooltip.visible = false; tooltip.content = null; }, 300)"
                                 :style="`position: fixed; top: ${tooltip.y - 10}px; left: ${tooltip.x + 16}px; z-index: 9999; transform: translateY(-100%); pointer-events: auto;`"
                                 class="sogat-tooltip-card bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 p-4 min-w-[250px]">
                                 <template x-if="tooltip.content && tooltip.content.length > 0">
                                     <div>
                                         <template x-for="(ev, i) in tooltip.content" :key="i">
-                                            <div :class="i > 0 ? 'mt-3 pt-3 border-t border-gray-100 dark:border-gray-700' : ''" class="flex justify-between items-center gap-4">
+                                            <div :class="i > 0 ? 'mt-3 pt-3 border-t border-gray-100 dark:border-gray-700' : ''"
+                                                class="flex justify-between items-center gap-4">
                                                 <div>
                                                     <div class="flex items-center gap-2 mb-1">
                                                         <span class="w-3 h-3 rounded-full shadow-sm"
                                                             :style="`background-color: ${ev.color}`"></span>
-                                                        <span class="font-extrabold text-sm text-gray-800 dark:text-gray-100" x-text="ev.nombre"></span>
+                                                        <span
+                                                            class="font-extrabold text-sm text-gray-800 dark:text-gray-100"
+                                                            x-text="ev.nombre"></span>
                                                     </div>
-                                                    <div class="text-[11px] mt-1 opacity-90 text-gray-600 dark:text-gray-400">
+                                                    <div
+                                                        class="text-[11px] mt-1 opacity-90 text-gray-600 dark:text-gray-400">
                                                         <span x-text="ev.inicio"></span>
                                                         <template x-if="ev.inicio !== ev.fin"><span> → <span
                                                                     x-text="ev.fin"></span></span></template>
                                                     </div>
                                                 </div>
-                                                <button type="button" @click="eliminarEventoDesdeTooltip(ev)" 
+                                                <button type="button" @click="eliminarEventoDesdeTooltip(ev)"
                                                     class="flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors">
                                                     <span class="material-icons text-sm">delete</span>
                                                 </button>
@@ -475,55 +466,79 @@
 
                             <div class="space-y-4 w-full">
                                 <!-- Trimestre 1 -->
-                                <div class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
+                                <div
+                                    class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
                                     <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                         @click="openTrimestre = openTrimestre === 1 ? null : 1">
-                                        <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Primer Trimestre del Año <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(0, 2)"></span></span>
+                                        <h4
+                                            class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                            Primer Trimestre del Año <span>| Eventos Asignados: <span
+                                                    x-text="contarEventosTrimestre(0, 2)"></span></span>
                                         </h4>
-                                        <span class="material-icons transition-transform duration-200" :class="openTrimestre === 1 ? 'rotate-180' : ''">expand_more</span>
+                                        <span class="material-icons transition-transform duration-200"
+                                            :class="openTrimestre === 1 ? 'rotate-180' : ''">expand_more</span>
                                     </div>
-                                    <div x-show="openTrimestre === 1" x-collapse class="p-4 flex justify-center flex-col items-center">
-                                        <div wire:ignore x-ref="calendar1" class="sogat-datepicker-container w-full"></div>
+                                    <div x-show="openTrimestre === 1" x-collapse
+                                        class="p-4 flex justify-center flex-col items-center">
+                                        <div wire:ignore x-ref="calendar1" class="sogat-datepicker-container w-full">
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Trimestre 2 -->
-                                <div class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
+                                <div
+                                    class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
                                     <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                         @click="openTrimestre = openTrimestre === 2 ? null : 2">
-                                        <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Segundo Trimestre del Año <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(3, 5)"></span></span>
+                                        <h4
+                                            class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                            Segundo Trimestre del Año <span>| Eventos Asignados: <span
+                                                    x-text="contarEventosTrimestre(3, 5)"></span></span>
                                         </h4>
-                                        <span class="material-icons transition-transform duration-200" :class="openTrimestre === 2 ? 'rotate-180' : ''">expand_more</span>
+                                        <span class="material-icons transition-transform duration-200"
+                                            :class="openTrimestre === 2 ? 'rotate-180' : ''">expand_more</span>
                                     </div>
-                                    <div x-show="openTrimestre === 2" x-collapse class="p-4 flex justify-center flex-col items-center">
-                                        <div wire:ignore x-ref="calendar2" class="sogat-datepicker-container w-full"></div>
+                                    <div x-show="openTrimestre === 2" x-collapse
+                                        class="p-4 flex justify-center flex-col items-center">
+                                        <div wire:ignore x-ref="calendar2" class="sogat-datepicker-container w-full">
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Trimestre 3 -->
-                                <div class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
+                                <div
+                                    class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
                                     <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                         @click="openTrimestre = openTrimestre === 3 ? null : 3">
-                                        <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Tercer Trimestre del Año <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(6, 8)"></span></span>
+                                        <h4
+                                            class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                            Tercer Trimestre del Año <span>| Eventos Asignados: <span
+                                                    x-text="contarEventosTrimestre(6, 8)"></span></span>
                                         </h4>
-                                        <span class="material-icons transition-transform duration-200" :class="openTrimestre === 3 ? 'rotate-180' : ''">expand_more</span>
+                                        <span class="material-icons transition-transform duration-200"
+                                            :class="openTrimestre === 3 ? 'rotate-180' : ''">expand_more</span>
                                     </div>
-                                    <div x-show="openTrimestre === 3" x-collapse class="p-4 flex justify-center flex-col items-center">
-                                        <div wire:ignore x-ref="calendar3" class="sogat-datepicker-container w-full"></div>
+                                    <div x-show="openTrimestre === 3" x-collapse
+                                        class="p-4 flex justify-center flex-col items-center">
+                                        <div wire:ignore x-ref="calendar3" class="sogat-datepicker-container w-full">
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Trimestre 4 -->
-                                <div class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
+                                <div
+                                    class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
                                     <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                         @click="openTrimestre = openTrimestre === 4 ? null : 4">
-                                        <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Cuarto Trimestre del Año <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(9, 11)"></span></span>
+                                        <h4
+                                            class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                            Cuarto Trimestre del Año <span>| Eventos Asignados: <span
+                                                    x-text="contarEventosTrimestre(9, 11)"></span></span>
                                         </h4>
-                                        <span class="material-icons transition-transform duration-200" :class="openTrimestre === 4 ? 'rotate-180' : ''">expand_more</span>
+                                        <span class="material-icons transition-transform duration-200"
+                                            :class="openTrimestre === 4 ? 'rotate-180' : ''">expand_more</span>
                                     </div>
-                                    <div x-show="openTrimestre === 4" x-collapse class="p-4 flex justify-center flex-col items-center">
-                                        <div wire:ignore x-ref="calendar4" class="sogat-datepicker-container w-full"></div>
+                                    <div x-show="openTrimestre === 4" x-collapse
+                                        class="p-4 flex justify-center flex-col items-center">
+                                        <div wire:ignore x-ref="calendar4" class="sogat-datepicker-container w-full">
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -31,7 +31,7 @@ class CreateCalendario extends Component
     public function mount()
     {
         $this->currentYear = date('Y');
-        
+
         // Cargar la biblioteca de eventos (templates)
         $eventoRepo = new EventoIndexRepo();
         $this->bibliotecaEventos = $eventoRepo->obtenerBiblioteca();
@@ -83,14 +83,43 @@ class CreateCalendario extends Component
             abort(403);
         }
 
+        // Limpiar errores previos para validación limpia
+        $this->resetErrorBag();
+
+        // 1. Validar campos del formulario (Fechas) manualmente para no interrumpir el flujo
+        $validador = \Illuminate\Support\Facades\Validator::make(
+            $this->form->all(),
+            $this->form->rules(),
+            $this->form->messages()
+        );
+
+        $hayErrorValidacion = false;
+
+        if ($validador->fails()) {
+            foreach ($validador->errors()->messages() as $campo => $mensajes) {
+                $this->addError("form.$campo", $mensajes[0]);
+            }
+            $hayErrorValidacion = true;
+        }
+
+        // 2. Validar que existan eventos registrados
         if (count($this->eventosRegistrados) === 0) {
             $this->addError('eventosRegistrados', 'Debe registrar al menos un evento antes de guardar el calendario.');
+            $hayErrorValidacion = true;
+        }
+
+        // Si hubo algún error en cualquiera de las secciones
+        if ($hayErrorValidacion) {
+            // Prioridad: Si hay errores en fechas, abrir esa sección. Si no, abrir eventos.
+            if ($this->getErrorBag()->hasAny(['form.dia_inicio_calendario_academico', 'form.dia_fin_calendario_academico'])) {
+                $this->dispatch('abrir-seccion', section: 'fechas');
+            } else {
+                $this->dispatch('abrir-seccion', section: 'eventos');
+            }
             return;
         }
 
         try {
-            $this->form->validate();
-            
             $id = $this->calendarioRepository->crearConEventos([
                 'dia_inicio_calendario_academico' => $this->form->dia_inicio_calendario_academico,
                 'dia_fin_calendario_academico' => $this->form->dia_fin_calendario_academico,
