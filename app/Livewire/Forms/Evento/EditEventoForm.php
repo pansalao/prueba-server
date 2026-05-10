@@ -38,8 +38,20 @@ class EditEventoForm extends Form
                 },
                 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\d\s\.,\-\(\)\"\':\/]+$/u'
             ],
-            'tipo_evento' => ['required', 'in:1,2,3'],
-            'id_color' => ['required', 'exists:color,id_color'],
+            'tipo_evento' => ['required', 'in:1,2,3,4'],
+            'id_color' => [
+                'required', 'exists:color,id_color',
+                function ($attribute, $value, $fail) {
+                    $exists = DB::table('evento')
+                        ->where('id_color', $value)
+                        ->where('id_evento', '!=', $this->id_evento)
+                        ->where('estatus', '!=', '3')
+                        ->exists();
+                    if ($exists) {
+                        $fail('Este color ya está asignado a otro evento activo.');
+                    }
+                }
+            ],
         ];
     }
 }

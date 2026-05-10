@@ -30,7 +30,22 @@ class UpdateEvento extends Component
         }
 
         $this->form->setEvento($evento);
-        $this->colores = DB::table('color')->where('estatus', '1')->get();
+        $this->cargarColores();
+    }
+
+    public function cargarColores()
+    {
+        $id = $this->form->id_evento;
+        $this->colores = DB::table('color')
+            ->where('estatus', '1')
+            ->whereNotIn('id_color', function ($query) use ($id) {
+                $query->select('id_color')
+                    ->from('evento')
+                    ->where('id_evento', '!=', $id)
+                    ->whereNotNull('id_color')
+                    ->where('estatus', '!=', '3');
+            })
+            ->get();
     }
 
     public function updated($propertyName)

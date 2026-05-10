@@ -53,11 +53,11 @@ class CreateCalendarioForm extends Form
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[A-Za-z0-9áéíóúÁÉÍÓÚñÑüÜ\d\s\.\?]+$/u'
+                'regex:/^[A-Za-z0-9áéíóúÁÉÍÓÚñÑüÜ\d\s\.\,\-\(\)\"\':\/]+$/u'
             ],
             'tipo' => [
                 'required',
-                'in:1,2,3'
+                'in:1,2,3,4'
             ],
         ];
 

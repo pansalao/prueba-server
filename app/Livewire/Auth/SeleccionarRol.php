@@ -72,12 +72,11 @@ class SeleccionarRol extends Component
             return;
 
         // Verificar que haya calendario activo antes de permitir seleccionar rol
-        // EXCEPCIÓN: Permitir al administrador (Rol 3) entrar sin calendario para que pueda crearlo internamente
-        $repo = new CalendarioCreateRepo();
+        /* $repo = new CalendarioCreateRepo();
         if (!$repo->hayCalendarioActivo() && $rolId != 3) {
             session()->flash('error', 'Debe existir un calendario activo para ingresar al sistema. Contacte al administrador.');
             return;
-        }
+        } */
 
         // Buscamos el usu_codigo específico en emulación para esa combinación
         $usuarioRepo = new UsuarioRepository();

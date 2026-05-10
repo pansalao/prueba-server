@@ -34,14 +34,19 @@ class Evento extends Model
 
     public function getTipoEventoNombreAttribute()
     {
-        $tipos = [1 => 'Feriado Nacional', 2 => 'Administrativo / Académico', 3 => 'Otros Eventos'];
+        $tipos = [
+            1 => 'Feriado Nacional', 
+            2 => 'Administrativo/Académico - Laborable', 
+            3 => 'Administrativo/Académico - No Laborable',
+            4 => 'Otros'
+        ];
         return $tipos[$this->tipo_evento] ?? 'Desconocido';
     }
 
     public function getColorAttribute()
     {
         // Map tipo_evento to a color for visual compatibility
-        $colors = [1 => '#DC3545', 2 => '#007BFF', 3 => '#6c757d'];
+        $colors = [1 => '#DC3545', 2 => '#007BFF', 3 => '#FD7E14', 4 => '#6c757d'];
         return $this->color_rel->codigo_color ?? ($colors[$this->tipo_evento] ?? '#6c757d');
     }
 }

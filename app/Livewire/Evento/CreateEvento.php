@@ -20,7 +20,20 @@ class CreateEvento extends Component
 
     public function mount()
     {
-        $this->colores = \Illuminate\Support\Facades\DB::table('color')->where('estatus', '1')->get();
+        $this->cargarColores();
+    }
+
+    public function cargarColores()
+    {
+        $this->colores = \Illuminate\Support\Facades\DB::table('color')
+            ->where('estatus', '1')
+            ->whereNotIn('id_color', function ($query) {
+                $query->select('id_color')
+                    ->from('evento')
+                    ->whereNotNull('id_color')
+                    ->where('estatus', '!=', '3'); // Solo colores de eventos activos o inactivos (no eliminados)
+            })
+            ->get();
     }
 
     public function updated($propertyName)

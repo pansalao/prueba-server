@@ -30,11 +30,20 @@ class CreateEventoForm extends Form
             ],
             'tipo_evento' => [
                 'required',
-                'in:1,2,3'
+                'in:1,2,3,4'
             ],
             'id_color' => [
                 'required',
-                'exists:color,id_color'
+                'exists:color,id_color',
+                function ($attribute, $value, $fail) {
+                    $exists = \Illuminate\Support\Facades\DB::table('evento')
+                        ->where('id_color', $value)
+                        ->where('estatus', '!=', '3')
+                        ->exists();
+                    if ($exists) {
+                        $fail('Este color ya está asignado a otro evento activo.');
+                    }
+                }
             ],
         ];
     }
