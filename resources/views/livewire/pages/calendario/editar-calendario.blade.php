@@ -1,0 +1,617 @@
+<div>
+    <x-slot name="header">
+        <h2 class="font-bold text-xl text-gray-800 dark:text-gray-500 leading-tight uppercase text-center">
+            {{ __('Editar Planificación de Calendario') }}
+        </h2>
+    </x-slot>
+
+    <x-table.alert-message type="success" :message="session('message')" />
+    <x-table.alert-message type="error" :message="session('error')" />
+
+    <div class="sogat-card planificacion-module">
+
+        <style>
+            .date-input-dark::-webkit-calendar-picker-indicator {
+                background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23d1d5db'%3e%3cpath fill-rule='evenodd' d='M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z' clip-rule='evenodd'/%3e%3c/svg%3e") no-repeat center;
+                background-size: 20px 20px;
+                cursor: pointer;
+            }
+
+            .date-input-dark {
+                color-scheme: light;
+            }
+
+            .vanilla-calendar-day__btn_today,
+            .vc-day_today {
+                background-color: transparent !important;
+                color: inherit !important;
+                border: none !important;
+            }
+
+            .vanilla-calendar-day__btn_disabled,
+            .vc-day_disabled {
+                opacity: 0.3 !important;
+                color: #999 !important;
+            }
+
+            .sogat-datepicker-container {
+                width: 100%;
+            }
+
+            .sogat-datepicker-container .vanilla-calendar-grid {
+                display: grid !important;
+                gap: 1.5rem;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+                justify-items: center !important;
+            }
+
+            .sogat-datepicker-container .vanilla-calendar-content {
+                background: white;
+                border-radius: 1rem;
+                padding: 1rem;
+                border: 1px solid #f3f4f6;
+            }
+
+            .dark .sogat-datepicker-container .vanilla-calendar-content {
+                background: #1f2937;
+                border-color: #374151;
+            }
+
+            .vanilla-calendar-month {
+                font-size: 1.2rem !important;
+                font-weight: 800 !important;
+                text-transform: capitalize !important;
+                color: #1a365d !important;
+                text-align: center !important;
+            }
+
+            .dark .vanilla-calendar-month {
+                color: #3b82f6 !important;
+            }
+
+            .vanilla-calendar-header__btn,
+            .vanilla-calendar-arrow,
+            .vc-arrow,
+            .vc-header__arrow,
+            .vanilla-calendar-header__btn_prev,
+            .vanilla-calendar-header__btn_next {
+                display: none !important;
+            }
+
+            .vanilla-calendar-year {
+                display: none !important;
+            }
+
+            .sogat-tooltip-card {
+                background: white;
+                border-radius: 0.875rem;
+                padding: 0.75rem 1rem;
+                box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            }
+
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+
+        <div class="space-y-6" x-data="{ 
+                    openSection: 'fechas',
+                    inicio: @entangle('form.dia_inicio_calendario_academico'),
+                    fin: @entangle('form.dia_fin_calendario_academico')
+                }">
+
+            {{-- Acordeón 1: Fechas --}}
+            <div
+                class="border-2 {{ $errors->has('form.dia_inicio_calendario_academico') || $errors->has('form.dia_fin_calendario_academico') ? 'border-sogat-red shadow-[0_0_10px_rgba(160,0,0,0.1)]' : 'border-gray-200 dark:border-gray-700 shadow-sm' }} rounded-xl transition-all duration-300">
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 transition-colors">
+                    <h4
+                        class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        <span class="material-icons text-blue-500">calendar_today</span>
+                        Configuración del Período
+                    </h4>
+                    <span class="material-icons transition-transform duration-200"
+                        :class="openSection === 'fechas' ? 'rotate-180' : ''">expand_more</span>
+                </div>
+                <div x-show="openSection === 'fechas'" x-collapse class="p-4 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto mt-4">
+                        <div class="w-full">
+                            <x-input-label for="dia_inicio_calendario_academico" :value="__('Inicio del Período')" />
+                            <x-text-input id="dia_inicio_calendario_academico" type="date"
+                                wire:model.live="form.dia_inicio_calendario_academico"
+                                class="w-full mt-1 date-input-dark" required />
+                        </div>
+                        <div class="w-full">
+                            <x-input-label for="dia_fin_calendario_academico" :value="__('Fin del Período')" />
+                            <x-text-input id="dia_fin_calendario_academico" type="date"
+                                wire:model.live="form.dia_fin_calendario_academico" 
+                                class="w-full mt-1 date-input-dark" required />
+                        </div>
+                    </div>
+                    <div
+                        class="flex justify-end pt-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 mt-4 -mx-4 -mb-4 p-4">
+                        <x-primary-button type="button" @click="openSection = 'eventos'">
+                            VER EVENTOS ASIGNADOS <span class="material-icons text-sm">arrow_forward</span>
+                        </x-primary-button>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Acordeón 2: Eventos --}}
+            <div
+                class="border-2 {{ $errors->has('eventosRegistrados') ? 'border-sogat-red shadow-[0_0_10px_rgba(160,0,0,0.1)]' : 'border-gray-200 dark:border-gray-700 shadow-sm' }} rounded-xl transition-all duration-300">
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 transition-colors">
+                    <h4
+                        class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        <span class="material-icons text-red-500">event</span>
+                        Revisión de Eventos
+                    </h4>
+                    <span class="material-icons transition-transform duration-200"
+                        :class="openSection === 'eventos' ? 'rotate-180' : ''">expand_more</span>
+                </div>
+                <div x-show="openSection === 'eventos'" x-collapse class="p-4 space-y-6">
+
+                    <div x-show="inicio && fin">
+                        <div x-data="{
+                                    openTrimestre: 1,
+                                    picker1: null,
+                                    picker2: null,
+                                    picker3: null,
+                                    picker4: null,
+                                    showEventModal: false,
+                                    selectedEventStart: '',
+                                    selectedEventEnd: '',
+                                    eventoNombre: '',
+                                    eventoTipo: '1',
+                                    eventoColor: '',
+                                    eventoSeleccionado: '',
+                                    clickCount: 0,
+                                    eventosAlpine: @entangle('eventosRegistrados'),
+                                    tooltip: { visible: false, x: 0, y: 0, content: null },
+                                    tooltipTimeout: null,
+                                    currentYear: null,
+                                    calStartYear: null,
+                                    calEndYear: null,
+                                    _savedStart: '',
+                                    _savedCount: 0,
+                                    _clickLock: false,
+                                    
+                                    getVanillaConfig(year, monthIndex) {
+                                        const isDark = document.documentElement.classList.contains('dark');
+                                        return {
+                                            type: 'multiple',
+                                            months: 3,
+                                            settings: {
+                                                lang: 'es',
+                                                selected: {
+                                                    month: monthIndex,
+                                                    year: year
+                                                },
+                                                range: { min: inicio, max: fin, disablePast: false, disableAllDays: false },
+                                                selection: { day: 'single' },
+                                                visibility: { daysOutside: false, today: false, theme: isDark ? 'dark' : 'light' }
+                                            },
+                                            actions: {
+                                                clickDay: (e, self) => {
+                                                    if (this._clickLock) return;
+                                                    this._clickLock = true;
+                                                    setTimeout(() => { this._clickLock = false; }, 200);
+                                                    let btn = e.target.closest('.vanilla-calendar-day__btn');
+                                                    let clickedDate = btn ? btn.dataset.calendarDay : null;
+                                                    if (!clickedDate) return;
+                                                    if (this.clickCount === 0) {
+                                                        this.selectedEventStart = clickedDate;
+                                                        this.selectedEventEnd   = '';
+                                                        this.clickCount  = 1;
+                                                        this._savedStart = clickedDate;
+                                                        this._savedCount = 1;
+                                                        this.$nextTick(() => this.refrescarEventosVisuales());
+                                                    } else {
+                                                        this.selectedEventEnd = clickedDate;
+                                                        let d1 = new Date(this.selectedEventStart + 'T00:00:00');
+                                                        let d2 = new Date(this.selectedEventEnd   + 'T00:00:00');
+                                                        if (d1 > d2) {
+                                                            let tmp = this.selectedEventStart;
+                                                            this.selectedEventStart = this.selectedEventEnd;
+                                                            this.selectedEventEnd   = tmp;
+                                                        }
+                                                        this.clickCount  = 0;
+                                                        this._savedStart = '';
+                                                        this._savedCount = 0;
+                                                        this.showEventModal = true;
+                                                        this.$nextTick(() => this.refrescarEventosVisuales());
+                                                    }
+                                                }
+                                            }
+                                        };
+                                    },
+
+                                    inicializarPicker(year) {
+                                        if(!inicio || !fin) return;
+                                        this._savedStart = this.selectedEventStart;
+                                        this._savedCount = this.clickCount;
+                                        
+                                        if(this.$refs.calendar1) { this.$refs.calendar1.innerHTML = ''; this.picker1 = new VanillaCalendar(this.$refs.calendar1, this.getVanillaConfig(year, 0)); this.picker1.init(); }
+                                        if(this.$refs.calendar2) { this.$refs.calendar2.innerHTML = ''; this.picker2 = new VanillaCalendar(this.$refs.calendar2, this.getVanillaConfig(year, 3)); this.picker2.init(); }
+                                        if(this.$refs.calendar3) { this.$refs.calendar3.innerHTML = ''; this.picker3 = new VanillaCalendar(this.$refs.calendar3, this.getVanillaConfig(year, 6)); this.picker3.init(); }
+                                        if(this.$refs.calendar4) { this.$refs.calendar4.innerHTML = ''; this.picker4 = new VanillaCalendar(this.$refs.calendar4, this.getVanillaConfig(year, 9)); this.picker4.init(); }
+
+                                        this.$nextTick(() => {
+                                            this.selectedEventStart = this._savedStart;
+                                            this.clickCount         = this._savedCount;
+                                            this.refrescarEventosVisuales();
+                                        });
+                                    },
+
+                                    init() {
+                                        this.clickCount = 0;
+                                        this.$watch('inicio', (val) => { if(val && fin) this.setupCalendar(); });
+                                        this.$watch('fin', (val) => { if(val && inicio) this.setupCalendar(); });
+                                        this.$watch('eventosAlpine', () => {
+                                            this.refrescarEventosVisuales();
+                                        });
+                                        if(inicio && fin) this.setupCalendar();
+                                    },
+                                    setupCalendar() {
+                                        this.calStartYear = parseInt(inicio.substring(0, 4));
+                                        this.calEndYear = parseInt(fin.substring(0, 4));
+                                        this.currentYear = this.calStartYear;
+                                        this.inicializarPicker(this.currentYear);
+                                    },
+
+                                    cambiarAnio(dir) {
+                                        const nuevoAnio = parseInt(this.currentYear) + dir;
+                                        if (nuevoAnio >= this.calStartYear && nuevoAnio <= this.calEndYear) {
+                                            this.currentYear = nuevoAnio;
+                                            this.inicializarPicker(nuevoAnio);
+                                        }
+                                    },
+                                    refrescarEventosVisuales() {
+                                        if (!this.picker1 && !this.picker2 && !this.picker3 && !this.picker4) return;
+                                        let dayColors = {};
+                                        let dayEventsCount = {};
+                                        if (this.eventosAlpine && this.eventosAlpine.length > 0) {
+                                            this.eventosAlpine.forEach(ev => {
+                                                let startD = new Date(ev.inicio + 'T00:00:00');
+                                                let endD   = new Date(ev.fin + 'T00:00:00');
+                                                while (startD <= endD) {
+                                                    let y = startD.getFullYear();
+                                                    let m = String(startD.getMonth() + 1).padStart(2, '0');
+                                                    let d = String(startD.getDate()).padStart(2, '0');
+                                                    let dateStr = `${y}-${m}-${d}`;
+                                                    dayColors[dateStr] = ev.color;
+                                                    dayEventsCount[dateStr] = (dayEventsCount[dateStr] || 0) + 1;
+                                                    startD.setDate(startD.getDate() + 1);
+                                                }
+                                            });
+                                        }
+                                        [this.$refs.calendar1, this.$refs.calendar2, this.$refs.calendar3, this.$refs.calendar4].forEach(calendarEl => {
+                                            if (!calendarEl) return;
+                                            calendarEl.querySelectorAll('[data-calendar-day]').forEach(btn => {
+                                            const day = btn.dataset.calendarDay;
+                                            btn.style.backgroundColor = ''; btn.style.color = ''; btn.style.border = '';
+                                            btn.classList.remove('sogat-evento-registrado');
+                                            
+                                            const existingBadge = btn.querySelector('.sogat-event-counter');
+                                            if (existingBadge) existingBadge.remove();
+
+                                            if (dayColors[day]) {
+                                                btn.classList.add('sogat-evento-registrado');
+                                                btn.style.setProperty('background-color', dayColors[day] + '26', 'important');
+                                                btn.style.setProperty('color', dayColors[day], 'important');
+                                                btn.style.setProperty('border', '2px solid ' + dayColors[day], 'important');
+                                                btn.style.setProperty('font-weight', '900', 'important');
+                                                
+                                                if (dayEventsCount[day] >= 2) {
+                                                    const badge = document.createElement('span');
+                                                    badge.className = 'sogat-event-counter absolute -top-2 -right-1 w-4 h-4 bg-gray-700 text-white text-[9px] flex items-center justify-center rounded-full border border-white dark:border-gray-800 shadow-sm font-bold z-10';
+                                                    badge.innerText = dayEventsCount[day];
+                                                    btn.style.position = 'relative';
+                                                    btn.appendChild(badge);
+                                                }
+                                                const matchingEvents = this.eventosAlpine.filter(ev => {
+                                                    let s = new Date(ev.inicio + 'T00:00:00');
+                                                    let e = new Date(ev.fin + 'T00:00:00');
+                                                    let d = new Date(day + 'T00:00:00');
+                                                    return d >= s && d <= e;
+                                                });
+                                                btn.addEventListener('mouseenter', (e) => { 
+                                                    clearTimeout(this.tooltipTimeout); 
+                                                    this.tooltip.content = matchingEvents; 
+                                                    this.tooltip.visible = true; 
+                                                    this.tooltip.x = e.clientX; 
+                                                    this.tooltip.y = e.clientY; 
+                                                });
+                                                btn.addEventListener('mouseleave', () => { 
+                                                    this.tooltipTimeout = setTimeout(() => {
+                                                        this.tooltip.visible = false; 
+                                                        this.tooltip.content = null; 
+                                                    }, 300);
+                                                });
+                                            }
+                                            });
+                                        });
+                                    },
+                                    closeModal() {
+                                        this.showEventModal = false;
+                                        if(this.picker1) {
+                                            this.picker1.selectedDates = []; this.picker1.update();
+                                            this.picker2.selectedDates = []; this.picker2.update();
+                                            this.picker3.selectedDates = []; this.picker3.update();
+                                            this.picker4.selectedDates = []; this.picker4.update();
+                                            this.$nextTick(() => this.refrescarEventosVisuales());
+                                        }
+                                        this.selectedEventStart = ''; this.selectedEventEnd = ''; this.eventoNombre = '';
+                                        this.eventoTipo = '1'; this.eventoColor = ''; this.eventoSeleccionado = ''; this.clickCount = 0;
+                                    },
+                                    guardarEvento() {
+                                        if(!this.eventoNombre.trim()) { alert('Debe ingresar un nombre para el evento.'); return; }
+                                        $wire.agregarEvento(this.selectedEventStart, this.selectedEventEnd, this.eventoSeleccionado, this.eventoNombre, this.eventoTipo, this.eventoColor);
+                                        this.closeModal();
+                                    },
+                                    eliminarEventoDesdeTooltip(ev) {
+                                        let index = this.eventosAlpine.findIndex(e => e.id === ev.id && e.inicio === ev.inicio && e.fin === ev.fin);
+                                        if (index !== -1) {
+                                            $wire.removerEvento(index);
+                                            this.tooltip.visible = false;
+                                            this.tooltip.content = null;
+                                        }
+                                    },
+                                    contarEventosTrimestre(m1, m2) {
+                                        if (!this.eventosAlpine || this.eventosAlpine.length === 0) return 0;
+                                        const tStart = new Date(this.currentYear, m1, 1);
+                                        const tEnd = new Date(this.currentYear, m2 + 1, 0);
+                                        return this.eventosAlpine.filter(ev => {
+                                            const evStart = new Date(ev.inicio + 'T00:00:00');
+                                            const evEnd = new Date(ev.fin + 'T00:00:00');
+                                            return evStart <= tEnd && evEnd >= tStart;
+                                        }).length;
+                                    }
+                                }" class="space-y-6 pt-4">
+
+                            {{-- Tooltip --}}
+                            <div x-show="tooltip.visible" x-cloak @mouseenter="clearTimeout(tooltipTimeout)"
+                                @mouseleave="tooltipTimeout = setTimeout(() => { tooltip.visible = false; tooltip.content = null; }, 300)"
+                                :style="`position: fixed; top: ${tooltip.y - 10}px; left: ${tooltip.x + 16}px; z-index: 9999; transform: translateY(-100%); pointer-events: auto;`"
+                                class="sogat-tooltip-card bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 p-4 min-w-[250px]">
+                                <template x-if="tooltip.content && tooltip.content.length > 0">
+                                    <div>
+                                        <template x-for="(ev, i) in tooltip.content" :key="i">
+                                            <div :class="i > 0 ? 'mt-3 pt-3 border-t border-gray-100 dark:border-gray-700' : ''"
+                                                class="flex justify-between items-center gap-4">
+                                                <div>
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <span class="w-3 h-3 rounded-full shadow-sm"
+                                                            :style="`background-color: ${ev.color}`"></span>
+                                                        <span
+                                                            class="font-extrabold text-sm text-gray-800 dark:text-gray-100"
+                                                            x-text="ev.nombre"></span>
+                                                    </div>
+                                                    <div
+                                                        class="text-[11px] mt-1 opacity-90 text-gray-600 dark:text-gray-400">
+                                                        <span x-text="ev.inicio"></span>
+                                                        <template x-if="ev.inicio !== ev.fin"><span> → <span
+                                                                    x-text="ev.fin"></span></span></template>
+                                                    </div>
+                                                </div>
+                                                <button type="button" @click="eliminarEventoDesdeTooltip(ev)"
+                                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors">
+                                                    <span class="material-icons text-sm">delete</span>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            {{-- Navegación Año --}}
+                            <template x-if="calStartYear && calEndYear && calStartYear < calEndYear">
+                                <div class="flex items-center justify-center gap-6 mb-8 mt-2">
+                                    <button type="button" @click="cambiarAnio(-1)"
+                                        :disabled="currentYear <= calStartYear"
+                                        :class="currentYear <= calStartYear ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer'"
+                                        class="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm transition-all duration-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M15.75 19.5 8.25 12l7.5-7.5" />
+                                        </svg>
+                                    </button>
+                                    <div class="flex flex-col items-center">
+                                        <span x-text="currentYear"
+                                            class="text-7xl font-black text-gray-800 dark:text-gray-100 min-w-[150px] text-center drop-shadow-sm"
+                                            style="font-family: 'Verdana', sans-serif; letter-spacing: -0.05em;"></span>
+                                        <span
+                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Año
+                                            Escolar</span>
+                                    </div>
+                                    <button type="button" @click="cambiarAnio(1)" :disabled="currentYear >= calEndYear"
+                                        :class="currentYear >= calEndYear ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer'"
+                                        class="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm transition-all duration-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </template>
+                            <template x-if="calStartYear && calEndYear && calStartYear >= calEndYear">
+                                <div class="text-center mb-8 mt-2">
+                                    <span x-text="currentYear"
+                                        class="text-7xl font-black text-gray-800 dark:text-gray-100 drop-shadow-sm"
+                                        style="font-family: 'Verdana', sans-serif; letter-spacing: -0.05em;"></span>
+                                </div>
+                            </template>
+
+                            <div class="space-y-4 w-full">
+                                <!-- Trimestre 1 -->
+                                <div
+                                    class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
+                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                        @click="openTrimestre = openTrimestre === 1 ? null : 1">
+                                        <h4
+                                            class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                            Primer Trimestre del Año <span>| Eventos Asignados: <span
+                                                    x-text="contarEventosTrimestre(0, 2)"></span></span>
+                                        </h4>
+                                        <span class="material-icons transition-transform duration-200"
+                                            :class="openTrimestre === 1 ? 'rotate-180' : ''">expand_more</span>
+                                    </div>
+                                    <div x-show="openTrimestre === 1" x-collapse
+                                        class="p-4 flex justify-center flex-col items-center">
+                                        <div wire:ignore x-ref="calendar1" class="sogat-datepicker-container w-full">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Trimestre 2 -->
+                                <div
+                                    class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
+                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                        @click="openTrimestre = openTrimestre === 2 ? null : 2">
+                                        <h4
+                                            class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                            Segundo Trimestre del Año <span>| Eventos Asignados: <span
+                                                    x-text="contarEventosTrimestre(3, 5)"></span></span>
+                                        </h4>
+                                        <span class="material-icons transition-transform duration-200"
+                                            :class="openTrimestre === 2 ? 'rotate-180' : ''">expand_more</span>
+                                    </div>
+                                    <div x-show="openTrimestre === 2" x-collapse
+                                        class="p-4 flex justify-center flex-col items-center">
+                                        <div wire:ignore x-ref="calendar2" class="sogat-datepicker-container w-full">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Trimestre 3 -->
+                                <div
+                                    class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
+                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                        @click="openTrimestre = openTrimestre === 3 ? null : 3">
+                                        <h4
+                                            class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                            Tercer Trimestre del Año <span>| Eventos Asignados: <span
+                                                    x-text="contarEventosTrimestre(6, 8)"></span></span>
+                                        </h4>
+                                        <span class="material-icons transition-transform duration-200"
+                                            :class="openTrimestre === 3 ? 'rotate-180' : ''">expand_more</span>
+                                    </div>
+                                    <div x-show="openTrimestre === 3" x-collapse
+                                        class="p-4 flex justify-center flex-col items-center">
+                                        <div wire:ignore x-ref="calendar3" class="sogat-datepicker-container w-full">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Trimestre 4 -->
+                                <div
+                                    class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
+                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                        @click="openTrimestre = openTrimestre === 4 ? null : 4">
+                                        <h4
+                                            class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                            Cuarto Trimestre del Año <span>| Eventos Asignados: <span
+                                                    x-text="contarEventosTrimestre(9, 11)"></span></span>
+                                        </h4>
+                                        <span class="material-icons transition-transform duration-200"
+                                            :class="openTrimestre === 4 ? 'rotate-180' : ''">expand_more</span>
+                                    </div>
+                                    <div x-show="openTrimestre === 4" x-collapse
+                                        class="p-4 flex justify-center flex-col items-center">
+                                        <div wire:ignore x-ref="calendar4" class="sogat-datepicker-container w-full">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Modal Registro --}}
+                            <div x-show="showEventModal" style="display: none;"
+                                class="fixed inset-0 z-50 flex items-center justify-center px-4">
+                                <div @click.away="closeModal()" x-transition:enter="ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 scale-90"
+                                    x-transition:enter-end="opacity-100 scale-100"
+                                    class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-gray-700">
+                                    <h3
+                                        class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6 uppercase tracking-widest text-center">
+                                        Registrar Evento</h3>
+                                    <div
+                                        class="bg-gray-100 dark:bg-gray-700/50 border-l-4 border-gray-400 p-4 rounded-r-lg mb-6 flex justify-between items-center">
+                                        <div><label
+                                                class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Inicio</label>
+                                            <div class="text-gray-900 dark:text-gray-200 font-extrabold text-sm"
+                                                x-text="selectedEventStart"></div>
+                                        </div>
+                                        <div class="text-gray-400 dark:text-gray-600 px-4"><span
+                                                class="material-icons text-sm">arrow_forward</span></div>
+                                        <div class="text-right"><label
+                                                class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Fin</label>
+                                            <div class="text-gray-900 dark:text-gray-200 font-extrabold text-sm"
+                                                x-text="selectedEventEnd"></div>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-5">
+                                        <div>
+                                            <label
+                                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Seleccionar
+                                                Evento</label>
+                                            <select x-model="eventoSeleccionado"
+                                                x-on:change="let opt = $event.target.options[$event.target.selectedIndex]; eventoNombre = opt.text; eventoTipo = opt.dataset.tipo; eventoColor = opt.dataset.color;"
+                                                class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 shadow-sm">
+                                                <option value="" disabled selected>-- Seleccione un Evento --</option>
+                                                @foreach($bibliotecaEventos as $evento)
+                                                    @if($evento->is_repetible_evento || !collect($eventosRegistrados)->contains('id', $evento->id_evento))
+                                                        <option value="{{ $evento->id_evento }}"
+                                                            data-tipo="{{ $evento->tipo_evento }}"
+                                                            data-color="{{ $evento->codigo_color }}">
+                                                            {{ $evento->nombre_evento }}
+                                                        </option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="mt-8 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                        <x-secondary-button type="button"
+                                            @click="closeModal()">{{ __('Cancelar') }}</x-secondary-button>
+                                        <x-primary-button type="button"
+                                            @click="guardarEvento()">{{ __('Guardar') }}</x-primary-button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Botón para regresar a la sección anterior --}}
+                            <div class="flex justify-start mt-8 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <x-secondary-button type="button" @click="openSection = 'fechas'">
+                                    <span class="material-icons text-sm mr-2">arrow_back</span>
+                                    REGRESAR A CONFIGURACIÓN
+                                </x-secondary-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Botones de Acción --}}
+            <div class="flex justify-end pt-4 gap-4">
+                <!-- Botón Cancelar -->
+                <x-danger-button type="button" wire:click="cancelar">
+                    <link rel="stylesheet"
+                        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_back" />
+                    <span class="material-symbols-outlined">
+                        arrow_back
+                    </span>
+                    {{ __('Volver') }}
+                </x-danger-button>
+
+                <!-- Botón Editar -->
+                <x-secondary-button type="button" wire:click="actualizar" wire:loading.attr="disabled">
+                    {{ __('Editar Calendario') }}
+                </x-secondary-button>
+
+                <!-- Botón Aprobar -->
+                <x-primary-button type="button" wire:click="aprobar" wire:loading.attr="disabled" class="bg-green-600 hover:bg-green-700 focus:ring-green-500">
+                    {{ __('Aceptar Calendario') }}
+                </x-primary-button>
+            </div>
+        </div>
+    </div>
+</div>

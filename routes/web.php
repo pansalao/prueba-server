@@ -61,6 +61,7 @@ use App\Livewire\Calendario\ListCalendario;
 use App\Livewire\Calendario\UpdateCalendario;
 use App\Livewire\Calendario\ShowCalendario;
 use App\Livewire\Calendario\ExcelCalendarioExport;
+use App\Livewire\Calendario\EditarCalendario;
 
 
 
@@ -155,6 +156,7 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
     Route::get('calendario/list', ListCalendario::class)->middleware('can:listar-calendario')->name('calendario.list');
     Route::get('calendario/create', CreateCalendario::class)->middleware('can:crear-calendario')->name('calendario.create');
     Route::get('calendario/show/{id}', ShowCalendario::class)->middleware('can:ver-calendario')->name('calendario.show');
+    Route::get('calendario/editar/{id}', EditarCalendario::class)->middleware('can:cambiar-estatus-calendario')->name('calendario.editar');
 
 
     // Módulo de Permisos (DAECE)

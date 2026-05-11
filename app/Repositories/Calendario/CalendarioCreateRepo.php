@@ -13,7 +13,7 @@ class CalendarioCreateRepo
             'semana_calendario_academico' => $data['semana_calendario_academico'],
             'dia_inicio_calendario_academico' => $data['dia_inicio_calendario_academico'],
             'dia_fin_calendario_academico' => $data['dia_fin_calendario_academico'],
-            'estatus' => '1',
+            'estatus' => '2', // En revisión
         ]);
 
         return $calendario->getKey();

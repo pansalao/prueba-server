@@ -36,6 +36,11 @@ class ExcelCalendarioExport implements FromView, WithStyles, WithDrawings, WithE
             return redirect()->back()->with('error', 'El calendario solicitado no existe o no hay calendarios activos.');
         }
 
+        // Solo permitir descargar si el estatus es 1 (Activo)
+        if ($calendario->estatus != 1) {
+            return redirect()->back()->with('error', 'Solo se pueden imprimir calendarios aprobados (Activos).');
+        }
+
         $data = $repo->prepararDataExportacion($calendario);
 
         return \Maatwebsite\Excel\Facades\Excel::download(
