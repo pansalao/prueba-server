@@ -13,7 +13,7 @@
             <div class="sogat-table-container">
                 <div
                     class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between p-4 bg-white dark:bg-gray-800">
-                    <x-table.search-input model="busqueda" placeholder="Buscar semana..." debounce="300ms" />
+                    <x-table.search-input model="busqueda" placeholder="Buscar calendario..." debounce="300ms" />
                 </div>
 
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">

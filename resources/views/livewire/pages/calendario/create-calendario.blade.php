@@ -134,7 +134,7 @@
                         class="flex justify-end pt-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 mt-4 -mx-4 -mb-4 p-4">
                         <x-primary-button type="button" wire:click="validarSeccionFechas"
                             @seccion-fechas-validada.window="openSection = 'eventos'">
-                            ASIGNAR EVENTOS <span class="material-icons text-sm">arrow_forward</span>
+                            CONTINUAR <span class="material-icons text-sm">arrow_forward</span>
                         </x-primary-button>
                     </div>
                 </div>
@@ -187,6 +187,39 @@
                                     _savedStart: '',
                                     _savedCount: 0,
                                     _clickLock: false,
+
+                                    formatDate(dateStr) {
+                                        if (!dateStr) return '';
+                                        const parts = dateStr.split('-');
+                                        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                    },
+
+                                    isTrimestreHabilitado(trimIndex) {
+                                        if (!inicio || !fin) return false;
+                                        const startMonth = (trimIndex - 1) * 3;
+                                        const endMonth = trimIndex * 3 - 1;
+                                        
+                                        // Fecha inicial del trimestre para el año actual
+                                        const trimStart = new Date(this.currentYear, startMonth, 1);
+                                        // Fecha final del trimestre (último día del mes final)
+                                        const trimEnd = new Date(this.currentYear, endMonth + 1, 0);
+                                        
+                                        const calInicio = new Date(inicio + 'T00:00:00');
+                                        const calFin = new Date(fin + 'T00:00:00');
+                                        
+                                        // Hay solapamiento si (trimStart <= calFin) && (trimEnd >= calInicio)
+                                        return (trimStart <= calFin) && (trimEnd >= calInicio);
+                                    },
+
+                                    abrirPrimerTrimestreValido() {
+                                        for (let i = 1; i <= 4; i++) {
+                                            if (this.isTrimestreHabilitado(i)) {
+                                                this.openTrimestre = i;
+                                                return;
+                                            }
+                                        }
+                                        this.openTrimestre = null;
+                                    },
                                     
                                     getVanillaConfig(year, monthIndex) {
                                         const isDark = document.documentElement.classList.contains('dark');
@@ -273,6 +306,7 @@
                                         this.calStartYear = parseInt(inicio.substring(0, 4));
                                         this.calEndYear = parseInt(fin.substring(0, 4));
                                         this.currentYear = this.calStartYear;
+                                        this.abrirPrimerTrimestreValido();
                                         this.inicializarPicker(this.currentYear);
                                     },
 
@@ -280,6 +314,7 @@
                                         const nuevoAnio = parseInt(this.currentYear) + dir;
                                         if (nuevoAnio >= this.calStartYear && nuevoAnio <= this.calEndYear) {
                                             this.currentYear = nuevoAnio;
+                                            this.abrirPrimerTrimestreValido();
                                             this.inicializarPicker(nuevoAnio);
                                         }
                                     },
@@ -441,9 +476,8 @@
                                         <span x-text="currentYear"
                                             class="text-7xl font-black text-gray-800 dark:text-gray-100 min-w-[150px] text-center drop-shadow-sm"
                                             style="font-family: 'Verdana', sans-serif; letter-spacing: -0.05em;"></span>
-                                        <span
-                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Año
-                                            Escolar</span>
+
+
                                     </div>
                                     <button type="button" @click="cambiarAnio(1)" :disabled="currentYear >= calEndYear"
                                         :class="currentYear >= calEndYear ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer'"
@@ -457,26 +491,40 @@
                                 </div>
                             </template>
                             <template x-if="calStartYear && calEndYear && calStartYear >= calEndYear">
-                                <div class="text-center mb-8 mt-2">
+                                <div class="text-center mb-4 mt-2">
                                     <span x-text="currentYear"
                                         class="text-7xl font-black text-gray-800 dark:text-gray-100 drop-shadow-sm"
                                         style="font-family: 'Verdana', sans-serif; letter-spacing: -0.05em;"></span>
                                 </div>
                             </template>
 
+                            {{-- Indicador de fecha seleccionada (siempre visible) --}}
+                            <div x-show="selectedEventStart"
+                                 class="flex justify-center mb-6 -mt-4">
+                                <div class="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-full text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center gap-2">
+                                    <span class="material-icons text-sm">event</span>
+                                    <span x-text="'Fecha de inicio seleccionada para el evento: ' + formatDate(selectedEventStart)"></span>
+                                </div>
+                            </div>
+
                             <div class="space-y-4 w-full">
                                 <!-- Trimestre 1 -->
                                 <div
                                     class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
-                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                        @click="openTrimestre = openTrimestre === 1 ? null : 1">
+                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 transition-colors"
+                                        :class="!isTrimestreHabilitado(1) ? 'opacity-40 cursor-not-allowed bg-gray-200 dark:bg-gray-800' : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'"
+                                        @click="if(isTrimestreHabilitado(1)) openTrimestre = openTrimestre === 1 ? null : 1">
                                         <h4
                                             class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Primer Trimestre del Año <span>| Eventos Asignados: <span
-                                                    x-text="contarEventosTrimestre(0, 2)"></span></span>
+                                            Primer Trimestre del Año 
+                                            <template x-if="isTrimestreHabilitado(1)">
+                                                <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(0, 2)"></span></span>
+                                            </template>
                                         </h4>
                                         <span class="material-icons transition-transform duration-200"
+                                            x-show="isTrimestreHabilitado(1)"
                                             :class="openTrimestre === 1 ? 'rotate-180' : ''">expand_more</span>
+                                        <span class="material-icons text-gray-400" x-show="!isTrimestreHabilitado(1)">lock</span>
                                     </div>
                                     <div x-show="openTrimestre === 1" x-collapse
                                         class="p-4 flex justify-center flex-col items-center">
@@ -487,15 +535,20 @@
                                 <!-- Trimestre 2 -->
                                 <div
                                     class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
-                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                        @click="openTrimestre = openTrimestre === 2 ? null : 2">
+                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 transition-colors"
+                                        :class="!isTrimestreHabilitado(2) ? 'opacity-40 cursor-not-allowed bg-gray-200 dark:bg-gray-800' : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'"
+                                        @click="if(isTrimestreHabilitado(2)) openTrimestre = openTrimestre === 2 ? null : 2">
                                         <h4
                                             class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Segundo Trimestre del Año <span>| Eventos Asignados: <span
-                                                    x-text="contarEventosTrimestre(3, 5)"></span></span>
+                                            Segundo Trimestre del Año 
+                                            <template x-if="isTrimestreHabilitado(2)">
+                                                <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(3, 5)"></span></span>
+                                            </template>
                                         </h4>
                                         <span class="material-icons transition-transform duration-200"
+                                            x-show="isTrimestreHabilitado(2)"
                                             :class="openTrimestre === 2 ? 'rotate-180' : ''">expand_more</span>
+                                        <span class="material-icons text-gray-400" x-show="!isTrimestreHabilitado(2)">lock</span>
                                     </div>
                                     <div x-show="openTrimestre === 2" x-collapse
                                         class="p-4 flex justify-center flex-col items-center">
@@ -506,15 +559,20 @@
                                 <!-- Trimestre 3 -->
                                 <div
                                     class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
-                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                        @click="openTrimestre = openTrimestre === 3 ? null : 3">
+                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 transition-colors"
+                                        :class="!isTrimestreHabilitado(3) ? 'opacity-40 cursor-not-allowed bg-gray-200 dark:bg-gray-800' : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'"
+                                        @click="if(isTrimestreHabilitado(3)) openTrimestre = openTrimestre === 3 ? null : 3">
                                         <h4
                                             class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Tercer Trimestre del Año <span>| Eventos Asignados: <span
-                                                    x-text="contarEventosTrimestre(6, 8)"></span></span>
+                                            Tercer Trimestre del Año 
+                                            <template x-if="isTrimestreHabilitado(3)">
+                                                <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(6, 8)"></span></span>
+                                            </template>
                                         </h4>
                                         <span class="material-icons transition-transform duration-200"
+                                            x-show="isTrimestreHabilitado(3)"
                                             :class="openTrimestre === 3 ? 'rotate-180' : ''">expand_more</span>
+                                        <span class="material-icons text-gray-400" x-show="!isTrimestreHabilitado(3)">lock</span>
                                     </div>
                                     <div x-show="openTrimestre === 3" x-collapse
                                         class="p-4 flex justify-center flex-col items-center">
@@ -525,15 +583,20 @@
                                 <!-- Trimestre 4 -->
                                 <div
                                     class="border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-all duration-300">
-                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                        @click="openTrimestre = openTrimestre === 4 ? null : 4">
+                                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 transition-colors"
+                                        :class="!isTrimestreHabilitado(4) ? 'opacity-40 cursor-not-allowed bg-gray-200 dark:bg-gray-800' : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800'"
+                                        @click="if(isTrimestreHabilitado(4)) openTrimestre = openTrimestre === 4 ? null : 4">
                                         <h4
                                             class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Cuarto Trimestre del Año <span>| Eventos Asignados: <span
-                                                    x-text="contarEventosTrimestre(9, 11)"></span></span>
+                                            Cuarto Trimestre del Año 
+                                            <template x-if="isTrimestreHabilitado(4)">
+                                                <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(9, 11)"></span></span>
+                                            </template>
                                         </h4>
                                         <span class="material-icons transition-transform duration-200"
+                                            x-show="isTrimestreHabilitado(4)"
                                             :class="openTrimestre === 4 ? 'rotate-180' : ''">expand_more</span>
+                                        <span class="material-icons text-gray-400" x-show="!isTrimestreHabilitado(4)">lock</span>
                                     </div>
                                     <div x-show="openTrimestre === 4" x-collapse
                                         class="p-4 flex justify-center flex-col items-center">
@@ -605,7 +668,7 @@
                             <div class="flex justify-start mt-8 pt-4 border-t border-gray-100 dark:border-gray-700">
                                 <x-secondary-button type="button" @click="openSection = 'fechas'">
                                     <span class="material-icons text-sm mr-2">arrow_back</span>
-                                    REGRESAR A CONFIGURACIÓN
+                                    VOLVER
                                 </x-secondary-button>
                             </div>
                         </div>
