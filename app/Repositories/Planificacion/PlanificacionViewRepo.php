@@ -119,10 +119,12 @@ class PlanificacionViewRepo
                     ->select(
                         'c.id_contenido as contenido_id',
                         'c.titulo_contenido as titulo_contenido',
-                        DB::raw('MIN(o.titulo_objetivo) as titulo_objetivo'),
-                        DB::raw('MIN(tu.titulo_tema) as titulo_tema')
+                        'o.id_objetivo as id_objetivo',
+                        'o.titulo_objetivo as titulo_objetivo',
+                        'tu.id_tema_unidad as tema_id',
+                        'tu.titulo_tema as titulo_tema'
                     )
-                    ->groupBy('c.id_contenido', 'c.titulo_contenido')
+                    ->groupBy('c.id_contenido') // Agrupamos solo por contenido para que salga una sola vez
                     ->get()
                     ->map(function ($contenidoItem) {
                         $contenidoArray = (array) $contenidoItem;

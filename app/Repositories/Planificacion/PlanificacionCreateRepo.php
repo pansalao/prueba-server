@@ -151,22 +151,22 @@ class PlanificacionCreateRepo
 
     public function hasDocenteOrCoordinadorRole($userId)
     {
-        // El rol_id para Coordinador es 11 y para Docente es 3 en emulacion_sogac_2
+        // El rol_id para Coordinador puede ser 1, 5 u 11; para Docente es 2 o 3 en emulacion_sogac_2
         return DB::connection('emulacion_sogac_2')
             ->table('usuario')
             ->where('usu_codigo', $userId)
-            ->whereIn('usu_cod_rol', [3, 11])
+            ->whereIn('usu_cod_rol', [1, 2, 3, 5, 11])
             ->where('usu_estatus', 'A')
             ->exists();
     }
 
     public function isCoordinador($userId)
     {
-        // El rol_id para Coordinador es 11 en emulacion_sogac_2
+        // El rol_id para Coordinador puede ser 1, 5 u 11 en emulacion_sogac_2
         return DB::connection('emulacion_sogac_2')
             ->table('usuario')
             ->where('usu_codigo', $userId)
-            ->where('usu_cod_rol', 11)
+            ->whereIn('usu_cod_rol', [1, 5, 11])
             ->where('usu_estatus', 'A')
             ->exists();
     }

@@ -66,7 +66,7 @@
                             @foreach ($form->unidades as $idx => $u)
                                 @php
                                     $isReachable = $idx <= $maxUnidadAlcanzada;
-                                    $isComplete = ($idx == $openUnidad) ? $form->isUnidadComplete($idx) : ($idx < $openUnidad && $form->isUnidadComplete($idx));
+                                    $isComplete = $form->isUnidadComplete($idx);
                                 @endphp
                                 <button type="button" 
                                     wire:click="irAUnidad({{ $idx }})"
@@ -125,17 +125,32 @@
                                     </div>
                                 </div>
 
-                                <div
-                                    class="flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                                    <span
-                                        class="text-xs font-bold text-gray-400 uppercase tracking-widest">Ponderación</span>
-                                    <div class="flex items-center gap-1">
-                                        <span
-                                            class="text-lg font-black {{ $validPonderacion ? 'text-green-600' : 'text-red-600' }}">
-                                            {{ $totalPonderacion }}%
-                                        </span>
-                                        <span class="text-xs text-gray-400 font-bold">/ 25%</span>
+                                <div class="flex flex-col items-end gap-2">
+                                    <div class="flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Estado</span>
+                                        @if($validPonderacion)
+                                            <span class="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-black rounded-full uppercase">Completo</span>
+                                        @else
+                                            <span class="px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-full uppercase">Pendiente</span>
+                                        @endif
+                                        
+                                        <div class="h-4 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
+
+                                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Ponderación</span>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-24 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                <div class="h-full transition-all duration-500 {{ $validPonderacion ? 'bg-green-500' : 'bg-amber-500' }}" 
+                                                     style="width: {{ ($totalPonderacion / 25) * 100 }}%"></div>
+                                            </div>
+                                            <span class="text-sm font-black {{ $validPonderacion ? 'text-green-600' : 'text-amber-600' }}">
+                                                {{ $totalPonderacion }}%
+                                            </span>
+                                            <span class="text-[10px] text-gray-400 font-bold">/ 25%</span>
+                                        </div>
                                     </div>
+                                    @error("form.unidades.$index.total_ponderacion_check")
+                                        <span class="text-red-500 text-[10px] font-bold block animate-bounce">{{ $message }}</span>
+                                    @enderror
                                 </div>
                                 </div>
 
@@ -291,9 +306,6 @@
                                                             <x-datalist :options="$tecnicasActividad" textField="nombre_tecnica_actividad"
                                                                 wire:model.live="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.tecnica_actividad_id"
                                                                 placeholder="Escriba o seleccione..." class="text-sm w-full" required />
-                                                            @error("form.unidades.$index.estrategias.$estrategiaIndex.tecnica_actividad_id")
-                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                            @enderror
                                                         </div>
                                                         <div class="space-y-2">
                                                             <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Actividad</label>
@@ -318,9 +330,6 @@
                                                                         <x-datalist :options="$recursosMaestros" textField="nombre_recurso"
                                                                             wire:model.live="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.recursos.{{ $recursoIndex }}.recurso_id"
                                                                             placeholder="Escriba o seleccione..." class="text-sm w-full" required />
-                                                                        @error("form.unidades.$index.estrategias.$estrategiaIndex.recursos.$recursoIndex.recurso_id")
-                                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                                        @enderror
                                                                     </div>
                                                                     @if (count($estrategia['recursos']) > 1)
                                                                         <button type="button" wire:click="removeItem({{ $index }}, 'estrategia_recursos', {{ $recursoIndex }}, {{ $estrategiaIndex }})"
@@ -400,34 +409,28 @@
                                                     @endif
                                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Fecha <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Fecha</label>
                                                             <x-text-input type="date" wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.fecha_evaluacion" class="w-full text-xs" required />
                                                             @error("form.unidades.$index.evaluaciones.$evaluacionIndex.fecha_evaluacion")
                                                                 <span class="text-red-500 text-[10px] font-bold block">{{ $message }}</span>
                                                             @enderror
                                                         </div>
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Evaluación <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Evaluación</label>
                                                             <x-datalist :options="$evaluaciones" textField="nombre_tipo_evaluacion"
                                                                 wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.evaluacion_id"
                                                                 placeholder="Escriba o seleccione..." class="text-xs w-full" required />
-                                                            @error("form.unidades.$index.evaluaciones.$evaluacionIndex.evaluacion_id")
-                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                            @enderror
                                                         </div>
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Técnica <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Técnica</label>
                                                             <x-datalist :options="$tecnica" textField="nombre_tecnica_evaluacion"
                                                                 wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.tecnica_id"
                                                                 placeholder="Escriba o seleccione..." class="text-xs w-full" required />
-                                                            @error("form.unidades.$index.evaluaciones.$evaluacionIndex.tecnica_id")
-                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                            @enderror
                                                         </div>
                                                     </div>
                                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Participación <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Participación</label>
                                                             <div class="flex gap-2">
                                                                 <x-select :options="$formasParticipacion" valueField="id" textField="nombre"
                                                                     wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.forma_participacion"
@@ -447,7 +450,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase text-center block">Pond. (%) <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase text-center block">Pond. (%)</label>
                                                             <div class="flex justify-center">
                                                                  <input type="number" step="1" min="5" max="25" onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                                                                     x-on:input="if($el.value > 25) $el.value = 25"
@@ -506,12 +509,9 @@
                                                     </div>
                                                     <div class="w-full">
                                                         <x-datalist :options="$bibliografiasMaestras" textField="nombre_bibliografia"
-                                                            wire:model.live="form.unidades.{{ $index }}.bibliografias.{{ $biblioIndex }}.bibliografia_id"
+                                                            wire:model.live.debounce.500ms="form.unidades.{{ $index }}.bibliografias.{{ $biblioIndex }}.bibliografia_id"
                                                             placeholder="Escriba o seleccione..."
                                                             class="w-full text-xs" />
-                                                        @error("form.unidades.$index.bibliografias.$biblioIndex.bibliografia_id")
-                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                        @enderror
                                                     </div>
                                                 </div>
                                             @endforeach

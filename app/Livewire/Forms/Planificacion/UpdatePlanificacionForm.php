@@ -75,7 +75,9 @@ class UpdatePlanificacionForm extends Form
         foreach ($u['evaluaciones'] as $eval) {
             if (empty($eval['fecha_evaluacion']) || empty($eval['evaluacion_id']) || 
                 empty($eval['tecnica_id']) || empty($eval['forma_participacion'])) return false;
-            if ($eval['forma_participacion'] == '2' && empty($eval['integrantes'])) return false;
+            
+            // Si es grupal, verificar integrantes
+            if ($eval['forma_participacion'] == '2' && (empty($eval['integrantes']) || $eval['integrantes'] < 2)) return false;
         }
         return true;
     }
@@ -148,26 +150,11 @@ class UpdatePlanificacionForm extends Form
                             }
                         }
 
-                        if ($this->id_lapso_academico) {
-                            if ($this->cachedEventos === null) {
-                                $this->cachedEventos = \Illuminate\Support\Facades\DB::table('evento')
-                                    ->where('estatus', '!=', '3')
-                                    ->get();
-                            }
-
-                            $evento = $this->cachedEventos->first(function($e) use ($value) {
-                                return $value >= $e->dia_inicio_evento && $value <= $e->dia_fin_evento;
-                            });
-
-                            if ($evento) {
-                                $fail("Fecha bloqueada por evento: {$evento->descripcion_evento}.");
-                            }
-                        }
                     }
                 ];
                 $rules["unidades.$index.evaluaciones.$evaluacionIndex.fecha_evaluacion"] = $fechaEvaluacionRules;
-                $rules["unidades.$index.evaluaciones.$evaluacionIndex.evaluacion_id"] = 'required|string';
-                $rules["unidades.$index.evaluaciones.$evaluacionIndex.tecnica_id"] = 'required|string';
+                $rules["unidades.$index.evaluaciones.$evaluacionIndex.evaluacion_id"] = 'required|string|min:1';
+                $rules["unidades.$index.evaluaciones.$evaluacionIndex.tecnica_id"] = 'required|string|min:1';
                 $rules["unidades.$index.evaluaciones.$evaluacionIndex.ponderacion"] = [
                     'bail',
                     'required',

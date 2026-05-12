@@ -128,16 +128,35 @@ class UpdatePlanificacion extends Component
 
             $objetivosDict = [];
             foreach ($corte['contenidos'] as $cont) {
-                $objId = $cont['id_objetivo'];
+                $objId = $cont['id_objetivo'] ?? null;
+                $temaId = $cont['tema_id'] ?? null;
+                $contId = $cont['contenido_id'] ?? null;
+
+                // Solo procesar si tenemos datos mínimos válidos
+                if (!$objId || !$temaId) continue;
+
                 if (!isset($objetivosDict[$objId])) {
                     $objetivosDict[$objId] = [
-                        'tema_id' => $cont['tema_id'],
+                        'tema_id' => $temaId,
                         'objetivo_id' => $objId,
                         'contenidos' => []
                     ];
                 }
-                $objetivosDict[$objId]['contenidos'][] = ['contenido_id' => $cont['contenido_id']];
+                
+                // Evitar duplicados de contenido en el mismo objetivo
+                $exists = false;
+                foreach ($objetivosDict[$objId]['contenidos'] as $existingCont) {
+                    if ($existingCont['contenido_id'] == $contId) {
+                        $exists = true;
+                        break;
+                    }
+                }
+                
+                if (!$exists && $contId) {
+                    $objetivosDict[$objId]['contenidos'][] = ['contenido_id' => $contId];
+                }
             }
+            
             $objetivos = array_values($objetivosDict);
             if (empty($objetivos)) {
                 $objetivos = [['tema_id' => '', 'objetivo_id' => '', 'contenidos' => [['contenido_id' => '']]]];

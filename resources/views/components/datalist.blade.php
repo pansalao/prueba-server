@@ -19,7 +19,7 @@
     $finalErrorField = $errorField ?? $finalWireModel;
 
     $inputClasses = Arr::toCssClasses([
-        'block py-2 px-3 pr-10 border rounded-md shadow-sm transition-all duration-200 cursor-text',
+        'block py-1.5 px-3 pr-10 border rounded-md shadow-sm transition-all duration-200 cursor-text',
         'w-full' => !$required,
         'flex-1' => $required,
         'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm',
@@ -33,7 +33,7 @@
      x-data="{ 
         open: false, 
         search: @entangle($finalWireModel), 
-        options: {{ $options->map(fn($o) => $o->{$textField})->toJson() }},
+        options: {{ collect($options)->map(fn($o) => is_array($o) ? ($o[$textField] ?? '') : ($o->{$textField} ?? ''))->toJson() }},
         filteredOptions: [],
         highlightedIndex: -1,
         
@@ -100,7 +100,7 @@
             @input="open = true"
             placeholder="{{ $placeholder }}"
             @disabled($disabled)
-            class="{{ $inputClasses }}"
+            class="{{ $inputClasses }} {{ $attributes->get('class') }}"
             autocomplete="off"
         >
         

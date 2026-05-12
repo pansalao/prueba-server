@@ -57,7 +57,7 @@ class AccesoRepository
 
     public function checkCoordinador(): bool
     {
-        return $this->checkRole(1); // El rol_id para Coordinador
+        return Auth::check() && in_array(Auth::user()->usu_cod_rol, [1, 5, 11]) && Auth::user()->usu_estatus == 'A';
     }
 
     public function checkProfesor(): bool

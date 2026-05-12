@@ -101,7 +101,7 @@
                             @foreach ($form->unidades as $idx => $u)
                                 @php
                                     $isReachable = $idx <= $maxUnidadAlcanzada;
-                                    $isComplete = ($idx == $openUnidad) ? $form->isUnidadComplete($idx) : ($idx < $openUnidad && $form->isUnidadComplete($idx));
+                                    $isComplete = $form->isUnidadComplete($idx);
                                 @endphp
                                 <button type="button" 
                                     wire:key="unit-circle-{{ $idx }}"
@@ -248,9 +248,6 @@
                                                             <x-select :options="$temasUnidad" valueField="id_tema_unidad" textField="titulo_tema"
                                                                 wire:model.live="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.tema_id"
                                                                 placeholder="Seleccione un tema" class="text-sm w-full" required />
-                                                            @error("form.unidades.$index.objetivos.$objetivoIndex.tema_id")
-                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                            @enderror
                                                         </div>
                                                         <div class="space-y-2">
                                                             <div class="flex items-center justify-between">
@@ -267,9 +264,6 @@
                                                             <x-select :options="$opcionesObjetivo" valueField="id_objetivo" textField="titulo_objetivo"
                                                                 wire:model.live="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.objetivo_id"
                                                                 placeholder="Seleccione un objetivo" class="text-sm w-full" :disabled="empty($selectedTemaId)" required />
-                                                            @error("form.unidades.$index.objetivos.$objetivoIndex.objetivo_id")
-                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                            @enderror
                                                         </div>
                                                     </div>
                                                     <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -293,9 +287,6 @@
                                                                         <x-select :options="$opcionesContenido" valueField="id_contenido" textField="titulo_contenido"
                                                                             wire:model.live="form.unidades.{{ $index }}.objetivos.{{ $objetivoIndex }}.contenidos.{{ $contenidoIndex }}.contenido_id"
                                                                             placeholder="Seleccione un contenido" class="text-sm w-full" :disabled="empty($selectedObjetivoId)" required />
-                                                                        @error("form.unidades.$index.objetivos.$objetivoIndex.contenidos.$contenidoIndex.contenido_id")
-                                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                                        @enderror
                                                                     </div>
                                                                     @if (count($objetivo['contenidos']) > 1)
                                                                         <button type="button" wire:click="removeItem({{ $index }}, 'contenidos', {{ $contenidoIndex }}, {{ $objetivoIndex }})"
@@ -318,7 +309,6 @@
                                             </div>
                                         </div>
 
-                                    {{-- Estrategias Pedagógicas Section --}}
                                     <div class="border-2 {{ $isEstrategiasDone ? 'border-green-500' : ($canShowEstrategias ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEstrategias ? 'opacity-50 pointer-events-none' : '' }}">
                                         <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'estrategias' ? '' : 'estrategias'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
@@ -350,19 +340,13 @@
                                                             <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Estrategia o Actividad</label>
                                                             <x-datalist :options="$tecnicasActividad" textField="nombre_tecnica_actividad"
                                                                 wire:model.live="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.tecnica_actividad_id"
-                                                                placeholder="Escriba o seleccione..." class="text-sm w-full" required />
-                                                            @error("form.unidades.$index.estrategias.$estrategiaIndex.tecnica_actividad_id")
-                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                            @enderror
+                                                                placeholder="Seleccione una técnica..." class="text-xs w-full" required />
                                                         </div>
                                                         <div class="space-y-2">
                                                             <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Actividad</label>
                                                             <textarea wire:model.live.debounce.500ms="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.actividad"
                                                                 class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-sm"
                                                                 rows="3" placeholder="Describa la actividad..."></textarea>
-                                                            @error("form.unidades.$index.estrategias.$estrategiaIndex.actividad")
-                                                                <span class="text-red-500 text-xs font-bold block mt-1">{{ $message }}</span>
-                                                            @enderror
                                                         </div>
                                                         <div class="space-y-2">
                                                             <div class="flex items-center justify-between">
@@ -377,10 +361,7 @@
                                                                     <div class="flex-grow">
                                                                         <x-datalist :options="$recursosMaestros" textField="nombre_recurso"
                                                                             wire:model.live="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.recursos.{{ $recursoIndex }}.recurso_id"
-                                                                            placeholder="Escriba o seleccione..." class="text-sm w-full" required />
-                                                                        @error("form.unidades.$index.estrategias.$estrategiaIndex.recursos.$recursoIndex.recurso_id")
-                                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                                        @enderror
+                                                                            placeholder="Seleccione un recurso..." class="text-xs w-full" required />
                                                                     </div>
                                                                     @if (count($estrategia['recursos']) > 1)
                                                                         <button type="button" wire:click="removeItem({{ $index }}, 'estrategia_recursos', {{ $recursoIndex }}, {{ $estrategiaIndex }})"
@@ -403,7 +384,6 @@
                                             </div>
                                         </div>
 
-                                    {{-- Indicadores de Logros Section --}}
                                     <div class="border-2 {{ $isIndicadoresDone ? 'border-green-500' : ($canShowIndicadores ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowIndicadores ? 'opacity-50 pointer-events-none' : '' }}">
                                         <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'indicadores' ? '' : 'indicadores'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
@@ -417,9 +397,6 @@
                                                 <textarea wire:model.live.debounce.500ms="form.unidades.{{ $index }}.indicadores_logro"
                                                     class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-sm"
                                                     rows="3" placeholder="Describa los indicadores de logros para esta unidad..."></textarea>
-                                                @error("form.unidades.$index.indicadores_logro")
-                                                    <span class="text-red-500 text-xs font-bold block mt-1">{{ $message }}</span>
-                                                @enderror
                                             </div>
 
                                                 <div class="flex justify-end pt-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 mt-4 -mx-4 -mb-4 p-4">
@@ -431,7 +408,6 @@
                                             </div>
                                         </div>
 
-                                    {{-- Plan de Evaluación Section --}}
                                     <div class="border-2 {{ $isEvaluacionDone ? 'border-green-500' : ($canShowEvaluacion ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEvaluacion ? 'opacity-50 pointer-events-none' : '' }}">
                                         <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'evaluacion' ? '' : 'evaluacion'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
@@ -458,34 +434,25 @@
                                                     @endif
                                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Fecha <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Fecha</label>
                                                             <x-text-input type="date" wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.fecha_evaluacion" class="w-full text-xs" required />
-                                                            @error("form.unidades.$index.evaluaciones.$evaluacionIndex.fecha_evaluacion")
-                                                                <span class="text-red-500 text-[10px] font-bold block">{{ $message }}</span>
-                                                            @enderror
                                                         </div>
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Evaluación <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Evaluación</label>
                                                             <x-datalist :options="$evaluaciones" textField="nombre_tipo_evaluacion"
                                                                 wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.evaluacion_id"
                                                                 placeholder="Escriba o seleccione..." class="text-xs w-full" required />
-                                                            @error("form.unidades.$index.evaluaciones.$evaluacionIndex.evaluacion_id")
-                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                            @enderror
                                                         </div>
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Técnica <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Técnica</label>
                                                             <x-datalist :options="$tecnica" textField="nombre_tecnica_evaluacion"
                                                                 wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.tecnica_id"
                                                                 placeholder="Escriba o seleccione..." class="text-xs w-full" required />
-                                                            @error("form.unidades.$index.evaluaciones.$evaluacionIndex.tecnica_id")
-                                                                <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                            @enderror
                                                         </div>
                                                     </div>
                                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Participación <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Participación</label>
                                                             <div class="flex gap-2">
                                                                 <x-select :options="$formasParticipacion" valueField="id" textField="nombre"
                                                                     wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.forma_participacion"
@@ -505,7 +472,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="space-y-1">
-                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase text-center block">Pond. (%) <span class="text-red-500">*</span></label>
+                                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase text-center block">Pond. (%)</label>
                                                             <div class="flex justify-center">
                                                                  <input type="number" step="1" min="5" max="25" onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                                                                     x-on:input="if($el.value > 25) $el.value = 25"
