@@ -60,6 +60,8 @@ use App\Livewire\Calendario\CreateCalendario;
 use App\Livewire\Calendario\ListCalendario;
 use App\Livewire\Calendario\UpdateCalendario;
 use App\Livewire\Calendario\ShowCalendario;
+use App\Livewire\Calendario\ExcelCalendarioExport;
+use App\Livewire\Calendario\EditarCalendario;
 
 
 
@@ -107,9 +109,12 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
     // Rutas para Reportes PDF (Abrir en pestaña)
     Route::get('planificacion/reporte-general', [\App\Http\Controllers\ReportePlanificacionController::class, 'reporteGeneral'])->middleware(['can:listar-planificacion', 'log.activity:REPORTE'])->name('planificacion.reporte.general');
     Route::get('planificacion/reporte-detalle/{id}', [\App\Http\Controllers\ReportePlanificacionController::class, 'reporteDetalle'])->middleware(['can:ver-planificacion', 'log.activity:REPORTE'])->name('planificacion.reporte.detalle');
+
+    Route::get('calendario/reporte', fn() => ExcelCalendarioExport::descargar())->middleware(['can:listar-calendario', 'log.activity:REPORTE'])->name('calendario.reporte');
+    Route::get('calendario/reporte/{id}', fn($id) => ExcelCalendarioExport::descargar($id))->middleware(['can:listar-calendario', 'log.activity:REPORTE'])->name('calendario.reporte.especifico');
+
     Route::get('planificacion/acuerdo-aprendizaje/{id}', [\App\Http\Controllers\ReportePlanificacionController::class, 'acuerdoAprendizaje'])->middleware(['can:ver-planificacion', 'log.activity:REPORTE'])->name('planificacion.acuerdo');
-    Route::get('calendario/reporte', [\App\Http\Controllers\ReporteCalendarioController::class, 'reporteUltimoCalendario'])->middleware(['can:listar-calendario', 'log.activity:REPORTE'])->name('calendario.reporte');
-    Route::get('calendario/reporte/{id}', [\App\Http\Controllers\ReporteCalendarioController::class, 'reporteCalendario'])->middleware(['can:listar-calendario', 'log.activity:REPORTE'])->name('calendario.reporte.especifico');
+
 
     Route::get('indicador-logro/list', ListIndicadorLogro::class)->middleware('can:listar-indicador-logro')->name('indicador-logro/listar');
     Route::get('indicador-logro/create', CreateIndicadorLogro::class)->middleware('can:crear-indicador-logro')->name('indicador-logro/crear');
@@ -154,8 +159,9 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
 
     // Rutas para Calendario Académico
     Route::get('calendario/list', ListCalendario::class)->middleware('can:listar-calendario')->name('calendario.list');
-    Route::get('calendario/create', CreateCalendario::class)->middleware('can:crear-calendario')->name('calendario.create');
+    Route::get('calendario/create/{id?}', CreateCalendario::class)->middleware('can:crear-calendario')->name('calendario.create');
     Route::get('calendario/show/{id}', ShowCalendario::class)->middleware('can:ver-calendario')->name('calendario.show');
+    Route::get('calendario/editar/{id}', EditarCalendario::class)->middleware('can:cambiar-estatus-calendario')->name('calendario.editar');
 
 
     // Módulo de Permisos (DAECE)

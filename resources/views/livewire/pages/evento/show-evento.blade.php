@@ -62,6 +62,26 @@
                             </div>
                         </div>
 
+                        {{-- Laborable --}}
+                        <div>
+                            <x-input-label value="Laborable:" />
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="material-icons {{ $evento->is_laborable_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
+                                    {{ $evento->is_laborable_evento ? 'check' : 'close' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- Repetible --}}
+                        <div>
+                            <x-input-label value="Repetible:" />
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="material-icons {{ $evento->is_repetible_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
+                                    {{ $evento->is_repetible_evento ? 'check' : 'close' }}
+                                </span>
+                            </div>
+                        </div>
+
                         {{-- Estatus --}}
                         <div>
                             <x-input-label value="Estatus:" />

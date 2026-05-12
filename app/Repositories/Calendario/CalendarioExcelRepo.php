@@ -1,55 +1,42 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Repositories\Calendario;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Exports\CalendarioExport;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ReporteCalendarioController extends Controller
+class CalendarioExcelRepo
 {
     /**
-     * Genera el reporte del último calendario académico activo.
+     * Obtiene el último calendario activo.
      */
-    public function reporteUltimoCalendario()
+    public function obtenerUltimoActivo()
     {
-        $calendario = DB::table('calendario_academico')
+        return DB::table('calendario_academico')
             ->where('estatus', 1)
             ->orderBy('id_calendario_academico', 'desc')
             ->first();
-
-        if (!$calendario) {
-            return redirect()->back()->with('error', 'No existe ningún calendario académico activo para imprimir.');
-        }
-
-        return $this->generarExcel($calendario);
     }
 
     /**
-     * Genera el reporte de un calendario específico por ID.
+     * Obtiene un calendario por ID.
      */
-    public function reporteCalendario($id)
+    public function obtenerPorId($id)
     {
-        $calendario = DB::table('calendario_academico')
+        return DB::table('calendario_academico')
             ->where('id_calendario_academico', $id)
             ->first();
-
-        if (!$calendario) {
-            return redirect()->back()->with('error', 'El calendario solicitado no existe.');
-        }
-
-        return $this->generarExcel($calendario);
     }
 
     /**
-     * Lógica compartida para generar el archivo Excel multi-año.
+     * Prepara toda la data necesaria para la exportación.
      */
-    private function generarExcel($calendario)
+    public function prepararDataExportacion($calendario)
     {
-        $startYear = Carbon::parse($calendario->dia_inicio_calendario_academico)->year;
-        $endYear   = Carbon::parse($calendario->dia_fin_calendario_academico)->year;
+        $startDate = Carbon::parse($calendario->dia_inicio_calendario_academico)->startOfDay();
+        $endDate   = Carbon::parse($calendario->dia_fin_calendario_academico)->endOfDay();
+        $startYear = $startDate->year;
+        $endYear   = $endDate->year;
 
         // Obtener TODOS los eventos del calendario
         $eventosRaw = DB::table('evento')
@@ -60,7 +47,9 @@ class ReporteCalendarioController extends Controller
                 'evento.nombre_evento as descripcion_evento',
                 'detalle_evento.dia_inicio_detalle_evento as dia_inicio_evento',
                 'detalle_evento.dia_fin_detalle_evento as dia_fin_evento',
-                'color.codigo_color'
+                'color.codigo_color',
+                'evento.is_laborable_evento',
+                'evento.tipo_evento'
             )
             ->where('detalle_evento.id_calendario_academico', $calendario->id_calendario_academico)
             ->where('evento.estatus', 1)
@@ -75,7 +64,6 @@ class ReporteCalendarioController extends Controller
         }
 
         // Construir mapa de días con eventos por AÑO
-        // eventDaysByYear[2025]['2025-03-10'] = ['ids'=>[...], 'nombres'=>[...]]
         $eventDaysByYear = [];
         for ($y = $startYear; $y <= $endYear; $y++) {
             $eventDaysByYear[$y] = [];
@@ -101,17 +89,38 @@ class ReporteCalendarioController extends Controller
 
         $years = range($startYear, $endYear);
 
-        return Excel::download(new CalendarioExport([
-            'calendario'      => $calendario,
-            'years'           => $years,
-            'startYear'       => $startYear,
-            'endYear'         => $endYear,
-            'eventDaysByYear' => $eventDaysByYear,
-            'eventColors'     => $eventColors,
-            'eventos'         => $eventosRaw,
-            // Compatibilidad con código legacy que use $year y $eventDays
-            'year'            => $startYear,
-            'eventDays'       => $eventDaysByYear[$startYear] ?? [],
-        ]), 'calendario_academico_' . $startYear . '-' . $endYear . '.xlsx');
+        return [
+            'calendario'         => $calendario,
+            'years'              => $years,
+            'startYear'          => $startYear,
+            'endYear'            => $endYear,
+            'eventDaysByYear'    => $eventDaysByYear,
+            'eventColors'        => $eventColors,
+            'eventos'            => $eventosRaw,
+            'year'               => $startYear,
+            'eventDays'          => $eventDaysByYear[$startYear] ?? [],
+            'listaMesesCompleta' => $this->obtenerListaMesesCompleta($years, $startDate, $endDate),
+        ];
+    }
+
+    /**
+     * Calcula la lista plana de meses que solapan con la vigencia.
+     */
+    public function obtenerListaMesesCompleta($years, $startDate, $endDate)
+    {
+        $lista = [];
+        foreach ($years as $yearLoop) {
+            foreach (range(1, 12) as $mes) {
+                $primerDiaMes = Carbon::create($yearLoop, $mes, 1)->startOfDay();
+                $ultimoDiaMes = $primerDiaMes->copy()->endOfMonth()->endOfDay();
+                if ($primerDiaMes <= $endDate && $ultimoDiaMes >= $startDate) {
+                    $lista[] = [
+                        'year'  => $yearLoop,
+                        'month' => $mes
+                    ];
+                }
+            }
+        }
+        return $lista;
     }
 }

@@ -8,23 +8,13 @@ class EventoIndexRepo
 {
     public function listar($busqueda = '', $paginacion = 5)
     {
-        $eventos = DB::table('evento as e')
-            ->leftJoin('color as col', 'e.id_color', '=', 'col.id_color')
-            ->select(
-                'e.id_evento',
-                'e.nombre_evento',
-                'col.codigo_color as color',
-                'col.nombre_color',
-                'e.tipo_evento',
-                'e.estatus'
-            )
+        return \App\Models\Evento::with('color_rel')
+            ->select('evento.*')
             ->when($busqueda, function ($consulta, $busqueda) {
-                $consulta->where('e.nombre_evento', 'LIKE', '%' . $busqueda . '%');
+                $consulta->where('nombre_evento', 'LIKE', '%' . $busqueda . '%');
             })
-            ->orderBy('e.id_evento', 'desc')
+            ->orderBy('id_evento', 'desc')
             ->paginate($paginacion);
-
-        return $eventos;
     }
 
     public function inhabilitar($id)
@@ -57,7 +47,7 @@ class EventoIndexRepo
         return DB::table('evento as e')
             ->join('color as c', 'e.id_color', '=', 'c.id_color')
             ->where('e.estatus', 1)
-            ->select('e.id_evento', 'e.nombre_evento', 'e.tipo_evento', 'c.codigo_color')
+            ->select('e.id_evento', 'e.nombre_evento', 'e.tipo_evento', 'e.is_laborable_evento', 'e.is_repetible_evento', 'c.codigo_color')
             ->get();
     }
 }

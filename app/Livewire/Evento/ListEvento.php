@@ -16,12 +16,7 @@ class ListEvento extends Component
     public $idInhabilitar = null;
     public $idRestaurar = null;
 
-    protected $eventoRepository;
 
-    public function __construct()
-    {
-        $this->eventoRepository = new EventoIndexRepo();
-    }
 
     public function confirmarInhabilitar($id)
     {
@@ -40,7 +35,8 @@ class ListEvento extends Component
         }
 
         try {
-            $result = $this->eventoRepository->inhabilitar($this->idInhabilitar);
+            $repo = new EventoIndexRepo();
+            $result = $repo->inhabilitar($this->idInhabilitar);
 
             if ($result) {
                 session()->flash('message', 'Evento inhabilitado exitosamente.');
@@ -62,7 +58,8 @@ class ListEvento extends Component
         }
 
         try {
-            $result = $this->eventoRepository->restaurar($this->idRestaurar);
+            $repo = new EventoIndexRepo();
+            $result = $repo->restaurar($this->idRestaurar);
 
             if ($result) {
                 session()->flash('message', 'Evento restaurado exitosamente.');
@@ -84,7 +81,8 @@ class ListEvento extends Component
             $this->paginacion = 5;
         }
 
-        $eventos = $this->eventoRepository->listar($this->busqueda, $this->paginacion);
+        $repo = new EventoIndexRepo();
+        $eventos = $repo->listar($this->busqueda, $this->paginacion);
 
         return view('livewire.pages.evento.list-evento', compact('eventos'));
     }

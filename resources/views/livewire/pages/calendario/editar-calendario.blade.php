@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-800 dark:text-gray-500 leading-tight uppercase text-center">
-            {{ __('Crear Calendario Académico') }}
+            {{ __('Editar Planificación de Calendario') }}
         </h2>
     </x-slot>
 
@@ -119,23 +119,18 @@
                             <x-text-input id="dia_inicio_calendario_academico" type="date"
                                 wire:model.live="form.dia_inicio_calendario_academico"
                                 class="w-full mt-1 date-input-dark" required />
-                            <x-input-error :messages="$errors->first('form.dia_inicio_calendario_academico')"
-                                class="mt-2" />
                         </div>
                         <div class="w-full">
                             <x-input-label for="dia_fin_calendario_academico" :value="__('Fin del Período')" />
                             <x-text-input id="dia_fin_calendario_academico" type="date"
-                                wire:model.live="form.dia_fin_calendario_academico" class="w-full mt-1 date-input-dark"
-                                required />
-                            <x-input-error :messages="$errors->first('form.dia_fin_calendario_academico')"
-                                class="mt-2" />
+                                wire:model.live="form.dia_fin_calendario_academico" 
+                                class="w-full mt-1 date-input-dark" required />
                         </div>
                     </div>
                     <div
                         class="flex justify-end pt-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 mt-4 -mx-4 -mb-4 p-4">
-                        <x-primary-button type="button" wire:click="validarSeccionFechas"
-                            @seccion-fechas-validada.window="openSection = 'eventos'">
-                            ASIGNAR EVENTOS <span class="material-icons text-sm">arrow_forward</span>
+                        <x-primary-button type="button" @click="openSection = 'eventos'">
+                            VER EVENTOS ASIGNADOS <span class="material-icons text-sm">arrow_forward</span>
                         </x-primary-button>
                     </div>
                 </div>
@@ -148,21 +143,12 @@
                     <h4
                         class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                         <span class="material-icons text-red-500">event</span>
-                        Asignación de Eventos
+                        Revisión de Eventos
                     </h4>
                     <span class="material-icons transition-transform duration-200"
                         :class="openSection === 'eventos' ? 'rotate-180' : ''">expand_more</span>
                 </div>
                 <div x-show="openSection === 'eventos'" x-collapse class="p-4 space-y-6">
-
-                    {{-- Indicador si faltan fechas --}}
-                    <div x-show="!inicio || !fin" class="text-center p-8">
-                        <span class="material-icons text-4xl text-gray-400 mb-2">warning</span>
-                        <p class="text-sm font-bold text-gray-500 uppercase">Debe configurar primero el inicio y fin del
-                            período en la sección anterior.</p>
-                    </div>
-
-                    <x-input-error :messages="$errors->first('eventosRegistrados')" class="mt-2 text-center" />
 
                     <div x-show="inicio && fin">
                         <div x-data="{
@@ -261,13 +247,8 @@
                                         this.$watch('inicio', (val) => { if(val && fin) this.setupCalendar(); });
                                         this.$watch('fin', (val) => { if(val && inicio) this.setupCalendar(); });
                                         this.$watch('eventosAlpine', () => {
-                                            if (this.picker1) this.picker1.update();
-                                            if (this.picker2) this.picker2.update();
-                                            if (this.picker3) this.picker3.update();
-                                            if (this.picker4) this.picker4.update();
-                                            this.$nextTick(() => this.refrescarEventosVisuales());
+                                            this.refrescarEventosVisuales();
                                         });
-                                        // initial setup if dates exist
                                         if(inicio && fin) this.setupCalendar();
                                     },
                                     setupCalendar() {
@@ -310,7 +291,6 @@
                                             btn.style.backgroundColor = ''; btn.style.color = ''; btn.style.border = '';
                                             btn.classList.remove('sogat-evento-registrado');
                                             
-                                            // Limpiar contador previo
                                             const existingBadge = btn.querySelector('.sogat-event-counter');
                                             if (existingBadge) existingBadge.remove();
 
@@ -321,7 +301,6 @@
                                                 btn.style.setProperty('border', '2px solid ' + dayColors[day], 'important');
                                                 btn.style.setProperty('font-weight', '900', 'important');
                                                 
-                                                // Agregar contador si hay 2 o más
                                                 if (dayEventsCount[day] >= 2) {
                                                     const badge = document.createElement('span');
                                                     badge.className = 'sogat-event-counter absolute -top-2 -right-1 w-4 h-4 bg-gray-700 text-white text-[9px] flex items-center justify-center rounded-full border border-white dark:border-gray-800 shadow-sm font-bold z-10';
@@ -600,8 +579,6 @@
                                 </div>
                             </div>
 
-
-
                             {{-- Botón para regresar a la sección anterior --}}
                             <div class="flex justify-start mt-8 pt-4 border-t border-gray-100 dark:border-gray-700">
                                 <x-secondary-button type="button" @click="openSection = 'fechas'">
@@ -614,7 +591,7 @@
                 </div>
             </div>
 
-            {{-- Botón Guardar Final --}}
+            {{-- Botones de Acción --}}
             <div class="flex justify-end pt-4 gap-4">
                 <!-- Botón Cancelar -->
                 <x-danger-button type="button" wire:click="cancelar">
@@ -626,9 +603,14 @@
                     {{ __('Volver') }}
                 </x-danger-button>
 
-                <!-- Botón Guardar Cambios -->
-                <x-primary-button type="button" wire:click="save" wire:loading.attr="disabled">
-                    {{ __('Guardar Calendario') }}
+                <!-- Botón Editar -->
+                <x-secondary-button type="button" wire:click="actualizar" wire:loading.attr="disabled">
+                    {{ __('Editar Calendario') }}
+                </x-secondary-button>
+
+                <!-- Botón Aprobar -->
+                <x-primary-button type="button" wire:click="aprobar" wire:loading.attr="disabled" class="bg-green-600 hover:bg-green-700 focus:ring-green-500">
+                    {{ __('Aceptar Calendario') }}
                 </x-primary-button>
             </div>
         </div>

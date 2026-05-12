@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Evento;
 
-use App\Livewire\Forms\Evento\EditEventoForm;
+use App\Livewire\Forms\Evento\UpdateEventoForm;
 use Livewire\Component;
 use App\Repositories\Evento\EventoUpdateRepo;
 use App\Repositories\Evento\EventoViewRepo;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class UpdateEvento extends Component
 {
-    public EditEventoForm $form;
+    public UpdateEventoForm $form;
     public $colores = [];
     protected $eventoRepository;
     protected $viewRepository;
@@ -30,13 +30,26 @@ class UpdateEvento extends Component
         }
 
         $this->form->setEvento($evento);
-        $this->colores = DB::table('color')->where('estatus', '1')->get();
+        $this->cargarColores();
+    }
+
+    public function cargarColores()
+    {
+        $this->colores = $this->eventoRepository->getColoresDisponibles($this->form->id_evento);
     }
 
     public function updated($propertyName)
     {
         $field = str_replace('form.', '', $propertyName);
         $this->form->validateOnly($field);
+
+        // Si cambia el tipo de evento
+        if ($propertyName === 'form.tipo_evento') {
+            if ($this->form->tipo_evento == '1') {
+                $this->form->is_laborable = false;
+                $this->form->is_repetible = false;
+            }
+        }
     }
 
     public function guardar()

@@ -10,7 +10,7 @@
 
     <div class="sogat-card">
         <form wire:submit.prevent="guardar" class="w-full space-y-6" novalidate>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="w-full">
                     <x-input-label for="descripcion" :value="__('Nombre del Evento')" />
                     <x-text-input id="descripcion" wire:model.live="form.descripcion_evento" class="w-full" type="text"
@@ -23,8 +23,8 @@
                     <select id="tipo" wire:model.live="form.tipo_evento"
                         class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                         <option value="1">Feriado Nacional</option>
-                        <option value="2">Administrativo / Académico</option>
-                        <option value="3">Otros Eventos</option>
+                        <option value="2">Administrativo/Académico</option>
+                        <option value="3">Otros</option>
                     </select>
                     <x-input-error :messages="$errors->first('form.tipo_evento')" class="mt-2" />
                 </div>
@@ -32,10 +32,7 @@
 
 
                 <div class="w-full">
-                    <div class="flex items-center mb-2">
-                        <x-input-label for="id_color" :value="__('Color del Evento')" />
-                        <span class="text-red-500 ml-1">*</span>
-                    </div>
+                    <x-input-label for="id_color" :value="__('Color del Evento *')" />
                     <div x-data="{ 
                             open: false, 
                             selectedId: @entangle('form.id_color'),
@@ -51,7 +48,7 @@
                         }" 
                         class="relative w-full">
                         
-                        <button @click="open = !open" type="button" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm pl-3 pr-10 py-2 text-left focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm min-h-[42px]">
+                        <button @click="if(!open) $wire.cargarColores(); open = !open" type="button" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm pl-3 pr-10 py-2 text-left focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm min-h-[42px]">
                             <span class="flex items-center gap-2">
                                 <template x-if="selectedHex">
                                     <span class="w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm" :style="`background-color: ${selectedHex}`"></span>
@@ -72,7 +69,7 @@
                                         <div class="flex items-center gap-3">
                                             <span class="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm" style="background-color: {{ $color->codigo_color }}"></span>
                                             <span class="text-gray-900 dark:text-gray-200 font-medium">{{ $color->nombre_color }}</span>
-                                            <span class="text-blue-600 dark:text-blue-400 text-xs ml-auto" x-show="selectedId == {{ $color->id_color }}">(Seleccionado)</span>
+
                                         </div>
                                     </li>
                                 @endforeach
@@ -81,6 +78,19 @@
                     </div>
                     <x-input-error :messages="$errors->first('form.id_color')" class="mt-2" />
                 </div>
+                @if($form->tipo_evento != '1')
+                <x-toggle-switch 
+                    id="is_laborable" 
+                    :label="__('¿Es Laborable?')" 
+                    model="form.is_laborable" 
+                />
+
+                <x-toggle-switch 
+                    id="is_repetible" 
+                    :label="__('¿Es Repetible?')" 
+                    model="form.is_repetible" 
+                />
+                @endif
             </div>
 
             <div class="flex items-center justify-end gap-4">

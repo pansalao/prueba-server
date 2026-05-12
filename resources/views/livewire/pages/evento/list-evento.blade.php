@@ -21,6 +21,7 @@
                         <tr>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Nombre</th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Color</th>
+                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Tipo</th>
 
                             @can('cambiar-estatus-evento')
                                 <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
@@ -32,15 +33,36 @@
                     </thead>
                     <tbody>
                         @if ($eventos->isNotEmpty())
+                            @php
+                                $tipos = [
+                                    1 => 'Feriado Nacional',
+                                    2 => 'Administrativo/Académico',
+                                    3 => 'Otros'
+                                ];
+                                $defaultColors = [
+                                    1 => '#DC3545',
+                                    2 => '#007BFF',
+                                    3 => '#6c757d'
+                                ];
+                            @endphp
                             @foreach ($eventos as $evento)
+                                @php
+                                    // Fallback logic for stdClass or missing relations
+                                    $nombreTipo = $evento instanceof \App\Models\Evento ? $evento->tipo_evento_nombre : ($tipos[$evento->tipo_evento] ?? 'Desconocido');
+                                    $codigoColor = $evento instanceof \App\Models\Evento ? $evento->color : ($evento->color ?? ($defaultColors[$evento->tipo_evento] ?? '#6c757d'));
+                                    $nombreColor = $evento instanceof \App\Models\Evento ? $evento->nombre_color : ($evento->nombre_color ?? 'N/A');
+                                @endphp
                                 <tr wire:key="{{ $evento->id_evento }}"
                                     class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td class="px-4 py-4 text-gray-900 dark:text-white break-words">{{ $evento->nombre_evento }}</td>
                                     <td class="px-4 py-4 text-gray-900 dark:text-white">
                                         <div class="flex items-center gap-2">
-                                            <span class="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm" style="background-color: {{ $evento->color }}"></span>
-                                            <span class="text-sm">{{ $evento->nombre_color }}</span>
+                                            <span class="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm" style="background-color: {{ $codigoColor }}"></span>
+                                            <span class="text-sm">{{ $nombreColor }}</span>
                                         </div>
+                                    </td>
+                                    <td class="px-4 py-4 text-gray-900 dark:text-white">
+                                        {{ $nombreTipo }}
                                     </td>
 
 

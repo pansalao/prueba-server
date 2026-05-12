@@ -20,13 +20,30 @@ class CreateEvento extends Component
 
     public function mount()
     {
-        $this->colores = \Illuminate\Support\Facades\DB::table('color')->where('estatus', '1')->get();
+        $this->cargarColores();
+    }
+
+    public function cargarColores()
+    {
+        $this->colores = $this->eventoRepository->getColoresDisponibles();
     }
 
     public function updated($propertyName)
     {
         $field = str_replace('form.', '', $propertyName);
         $this->form->validateOnly($field);
+
+        // Si cambia el tipo de evento
+        if ($propertyName === 'form.tipo_evento') {
+            if ($this->form->tipo_evento == '1') {
+                $this->form->is_laborable = false;
+                $this->form->is_repetible = false;
+            } else {
+                // Para tipos 2 y 3, por defecto desmarcados
+                $this->form->is_laborable = false;
+                $this->form->is_repetible = false;
+            }
+        }
     }
 
     public function guardar()
