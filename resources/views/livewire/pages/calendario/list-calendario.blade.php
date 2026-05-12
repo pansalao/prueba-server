@@ -48,11 +48,13 @@
                                                     '1' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
                                                     '2' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
                                                     '3' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+                                                    '4' => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
                                                 ];
                                                 $statusLabels = [
                                                     '1' => 'Activo',
                                                     '2' => 'En revisión',
                                                     '3' => 'Inactivo',
+                                                    '4' => 'Incompleto',
                                                 ];
                                             @endphp
                                             <span class="{{ $statusClasses[$calendario->estatus] ?? $statusClasses['3'] }} text-xs font-medium px-2.5 py-0.5 rounded">
@@ -72,7 +74,7 @@
                                                 </a>
                                             @endif
 
-                                            @if($calendario->estatus == 2)
+                                            @if ($calendario->estatus == 2)
                                                 @can('cambiar-estatus-calendario')
                                                     <a href="{{ route('calendario.editar', $calendario->id_calendario_academico) }}"
                                                         class="flex items-center gap-1 bg-yellow-50 text-yellow-600 text-xs font-medium px-2.5 py-0.5 rounded hover:bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-200 dark:hover:bg-yellow-800">
@@ -81,7 +83,15 @@
                                                     </a>
                                                 @endcan
                                             @endif
-                                         </div>
+
+                                            @if ($calendario->estatus == 4)
+                                                <a href="{{ route('calendario.create', $calendario->id_calendario_academico) }}"
+                                                    class="flex items-center gap-1 bg-orange-50 text-orange-600 text-xs font-medium px-2.5 py-0.5 rounded hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-200 dark:hover:bg-orange-800">
+                                                    <span class="material-icons text-sm">play_arrow</span>
+                                                    Continuar
+                                                </a>
+                                            @endif
+                                        </div>
                                      </td>
 
 
