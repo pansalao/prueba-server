@@ -193,6 +193,7 @@
                                     nuevoTipo: @entangle('form.nuevoTipo'),
                                     nuevoLaborable: @entangle('form.nuevoLaborable'),
                                     nuevoRepetible: @entangle('form.nuevoRepetible'),
+                                    isCreatingEvento: @entangle('form.isCreatingEvento'),
 
                                     formatDate(dateStr) {
                                         if (!dateStr) return '';
@@ -409,6 +410,7 @@
                                              // No existe, abrir el modal de registro rápido
                                              this.showEventModal = false;
                                              this.showQuickModal = true;
+                                             this.isCreatingEvento = true;
                                          }
                                      },
 
@@ -443,7 +445,8 @@
                                          }
                                          this.selectedEventStart = ''; this.selectedEventEnd = ''; this.eventoNombre = '';
                                          this.eventoSeleccionado = ''; this.clickCount = 0;
-                                         this.nuevoColorId = ''; this.nuevoTipo = '1'; this.nuevoLaborable = false; this.nuevoRepetible = false;
+                                                                                   this.nuevoColorId = ''; this.nuevoTipo = '1'; this.nuevoLaborable = false; this.nuevoRepetible = false; this.isCreatingEvento = false;
+
                                      },
                                     eliminarEventoDesdeTooltip(ev) {
                                         let index = this.eventosAlpine.findIndex(e => e.id === ev.id && e.inicio === ev.inicio && e.fin === ev.fin);

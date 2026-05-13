@@ -18,6 +18,7 @@ class CreateCalendarioForm extends Form
     public $nuevoLaborable = false;
     public $nuevoRepetible = false;
     public $idEventoTemporal = null; // Para cuando se edite un evento existente
+    public $isCreatingEvento = false; // Controlar si se están aplicando las validaciones de creación rápida
 
     public function rules()
     {
@@ -37,42 +38,50 @@ class CreateCalendarioForm extends Form
                 'date',
                 'after_or_equal:dia_inicio_calendario_academico',
             ],
-            // Reglas para registro rápido
-            'nombreEventoTemporal' => [
-                'required', 'string', 'max:100',
-                function ($attribute, $value, $fail) {
-                    $exists = DB::table('evento')
-                        ->where('nombre_evento', $value)
-                        ->where('estatus', '!=', '3')
-                        ->when($this->idEventoTemporal, function ($q) {
-                            $q->where('id_evento', '!=', $this->idEventoTemporal);
-                        })
-                        ->exists();
-                    if ($exists) {
-                        $fail($this->idEventoTemporal ? 'Ya existe otro evento con esta descripción.' : 'Ya existe un evento con esta descripción.');
-                    }
-                },
-                'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\d\s\.,\-\(\)\"\':\/]+$/u'
-            ],
-            'nuevoTipo' => ['required', 'in:1,2,3'],
-            'nuevoLaborable' => ['required', 'boolean'],
-            'nuevoRepetible' => ['required', 'boolean'],
-            'nuevoColorId' => [
-                'required', 'exists:color,id_color',
-                function ($attribute, $value, $fail) {
-                    $exists = DB::table('evento')
-                        ->where('id_color', $value)
-                        ->where('estatus', '!=', '3')
-                        ->when($this->idEventoTemporal, function ($q) {
-                            $q->where('id_evento', '!=', $this->idEventoTemporal);
-                        })
-                        ->exists();
-                    if ($exists) {
-                        $fail('Este color ya está asignado a otro evento activo.');
-                    }
-                }
-            ],
         ];
+
+        if ($this->isCreatingEvento) {
+            $eventRules = [
+                // Reglas para registro rápido
+                'nombreEventoTemporal' => [
+                    'required', 'string', 'max:100',
+                    function ($attribute, $value, $fail) {
+                        $exists = DB::table('evento')
+                            ->where('nombre_evento', $value)
+                            ->where('estatus', '!=', '3')
+                            ->when($this->idEventoTemporal, function ($q) {
+                                $q->where('id_evento', '!=', $this->idEventoTemporal);
+                            })
+                            ->exists();
+                        if ($exists) {
+                            $fail($this->idEventoTemporal ? 'Ya existe otro evento con esta descripción.' : 'Ya existe un evento con esta descripción.');
+                        }
+                    },
+                    'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\d\s\.,\-\(\)\"\':\/]+$/u'
+                ],
+                'nuevoTipo' => ['required', 'in:1,2,3'],
+                'nuevoLaborable' => ['required', 'boolean'],
+                'nuevoRepetible' => ['required', 'boolean'],
+                'nuevoColorId' => [
+                    'required', 'exists:color,id_color',
+                    function ($attribute, $value, $fail) {
+                        $exists = DB::table('evento')
+                            ->where('id_color', $value)
+                            ->where('estatus', '!=', '3')
+                            ->when($this->idEventoTemporal, function ($q) {
+                                $q->where('id_evento', '!=', $this->idEventoTemporal);
+                            })
+                            ->exists();
+                        if ($exists) {
+                            $fail('Este color ya está asignado a otro evento activo.');
+                        }
+                    }
+                ],
+            ];
+            $rules = array_merge($rules, $eventRules);
+        }
+
+        return $rules;
     }
 
     public function messages()

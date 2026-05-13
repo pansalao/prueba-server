@@ -163,7 +163,23 @@ class CreateCalendario extends Component
 
     public function crearYAgregarEvento($inicio, $fin, $nombre, $tipo, $id_color, $is_laborable, $is_repetible)
     {
+        $this->form->isCreatingEvento = true;
+
         try {
+            // Validar usando las reglas del formulario
+            $validador = \Illuminate\Support\Facades\Validator::make(
+                $this->form->all(),
+                $this->form->rules(),
+                $this->form->messages()
+            );
+
+            if ($validador->fails()) {
+                $errores = $validador->errors()->all();
+                $msg = "Error al crear el nuevo evento:\n\n• " . implode("\n• ", $errores);
+                $this->showAlert('error', $msg);
+                return false;
+            }
+
             $id_evento = DB::table('evento')->insertGetId([
                 'id_color' => $id_color,
                 'nombre_evento' => mb_strtoupper($nombre),
@@ -188,6 +204,8 @@ class CreateCalendario extends Component
         } catch (Exception $e) {
             $this->js("alert('Error al crear el nuevo evento: " . addslashes($e->getMessage()) . "')");
             return false;
+        } finally {
+            $this->form->isCreatingEvento = false;
         }
     }
 
