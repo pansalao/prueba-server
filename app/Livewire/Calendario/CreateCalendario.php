@@ -143,6 +143,12 @@ class CreateCalendario extends Component
 
     public function crearYAgregarEvento($inicio, $fin, $nombre, $tipo, $id_color, $is_laborable, $is_repetible)
     {
+        // Enforce flags for National Holiday (type 1)
+        if ($tipo == '1') {
+            $is_laborable = false;
+            $is_repetible = false;
+        }
+
         $this->form->isCreatingEvento = true;
 
         try {

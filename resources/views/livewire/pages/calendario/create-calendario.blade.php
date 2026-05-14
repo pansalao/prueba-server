@@ -717,7 +717,7 @@
                                          {{-- Tipo de Evento --}}
                                          <div>
                                              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tipo de Evento</label>
-                                             <select x-model="nuevoTipo" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400">
+                                             <select x-model="nuevoTipo" wire:model.live="form.nuevoTipo" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400">
                                                  <option value="1">FERIADO NACIONAL</option>
                                                  <option value="2">ADMINISTRATIVO/ACADÉMICO</option>
                                                  <option value="3">OTROS</option>

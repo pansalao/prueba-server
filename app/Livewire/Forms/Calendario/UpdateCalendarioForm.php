@@ -48,8 +48,22 @@ class UpdateCalendarioForm extends Form
                     'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\d\s\.,\-\(\)\"\':\/]+$/u'
                 ],
                 'nuevoTipo' => ['required', 'in:1,2,3'],
-                'nuevoLaborable' => ['required', 'boolean'],
-                'nuevoRepetible' => ['required', 'boolean'],
+                'nuevoLaborable' => [
+                    'required', 'boolean',
+                    function ($attribute, $value, $fail) {
+                        if ($this->nuevoTipo == '1' && $value) {
+                            $fail('Un feriado nacional no puede ser marcado como laborable.');
+                        }
+                    }
+                ],
+                'nuevoRepetible' => [
+                    'required', 'boolean',
+                    function ($attribute, $value, $fail) {
+                        if ($this->nuevoTipo == '1' && $value) {
+                            $fail('Un feriado nacional no puede ser marcado como repetible.');
+                        }
+                    }
+                ],
                 'nuevoColorId' => [
                     'required', 'exists:color,id_color',
                     function ($attribute, $value, $fail) {
