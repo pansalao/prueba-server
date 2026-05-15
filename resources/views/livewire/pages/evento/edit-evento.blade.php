@@ -97,6 +97,14 @@
                     model="form.is_repetible" 
                 />
                 @endif
+
+                @if($form->tipo_evento != '1' && $form->tipo_evento != '2')
+                <x-toggle-switch 
+                    id="is_obligatorio_edit" 
+                    :label="__('¿Es Obligatorio?')" 
+                    model="form.is_obligatorio" 
+                />
+                @endif
             </div>
 
             <!-- Botones -->

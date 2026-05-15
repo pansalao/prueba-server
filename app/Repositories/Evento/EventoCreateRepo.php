@@ -16,6 +16,7 @@ class EventoCreateRepo
             'id_color'      => $data['id_color'] ?? null,
             'is_laborable_evento'  => $data['is_laborable'] ?? true,
             'is_repetible_evento'  => $data['is_repetible'] ?? false,
+            'is_obligatorio_evento' => $data['is_obligatorio'] ?? true,
             'estatus'       => '1',
         ]);
 

@@ -17,6 +17,7 @@ class Evento extends Model
     protected $casts = [
         'is_laborable_evento' => 'boolean',
         'is_repetible_evento' => 'boolean',
+        'is_obligatorio_evento' => 'boolean',
     ];
 
     public function color_rel()

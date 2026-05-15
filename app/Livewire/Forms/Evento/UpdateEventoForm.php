@@ -15,6 +15,7 @@ class UpdateEventoForm extends Form
     public $tipo_evento = '1';
     public $is_laborable = false;
     public $is_repetible = false;
+    public $is_obligatorio = true;
 
     public function setEvento($evento)
     {
@@ -22,8 +23,9 @@ class UpdateEventoForm extends Form
         $this->descripcion_evento = $evento->nombre_evento;
         $this->tipo_evento = $evento->tipo_evento;
         $this->id_color = $evento->id_color;
-        $this->is_laborable = (bool)$evento->is_laborable_evento;
-        $this->is_repetible = (bool)$evento->is_repetible_evento;
+        $this->is_laborable = (bool) $evento->is_laborable_evento;
+        $this->is_repetible = (bool) $evento->is_repetible_evento;
+        $this->is_obligatorio = (bool) $evento->is_obligatorio_evento;
     }
 
     protected function rules()
@@ -44,6 +46,7 @@ class UpdateEventoForm extends Form
             'tipo_evento' => ['required', 'in:1,2,3,4,5'],
             'is_laborable' => ['required', 'boolean'],
             'is_repetible' => ['required', 'boolean'],
+            'is_obligatorio' => ['required', 'boolean'],
             'id_color' => [
                 'required',
                 'exists:color,id_color',
@@ -70,6 +73,7 @@ class UpdateEventoForm extends Form
             'id_color.exists' => 'El color seleccionado no es válido.',
             'is_laborable.boolean' => 'El valor de laborable debe ser booleano.',
             'is_repetible.boolean' => 'El valor de repetible debe ser booleano.',
+            'is_obligatorio.boolean' => 'El valor de obligatorio debe ser booleano.',
         ];
     }
 }
