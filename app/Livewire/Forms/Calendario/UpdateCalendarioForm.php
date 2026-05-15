@@ -61,13 +61,13 @@ class UpdateCalendarioForm extends Form
                     },
                     'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\d\s\.,\-\(\)\"\':\/]+$/u'
                 ],
-                'nuevoTipo' => ['required', 'in:1,2,3'],
+                'nuevoTipo' => ['required', 'in:1,2,3,4,5'],
                 'nuevoLaborable' => [
                     'required',
                     'boolean',
                     function ($attribute, $value, $fail) {
-                        if ($this->nuevoTipo == '1' && $value) {
-                            $fail('Un feriado nacional no puede ser marcado como laborable.');
+                        if (($this->nuevoTipo == '1' || $this->nuevoTipo == '2') && $value) {
+                            $fail('Un feriado no puede ser marcado como laborable.');
                         }
                     }
                 ],
@@ -75,8 +75,8 @@ class UpdateCalendarioForm extends Form
                     'required',
                     'boolean',
                     function ($attribute, $value, $fail) {
-                        if ($this->nuevoTipo == '1' && $value) {
-                            $fail('Un feriado nacional no puede ser marcado como repetible.');
+                        if (($this->nuevoTipo == '1' || $this->nuevoTipo == '2') && $value) {
+                            $fail('Un feriado no puede ser marcado como repetible.');
                         }
                     }
                 ],
@@ -125,7 +125,7 @@ class UpdateCalendarioForm extends Form
     {
         $reglas = [
             'nombre' => ['required', 'string', 'max:255', 'regex:/^[A-Za-z0-9áéíóúÁÉÍÓÚñÑüÜ\d\s\.\,\-\(\)\"\':\/]+$/u'],
-            'tipo' => ['required', 'in:1,2,3,4'],
+            'tipo' => ['required', 'in:1,2,3,4,5'],
         ];
 
         $mensajes = [

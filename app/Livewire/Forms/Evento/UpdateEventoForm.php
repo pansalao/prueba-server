@@ -41,7 +41,7 @@ class UpdateEventoForm extends Form
                 },
                 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\d\s\.,\-\(\)\"\':\/]+$/u'
             ],
-            'tipo_evento' => ['required', 'in:1,2,3'],
+            'tipo_evento' => ['required', 'in:1,2,3,4,5'],
             'is_laborable' => ['required', 'boolean'],
             'is_repetible' => ['required', 'boolean'],
             'id_color' => [

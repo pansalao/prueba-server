@@ -27,8 +27,10 @@
                     <select id="tipo" wire:model.live="form.tipo_evento"
                         class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                         <option value="1">Feriado Nacional</option>
-                        <option value="2">Administrativo/Académico</option>
-                        <option value="3">Otros</option>
+                        <option value="2">Feriado Local</option>
+                        <option value="3">Administrativo</option>
+                        <option value="4">Académico</option>
+                        <option value="5">Vacaciones Colectivas</option>
                     </select>
                     <x-input-error :messages="$errors->first('form.tipo_evento')" class="mt-2" />
                 </div>
@@ -82,7 +84,7 @@
                     </div>
                     <x-input-error :messages="$errors->first('form.id_color')" class="mt-2" />
                 </div>
-                @if($form->tipo_evento != '1')
+                @if($form->tipo_evento != '1' && $form->tipo_evento != '2')
                 <x-toggle-switch 
                     id="is_laborable" 
                     :label="__('¿Es Laborable?')" 

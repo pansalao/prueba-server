@@ -321,6 +321,12 @@
                                         this.clickCount = 0;
                                         this.$watch('inicio', (val) => { if(val && fin) this.setupCalendar(); });
                                         this.$watch('fin', (val) => { if(val && inicio) this.setupCalendar(); });
+                                        this.$watch('nuevoTipo', (val) => {
+                                            if (val == '1' || val == '2') {
+                                                this.nuevoLaborable = false;
+                                                this.nuevoRepetible = false;
+                                            }
+                                        });
                                         this.$watch('eventosAlpine', () => {
                                             if (this.picker1) this.picker1.update();
                                             if (this.picker2) this.picker2.update();
@@ -779,14 +785,16 @@
                                                 de Evento</label>
                                             <select x-model="nuevoTipo" wire:model.live="form.nuevoTipo"
                                                 class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400">
-                                                <option value="1">FERIADO NACIONAL</option>
-                                                <option value="2">ADMINISTRATIVO/ACADÉMICO</option>
-                                                <option value="3">OTROS</option>
+                                                <option value="1">FERIADOS NACIONALES</option>
+                                                <option value="2">FERIADOS LOCALES</option>
+                                                <option value="3">ADMINISTRATIVO</option>
+                                                <option value="4">ACADÉMICO</option>
+                                                <option value="5">VACACIONES COLECTIVAS</option>
                                             </select>
                                         </div>
 
                                         {{-- Opciones adicionales --}}
-                                        <div class="space-y-4 pt-2" x-show="nuevoTipo != '1'"
+                                        <div class="space-y-4 pt-2" x-show="nuevoTipo != '1' && nuevoTipo != '2'"
                                             x-transition:enter="transition ease-out duration-300"
                                             x-transition:enter-start="opacity-0 -translate-y-2"
                                             x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">

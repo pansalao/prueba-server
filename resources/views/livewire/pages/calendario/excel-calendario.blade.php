@@ -10,22 +10,32 @@
         $startDate = \Carbon\Carbon::parse($calendario->dia_inicio_calendario_academico)->startOfDay();
         $endDate = \Carbon\Carbon::parse($calendario->dia_fin_calendario_academico)->endOfDay();
         $mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        $academicos = $eventos->where('tipo_evento', 1)->sortBy('dia_inicio_evento');
-        $festivos   = $eventos->where('tipo_evento', 2)->sortBy('dia_inicio_evento');
-        $otros      = $eventos->where('tipo_evento', 3)->sortBy('dia_inicio_evento');
+        $f_nacionales = $eventos->where('tipo_evento', 1)->sortBy('dia_inicio_evento');
+        $f_locales    = $eventos->where('tipo_evento', 2)->sortBy('dia_inicio_evento');
+        $administrativos = $eventos->where('tipo_evento', 3)->sortBy('dia_inicio_evento');
+        $academicos   = $eventos->where('tipo_evento', 4)->sortBy('dia_inicio_evento');
+        $vacaciones   = $eventos->where('tipo_evento', 5)->sortBy('dia_inicio_evento');
 
         $eventosAgrupados = [];
+        if ($f_nacionales->count() > 0) {
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'FERIADOS NACIONALES'];
+            foreach ($f_nacionales as $e) { $eventosAgrupados[] = $e; }
+        }
+        if ($f_locales->count() > 0) {
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'FERIADOS LOCALES'];
+            foreach ($f_locales as $e) { $eventosAgrupados[] = $e; }
+        }
+        if ($administrativos->count() > 0) {
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'ADMINISTRATIVO'];
+            foreach ($administrativos as $e) { $eventosAgrupados[] = $e; }
+        }
         if ($academicos->count() > 0) {
-            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'ACADÉMICOS'];
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'ACADÉMICO'];
             foreach ($academicos as $e) { $eventosAgrupados[] = $e; }
         }
-        if ($festivos->count() > 0) {
-            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'FESTIVOS'];
-            foreach ($festivos as $e) { $eventosAgrupados[] = $e; }
-        }
-        if ($otros->count() > 0) {
-            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'OTROS'];
-            foreach ($otros as $e) { $eventosAgrupados[] = $e; }
+        if ($vacaciones->count() > 0) {
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'VACACIONES COLECTIVAS'];
+            foreach ($vacaciones as $e) { $eventosAgrupados[] = $e; }
         }
 
         $eventosSorted = collect($eventosAgrupados);

@@ -29,7 +29,7 @@ class CreateEventoForm extends Form
             ],
             'tipo_evento' => [
                 'required',
-                'in:1,2,3'
+                'in:1,2,3,4,5'
             ],
             'is_laborable' => ['required', 'boolean'],
             'is_repetible' => ['required', 'boolean'],

@@ -52,7 +52,7 @@ class UpdateEvento extends Component
 
         // Si cambia el tipo de evento
         if ($propertyName === 'form.tipo_evento') {
-            if ($this->form->tipo_evento == '1') {
+            if ($this->form->tipo_evento == '1' || $this->form->tipo_evento == '2') {
                 $this->form->is_laborable = false;
                 $this->form->is_repetible = false;
             }
