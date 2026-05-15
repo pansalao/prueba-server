@@ -440,7 +440,7 @@
                                          if(!this.eventoNombre || !this.eventoNombre.trim()) { alert('Debe ingresar un nombre para el evento.'); return; }
                                          
                                          // Buscar si el nombre existe en la biblioteca
-                                         const existing = this.bibliotecaAlpine.find(o => o.nombre_evento.toUpperCase() === this.eventoNombre.trim().toUpperCase());
+                                         const existing = this.bibliotecaAlpine.find(o => o.nombre_evento.trim().toUpperCase() === this.eventoNombre.trim().toUpperCase());
                                          
                                          if (existing) {
                                              this.eventoSeleccionado = existing.id_evento;
