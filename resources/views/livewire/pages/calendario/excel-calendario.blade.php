@@ -47,11 +47,11 @@
     {{-- Título General con Rango de Años --}}
     <thead style="font-weight: bold;">
         <tr>
-            <th colspan="25" style="text-align: center; font-size: 14pt;">CALENDARIO ACADÉMICO {{ $startYear }} -
+            <th colspan="33" style="text-align: center; font-size: 14pt;">CALENDARIO ACADÉMICO {{ $startYear }} -
                 {{ $endYear }}</th>
         </tr>
         <tr>
-            <th colspan="25" style="text-align: center;"><strong>Vigencia:</strong>
+            <th colspan="33" style="text-align: center;"><strong>Vigencia:</strong>
                 {{ \Carbon\Carbon::parse($calendario->dia_inicio_calendario_academico)->format('d/m/Y') }} hasta
                 {{ \Carbon\Carbon::parse($calendario->dia_fin_calendario_academico)->format('d/m/Y') }}</th>
         </tr>
@@ -113,6 +113,9 @@
                         {{ $mesesNombres[$m - 1] }} {{ $y }}</td>
                     <td style="width: 20px;"></td>
                 @endforeach
+                @if(count($chunk) < 3)
+                    <td colspan="{{ (3 - count($chunk)) * 8 }}"></td>
+                @endif
                 @if($chunkIndex == 0)
                     <td colspan="9" style="text-align: center; background-color: #f2f2f2; border: 1px solid #000; font-size: 11pt; font-weight: bold;">EVENTOS DEL
                         CALENDARIO</td>
@@ -150,6 +153,9 @@
                     <td style="border: 0.5px solid #000; text-align: center; font-size: 11pt;">S</td>
                     <td></td>
                 @endforeach
+                @if(count($chunk) < 3)
+                    <td colspan="{{ (3 - count($chunk)) * 8 }}"></td>
+                @endif
                 @if($chunkIndex == 0)
                     <td colspan="4" style="border: 1px solid #000; background-color: #f2f2f2; font-size: 11pt; font-weight: bold; text-align: left; padding-left: 5px;">Evento</td>
                     <td colspan="3" style="border: 1px solid #000; background-color: #f2f2f2; font-size: 11pt; font-weight: bold; text-align: center;">Fecha</td>
@@ -218,6 +224,9 @@
                         @endfor
                         <td></td>
                     @endforeach
+                    @if(count($chunk) < 3)
+                        <td colspan="{{ (3 - count($chunk)) * 8 }}"></td>
+                    @endif
 
                     {{-- Eventos --}}
                     @if($eventoIndex < $totalEventos)
