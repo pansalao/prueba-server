@@ -139,25 +139,9 @@
                         :class="openSection === 'fechas' ? 'rotate-180' : ''">expand_more</span>
                 </div>
                 <div x-show="openSection === 'fechas'" x-collapse class="p-4 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto mt-4">
-                        <div class="w-full">
-                            <x-input-label for="dia_inicio_calendario_academico" :value="__('Inicio del Período')" />
-                            <x-text-input id="dia_inicio_calendario_academico" type="date"
-                                wire:model.live="form.dia_inicio_calendario_academico"
-                                class="w-full mt-1 date-input-dark" required />
-                        </div>
-                        <div class="w-full">
-                            <x-input-label for="dia_fin_calendario_academico" :value="__('Fin del Período')" />
-                            <x-text-input id="dia_fin_calendario_academico" type="date"
-                                wire:model.live="form.dia_fin_calendario_academico" class="w-full mt-1 date-input-dark"
-                                required />
-                        </div>
-                    </div>
-
-                    {{-- Selección de Tipo de Calendario --}}
-                    <div class="max-w-4xl mx-auto">
-                        <x-input-label :value="__('Tipo de Régimen / Calendario')"
-                            class="mb-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest" />
+                    {{-- 1. Selección de Tipo de Calendario (AHORA ARRIBA) --}}
+                    <div class="max-w-4xl mx-auto mt-4">
+                        <x-input-label :value="__('Tipo de Calendario')" class="mb-2" />
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {{-- Semestral --}}
                             <label
@@ -173,7 +157,7 @@
                                         <div class="text-left">
                                             <p
                                                 class="font-black text-sm text-gray-900 dark:text-gray-100 uppercase tracking-tight">
-                                                TIPO 1 - SEMESTRAL</p>
+                                                SEMESTRAL</p>
                                             <p
                                                 class="text-gray-500 dark:text-gray-400 text-[10px] mt-0.5 font-bold uppercase tracking-widest">
                                                 18 SEMANAS ACADÉMICAS</p>
@@ -198,7 +182,7 @@
                                         <div class="text-left">
                                             <p
                                                 class="font-black text-sm text-gray-900 dark:text-gray-100 uppercase tracking-tight">
-                                                TIPO 2 - ANUAL</p>
+                                                ANUAL</p>
                                             <p
                                                 class="text-gray-500 dark:text-gray-400 text-[10px] mt-0.5 font-bold uppercase tracking-widest">
                                                 52 SEMANAS ACADÉMICAS</p>
@@ -208,6 +192,22 @@
                                         class="material-icons text-blue-500">check_circle</span>
                                 </div>
                             </label>
+                        </div>
+                    </div>
+
+                    {{-- Selección de Fechas (AHORA ABAJO) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto">
+                        <div class="w-full">
+                            <x-input-label for="dia_inicio_calendario_academico" :value="__('Inicio del Período')" />
+                            <x-text-input id="dia_inicio_calendario_academico" type="date"
+                                wire:model.live="form.dia_inicio_calendario_academico"
+                                class="w-full mt-1 date-input-dark" required />
+                        </div>
+                        <div class="w-full">
+                            <x-input-label for="dia_fin_calendario_academico" :value="__('Fin del Período')" />
+                            <x-text-input id="dia_fin_calendario_academico" type="date"
+                                wire:model.live="form.dia_fin_calendario_academico" class="w-full mt-1 date-input-dark"
+                                required />
                         </div>
                     </div>
                     <div
