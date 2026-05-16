@@ -19,6 +19,7 @@ class EditarCalendario extends Component
     protected $viewRepository;
 
     public $eventosRegistrados = [];
+    public $eventosPorFecha = []; // Mapa de eventos agrupados por fecha
     public $bibliotecaEventos = [];
     public $currentYear;
     public $id_calendario;
@@ -53,12 +54,15 @@ class EditarCalendario extends Component
 
         foreach ($eventos as $ev) {
             $this->eventosRegistrados[] = [
-                'id' => $ev->id,
-                'inicio' => $ev->inicio,
-                'fin' => $ev->fin,
-                'nombre' => $ev->nombre,
-                'tipo' => $ev->tipo,
-                'color' => $ev->color,
+                'id' => (int) $ev->id,
+                'inicio' => (string) $ev->inicio,
+                'fin' => (string) $ev->fin,
+                'nombre' => (string) $ev->nombre,
+                'nombre_evento' => (string) $ev->nombre,
+                'tipo' => (string) $ev->tipo,
+                'color' => (string) $ev->color,
+                'is_rango_dias_evento' => (bool) ($ev->is_rango_dias_evento ?? false),
+                'rango_dias_evento' => $ev->rango_dias_evento ?? null,
             ];
         }
 
@@ -66,6 +70,7 @@ class EditarCalendario extends Component
         $eventoRepo = new EventoIndexRepo();
         $this->bibliotecaEventos = $eventoRepo->obtenerBiblioteca();
         $this->cargarColoresDisponibles();
+        $this->actualizarMapaEventos();
     }
 
     public function cargarColoresDisponibles()
@@ -107,49 +112,73 @@ class EditarCalendario extends Component
         });
 
         $this->eventosRegistrados = array_values($this->eventosRegistrados);
+        $this->actualizarMapaEventos();
     }
 
-    public function agregarEvento($inicio, $fin, $id_evento, $nombre, $tipo, $color)
+    public function agregarEvento($inicio, $fin, $id_evento, $nombre = null, $tipo = null, $color = null)
     {
-        $this->form->validarEvento($nombre, $tipo);
+        $eventoInfo = \App\Models\Evento::find($id_evento);
 
-        if (empty($id_evento) || empty($nombre) || empty($tipo)) {
-            return;
-        }
-
-        // Validación: No permitir que un evento inicie o termine en fin de semana
-        if (date('N', strtotime($inicio)) >= 6 || date('N', strtotime($fin)) >= 6) {
-            $this->js("alert('Los eventos no pueden iniciar ni finalizar en días de fin de semana (Sábado o Domingo).')");
-            return;
-        }
-
-        // Validación de duplicados
-        $isRepetible = false;
-        $eventoInfo = collect($this->bibliotecaEventos)->firstWhere('id_evento', $id_evento);
-        if ($eventoInfo && $eventoInfo->is_repetible_evento) {
-            $isRepetible = true;
-        }
-
-        if (!$isRepetible) {
-            foreach ($this->eventosRegistrados as $evento) {
-                if (isset($evento['id']) && $evento['id'] == $id_evento) {
-                    return;
-                }
+        // Buscar info fresca de la base de datos
+        if (!$eventoInfo) {
+            $eventoRepo = new \App\Repositories\Evento\EventoIndexRepo();
+            $biblioteca = $eventoRepo->obtenerBiblioteca();
+            $info = collect($biblioteca)->firstWhere('id_evento', $id_evento);
+            if ($info) {
+                $nombre = (string)$info->nombre_evento;
+                $color = (string)$info->codigo_color;
+                $tipo = (string)$info->tipo_evento;
             }
+        } else {
+            $nombre = (string)$eventoInfo->nombre_evento;
+            // Intentar obtener el color desde la relación o fallback
+            $color = (string)($eventoInfo->color_rel ? $eventoInfo->color_rel->codigo_color : $color);
+            $tipo = (string)$eventoInfo->id_tipo_evento;
         }
 
-        $this->eventosRegistrados[] = [
-            'id' => $id_evento,
-            'inicio' => $inicio,
-            'fin' => $fin,
-            'nombre' => $nombre,
-            'tipo' => $tipo,
-            'color' => $color,
-            'is_rango_dias_evento' => $eventoInfo->is_rango_dias_evento ?? false,
-            'rango_dias_evento' => $eventoInfo->rango_dias_evento ?? null,
+        $nuevoEvento = [
+            'id' => (int)$id_evento,
+            'inicio' => (string)$inicio,
+            'fin' => (string)$fin,
+            'nombre_evento' => (string)$nombre,
+            'tipo' => (string)$tipo,
+            'color' => (string)$color,
+            'is_rango_dias_evento' => $eventoInfo ? (bool)$eventoInfo->is_rango_dias_evento : false,
+            'rango_dias_evento' => $eventoInfo ? $eventoInfo->rango_dias_evento : null,
         ];
 
+        $this->eventosRegistrados[] = $nuevoEvento;
+        $this->actualizarMapaEventos();
         $this->guardarBorrador();
+    }
+
+    /**
+     * Organiza los eventos en un mapa indexado por fecha
+     */
+    public function actualizarMapaEventos()
+    {
+        $mapa = [];
+        foreach ($this->eventosRegistrados as $ev) {
+            $actual = \Carbon\Carbon::parse($ev['inicio']);
+            $fin = \Carbon\Carbon::parse($ev['fin']);
+
+            while ($actual->lte($fin)) {
+                $fechaStr = $actual->format('Y-m-d');
+                if (!isset($mapa[$fechaStr])) {
+                    $mapa[$fechaStr] = [];
+                }
+                $mapa[$fechaStr][] = [
+                    'id' => $ev['id'],
+                    'nombre_evento' => $ev['nombre_evento'],
+                    'color' => $ev['color'],
+                    'inicio' => $ev['inicio'],
+                    'fin' => $ev['fin'],
+                    'tipo' => $ev['tipo']
+                ];
+                $actual->addDay();
+            }
+        }
+        $this->eventosPorFecha = $mapa;
     }
 
     public function removerEvento($index)
