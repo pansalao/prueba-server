@@ -160,12 +160,12 @@ class CreateCalendario extends Component
                     $mapa[$fechaStr] = [];
                 }
                 $mapa[$fechaStr][] = [
-                    'id' => $ev['id'],
-                    'nombre_evento' => $ev['nombre_evento'],
-                    'color' => $ev['color'],
-                    'inicio' => $ev['inicio'],
-                    'fin' => $ev['fin'],
-                    'tipo' => $ev['tipo']
+                    'id' => $ev['id'] ?? null,
+                    'nombre_evento' => $ev['nombre_evento'] ?? $ev['nombre'] ?? 'Sin nombre',
+                    'color' => $ev['color'] ?? '#333',
+                    'inicio' => $ev['inicio'] ?? $fechaStr,
+                    'fin' => $ev['fin'] ?? $fechaStr,
+                    'tipo' => $ev['tipo'] ?? '1'
                 ];
                 $actual->addDay();
             }
