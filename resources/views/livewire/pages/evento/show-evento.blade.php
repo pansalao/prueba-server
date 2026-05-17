@@ -48,6 +48,22 @@
                             </p>
                         </div>
 
+                        {{-- Evento Especial --}}
+                        <div>
+                            <x-input-label value="Evento Especial:" />
+                            <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                @if($evento->especial_evento == 1)
+                                    Vacaciones Colectivas
+                                @elseif($evento->especial_evento == 2)
+                                    Inicio del Lapso Académico
+                                @elseif($evento->especial_evento == 3)
+                                    Fin del Lapso Académico
+                                @else
+                                    Ninguno
+                                @endif
+                            </p>
+                        </div>
+
                         {{-- Color --}}
                         <div>
                             <x-input-label value="Color Asignado:" />

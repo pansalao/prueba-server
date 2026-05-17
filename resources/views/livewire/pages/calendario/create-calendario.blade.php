@@ -837,7 +837,7 @@
                                                     <option value="2">FERIADOS LOCALES</option>
                                                     <option value="3">ADMINISTRATIVO</option>
                                                     <option value="4">ACADÉMICO</option>
-                                                    <option value="5">VACACIONES COLECTIVAS</option>
+                                                    <option value="5">ADMINISTRATIVO/ACADÉMICO</option>
                                                 </select>
                                             </div>
                                         </div>

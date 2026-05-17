@@ -13,6 +13,7 @@ class EventoCreateRepo
         $evento = Evento::create([
             'nombre_evento' => $data['descripcion_evento'],
             'tipo_evento'   => $data['tipo_evento'] ?? null,
+            'especial_evento' => ($data['is_especial'] ?? false) ? (empty($data['especial_evento']) ? null : $data['especial_evento']) : null,
             'id_color'      => $data['id_color'] ?? null,
             'is_laborable_evento'  => $data['is_laborable'] ?? true,
             'is_repetible_evento'  => $data['is_repetible'] ?? false,

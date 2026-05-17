@@ -52,6 +52,12 @@ class CreateEvento extends Component
             }
         }
 
+        // Limpiar especial_evento si el switch se apaga
+        if ($propertyName === 'form.is_especial' && !$this->form->is_especial) {
+            $this->form->especial_evento = '';
+            $this->resetErrorBag('form.especial_evento');
+        }
+
         // Limpiar rango de días si el switch se apaga
         if ($propertyName === 'form.is_rango_dias' && !$this->form->is_rango_dias) {
             $this->form->rango_dias = '';
@@ -65,7 +71,7 @@ class CreateEvento extends Component
             $this->form->validate();
             $id_repo = $this->eventoRepository->crear($this->form->all());
 
-            $this->reset('form.descripcion_evento', 'form.tipo_evento', 'form.id_color');
+            $this->reset('form.descripcion_evento', 'form.tipo_evento', 'form.id_color', 'form.especial_evento', 'form.is_especial');
             $this->refreshEventos();
             $this->showAlert('success', 'Evento creado correctamente.');
         } catch (\Illuminate\Validation\ValidationException $e) {

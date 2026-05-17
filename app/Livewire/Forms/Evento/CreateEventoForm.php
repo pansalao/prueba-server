@@ -9,6 +9,8 @@ class CreateEventoForm extends Form
     public $id_color = '';
     public $descripcion_evento = '';
     public $tipo_evento = '1';
+    public $especial_evento = '';
+    public $is_especial = false;
     public $is_laborable = false;
     public $is_repetible = false;
     public $is_rango_dias = false;
@@ -32,6 +34,15 @@ class CreateEventoForm extends Form
             'tipo_evento' => [
                 'required',
                 'in:1,2,3,4,5'
+            ],
+            'is_especial' => [
+                'required',
+                'boolean'
+            ],
+            'especial_evento' => [
+                'required_if:is_especial,true',
+                'nullable',
+                'in:1,2,3'
             ],
             'is_laborable' => ['required', 'boolean'],
             'is_repetible' => ['required', 'boolean'],
@@ -59,6 +70,8 @@ class CreateEventoForm extends Form
             'descripcion_evento.regex' => 'Formato inválido en la descripción.',
             'tipo_evento.required' => 'El tipo de evento es obligatorio.',
             'tipo_evento.in' => 'El tipo de evento no es válido.',
+            'especial_evento.required_if' => 'Debe seleccionar qué tipo de evento especial es.',
+            'especial_evento.in' => 'El evento especial seleccionado no es válido.',
             'id_color.required' => 'El color es obligatorio.',
             'id_color.exists' => 'El color seleccionado no es válido.',
             'is_laborable.boolean' => 'El valor de laborable debe ser booleano.',

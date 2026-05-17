@@ -14,7 +14,7 @@
         $f_locales    = $eventos->where('tipo_evento', 2)->sortBy('dia_inicio_evento');
         $administrativos = $eventos->where('tipo_evento', 3)->sortBy('dia_inicio_evento');
         $academicos   = $eventos->where('tipo_evento', 4)->sortBy('dia_inicio_evento');
-        $vacaciones   = $eventos->where('tipo_evento', 5)->sortBy('dia_inicio_evento');
+        $admin_acad   = $eventos->where('tipo_evento', 5)->sortBy('dia_inicio_evento');
 
         $eventosAgrupados = [];
         if ($f_nacionales->count() > 0) {
@@ -33,9 +33,9 @@
             $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'ACADÉMICO'];
             foreach ($academicos as $e) { $eventosAgrupados[] = $e; }
         }
-        if ($vacaciones->count() > 0) {
-            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'VACACIONES COLECTIVAS'];
-            foreach ($vacaciones as $e) { $eventosAgrupados[] = $e; }
+        if ($admin_acad->count() > 0) {
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'ADMINISTRATIVO/ACADÉMICO'];
+            foreach ($admin_acad as $e) { $eventosAgrupados[] = $e; }
         }
 
         $eventosSorted = collect($eventosAgrupados);

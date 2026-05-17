@@ -45,7 +45,7 @@ class Evento extends Model
             2 => 'Feriado Local', 
             3 => 'Administrativo',
             4 => 'Académico',
-            5 => 'Vacaciones Colectivas'
+            5 => 'Administrativo/Académico'
         ];
         return $tipos[$this->tipo_evento] ?? 'Desconocido';
     }

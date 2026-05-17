@@ -15,6 +15,7 @@ class EventoUpdateRepo
             $evento->update([
                 'nombre_evento' => $data['descripcion_evento'],
                 'tipo_evento'   => $data['tipo_evento'],
+                'especial_evento' => ($data['is_especial'] ?? false) ? (empty($data['especial_evento']) ? null : $data['especial_evento']) : null,
                 'id_color'      => $data['id_color'],
                 'is_laborable_evento'  => $data['is_laborable'],
                 'is_repetible_evento'  => $data['is_repetible'],

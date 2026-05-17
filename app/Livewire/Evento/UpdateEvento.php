@@ -58,6 +58,12 @@ class UpdateEvento extends Component
             }
         }
 
+        // Limpiar especial_evento si el switch se apaga
+        if ($propertyName === 'form.is_especial' && !$this->form->is_especial) {
+            $this->form->especial_evento = '';
+            $this->resetErrorBag('form.especial_evento');
+        }
+
         // Limpiar rango de días si el switch se apaga
         if ($propertyName === 'form.is_rango_dias' && !$this->form->is_rango_dias) {
             $this->form->rango_dias = '';

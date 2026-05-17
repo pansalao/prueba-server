@@ -17,6 +17,22 @@
                         wire:model.live="form.descripcion_evento" placeholder="Ej: Congreso Nacional" required />
                 </div>
 
+                <x-toggle-switch id="is_especial" :label="__('¿Es un Evento Especial?')" model="form.is_especial" />
+
+                @if($form->is_especial)
+                    <div class="w-full">
+                        <x-input-label for="especial" :value="__('Seleccione Evento Especial')" />
+                        <select id="especial" wire:model.live="form.especial_evento"
+                            class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                            <option value="">Seleccione...</option>
+                            <option value="1">Vacaciones Colectivas</option>
+                            <option value="2">Inicio del Lapso Académico</option>
+                            <option value="3">Fin del Lapso Académico</option>
+                        </select>
+                        <x-input-error :messages="$errors->first('form.especial_evento')" class="mt-2" />
+                    </div>
+                @endif
+
                 <div class="w-full">
                     <x-input-label for="tipo" :value="__('Tipo de Evento')" />
                     <select id="tipo" wire:model.live="form.tipo_evento"
@@ -25,7 +41,7 @@
                         <option value="2">Feriado Local</option>
                         <option value="3">Administrativo</option>
                         <option value="4">Académico</option>
-                        <option value="5">Vacaciones Colectivas</option>
+                        <option value="5">Administrativo/Académico</option>
                     </select>
                     <x-input-error :messages="$errors->first('form.tipo_evento')" class="mt-2" />
                 </div>

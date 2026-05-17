@@ -39,7 +39,7 @@
                                     2 => 'Feriado Local',
                                     3 => 'Administrativo',
                                     4 => 'Académico',
-                                    5 => 'Vacaciones Colectivas'
+                                    5 => 'Administrativo/Académico'
                                 ];
                                 $defaultColors = [
                                     1 => '#DC3545', // Rojo
