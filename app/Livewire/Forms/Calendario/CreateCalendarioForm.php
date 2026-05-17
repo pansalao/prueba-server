@@ -231,6 +231,36 @@ class CreateCalendarioForm extends Form
             }
         }
 
+        // 3. Validar que exista exactamente un evento de tipo 'Inicio del Lapso Académico' (especial_evento = 2)
+        // y un evento de tipo 'Fin del Lapso Académico' (especial_evento = 3)
+        $eventosDb = \App\Models\Evento::whereIn('id_evento', $idsRegistrados)->get()->keyBy('id_evento');
+        $countInicio = 0;
+        $countFin = 0;
+
+        foreach ($eventosRegistrados as $reg) {
+            $id = $reg['id'] ?? null;
+            if ($id && isset($eventosDb[$id])) {
+                $esp = $eventosDb[$id]->especial_evento;
+                if ($esp == '2') {
+                    $countInicio++;
+                } elseif ($esp == '3') {
+                    $countFin++;
+                }
+            }
+        }
+
+        if ($countInicio !== 2) {
+            $msg = "El calendario debe contener exactamente dos eventos especiales de tipo \"Inicio del Lapso Académico\".";
+            $this->addError('eventosRegistrados', $msg);
+            $errores[] = [$msg];
+        }
+
+        if ($countFin !== 2) {
+            $msg = "El calendario debe contener exactamente dos eventos especiales de tipo \"Fin del Lapso Académico\".";
+            $this->addError('eventosRegistrados', $msg);
+            $errores[] = [$msg];
+        }
+
         if (count($errores) > 0) {
             // Aplanar array de errores si es necesario
             $todosLosErrores = [];

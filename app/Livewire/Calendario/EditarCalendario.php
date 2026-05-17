@@ -364,6 +364,12 @@ class EditarCalendario extends Component
         $idsAsignados = collect($this->eventosRegistrados)->pluck('id')->filter()->toArray();
 
         return $biblioteca->filter(function ($evento) use ($idsAsignados) {
+            // Si es un evento especial de tipo 2 (Inicio) o 3 (Fin) y ya está asignado, no lo mostramos
+            $especial = $evento->especial_evento ?? null;
+            if (in_array($especial, ['2', '3']) && in_array($evento->id_evento, $idsAsignados)) {
+                return false;
+            }
+
             // Si el evento es repetible, siempre aparece.
             // Si NO es repetible, solo aparece si NO ha sido asignado aún.
             return $evento->is_repetible_evento || !in_array($evento->id_evento, $idsAsignados);
