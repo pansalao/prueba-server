@@ -227,8 +227,9 @@
                                     nuevoTipo: @entangle('form.nuevoTipo'),
                                     nuevoLaborable: @entangle('form.nuevoLaborable'),
                                      nuevoRepetible: @entangle('form.nuevoRepetible'),
-                                     nuevoIsRangoDias: @entangle('form.nuevoIsRangoDias'),
-                                     nuevoRangoDias: @entangle('form.nuevoRangoDias'),
+                                      nuevoIsRangoDias: @entangle('form.nuevoIsRangoDias'),
+                                      nuevoRangoDias: @entangle('form.nuevoRangoDias'),
+                                      nuevoIsIndependiente: @entangle('form.nuevoIsIndependiente'),
 
 
                                     formatDate(dateStr) {
@@ -548,7 +549,7 @@
                                          }
                                          this.selectedEventStart = ''; this.selectedEventEnd = ''; this.eventoNombre = '';
                                          this.eventoSeleccionado = ''; this.clickCount = 0;
-                                         this.nuevoColorId = ''; this.nuevoTipo = '1'; this.nuevoLaborable = false; this.nuevoRepetible = false; this.nuevoIsRangoDias = false; this.nuevoRangoDias = '';
+                                         this.nuevoColorId = ''; this.nuevoTipo = '1'; this.nuevoLaborable = false; this.nuevoRepetible = false; this.nuevoIsRangoDias = false; this.nuevoRangoDias = ''; this.nuevoIsIndependiente = true;
                                      },
                                      eliminarEventoDesdeTooltip(ev) {
                                         let index = this.eventosAlpine.findIndex(e => e.id === ev.id && e.inicio === ev.inicio && e.fin === ev.fin);
@@ -918,6 +919,15 @@
                                                         class="w-full block" wire:model.live="form.nuevoRangoDias"
                                                         placeholder="EJ: 5" min="1" max="90" />
                                                     <x-input-error :messages="$errors->get('form.nuevoRangoDias')"
+                                                        class="mt-2" />
+                                                </div>
+                                            </div>
+
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <x-toggle-switch id="nuevo_is_independiente_switch_edit" :label="__('¿Es Independiente?')"
+                                                        model="form.nuevoIsIndependiente" />
+                                                    <x-input-error :messages="$errors->get('form.nuevoIsIndependiente')"
                                                         class="mt-2" />
                                                 </div>
                                             </div>

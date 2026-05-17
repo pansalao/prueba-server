@@ -48,9 +48,11 @@ class CreateCalendario extends Component
             if ($this->form->nuevoTipo == '1' || $this->form->nuevoTipo == '2') {
                 $this->form->nuevoLaborable = false;
                 $this->form->nuevoRepetible = false;
+                $this->form->nuevoIsIndependiente = true;
             } else {
                 $this->form->nuevoLaborable = false;
                 $this->form->nuevoRepetible = false;
+                $this->form->nuevoIsIndependiente = false;
             }
         }
     }
@@ -241,6 +243,7 @@ class CreateCalendario extends Component
                 'is_repetible' => $is_repetible,
                 'is_rango_dias' => $is_rango_dias,
                 'rango_dias' => $rango_dias,
+                'is_independiente' => $this->form->nuevoIsIndependiente,
             ]);
 
             $colorObj = $eventoRepo->obtenerColorPorId($id_color);

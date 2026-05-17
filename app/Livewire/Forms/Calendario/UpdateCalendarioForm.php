@@ -21,6 +21,7 @@ class UpdateCalendarioForm extends Form
     public $nuevoRepetible = false;
     public $nuevoIsRangoDias = false;
     public $nuevoRangoDias = '';
+    public $nuevoIsIndependiente = true;
     public $idEventoTemporal = null;
     public $isCreatingEvento = false;
 
@@ -91,6 +92,15 @@ class UpdateCalendarioForm extends Form
                     'min:1',
                     'max:90'
                 ],
+                'nuevoIsIndependiente' => [
+                    'required',
+                    'boolean',
+                    function ($attribute, $value, $fail) {
+                        if (in_array($this->nuevoTipo, ['1', '2']) && !$value) {
+                            $fail('Para los feriados nacionales y locales, el evento debe ser obligatoriamente Independiente.');
+                        }
+                    }
+                ],
                 'nuevoColorId' => [
                     'required',
                     'exists:color,id_color',
@@ -121,6 +131,8 @@ class UpdateCalendarioForm extends Form
             'nombreEventoTemporal.regex' => 'Formato inválido en la descripción.',
             'nuevoTipo.required' => 'El tipo de evento es obligatorio.',
             'nuevoColorId.required' => 'El color es obligatorio.',
+            'nuevoIsIndependiente.required' => 'El campo independiente es obligatorio.',
+            'nuevoIsIndependiente.boolean' => 'El campo independiente debe ser un valor booleano.',
         ];
     }
 

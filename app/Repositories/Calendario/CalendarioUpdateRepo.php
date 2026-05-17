@@ -125,7 +125,7 @@ class CalendarioUpdateRepo
      */
     public function crearTemplate($data)
     {
-        return DB::table('evento')->insertGetId([
+        $insert = [
             'id_color' => $data['id_color'],
             'nombre_evento' => mb_strtoupper($data['nombre']),
             'tipo_evento' => $data['tipo'],
@@ -134,6 +134,17 @@ class CalendarioUpdateRepo
             'is_rango_dias_evento' => $data['is_rango_dias'],
             'rango_dias_evento' => $data['rango_dias'],
             'estatus' => '1',
-        ]);
+        ];
+
+        // Guardar is_independiente de forma dinámica según la columna que exista en la BD
+        $columns = \Illuminate\Support\Facades\Schema::getColumnListing('evento');
+        if (in_array('is_independiente', $columns)) {
+            $insert['is_independiente'] = $data['is_independiente'] ?? false;
+        }
+        if (in_array('is_independiente_evento', $columns)) {
+            $insert['is_independiente_evento'] = $data['is_independiente'] ?? false;
+        }
+
+        return DB::table('evento')->insertGetId($insert);
     }
 }

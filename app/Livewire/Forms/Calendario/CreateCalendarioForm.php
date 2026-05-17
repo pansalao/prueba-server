@@ -19,6 +19,8 @@ class CreateCalendarioForm extends Form
     public $nuevoRepetible = false;
     public $nuevoIsRangoDias = false;
     public $nuevoRangoDias = '';
+
+    public $nuevoIsIndependiente = true;
     public $tipo_calendario = '1'; // Nuevo: 1 (Semestral), 2 (Anual)
     public $idEventoTemporal = null; // Para cuando se edite un evento existente
     public $isCreatingEvento = false; // Controlar si se están aplicando las validaciones de creación rápida
@@ -90,6 +92,15 @@ class CreateCalendarioForm extends Form
                     'min:1',
                     'max:90'
                 ],
+                'nuevoIsIndependiente' => [
+                    'required',
+                    'boolean',
+                    function ($attribute, $value, $fail) {
+                        if (in_array($this->nuevoTipo, ['1', '2']) && !$value) {
+                            $fail('Para los feriados nacionales y locales, el evento debe ser obligatoriamente Independiente.');
+                        }
+                    }
+                ],
                 'nuevoColorId' => [
                     'required',
                     'exists:color,id_color',
@@ -121,6 +132,8 @@ class CreateCalendarioForm extends Form
             'nombreEventoTemporal.regex' => 'Formato inválido en la descripción.',
             'nuevoTipo.required' => 'El tipo de evento es obligatorio.',
             'nuevoColorId.required' => 'El color es obligatorio.',
+            'nuevoIsIndependiente.required' => 'El campo independiente es obligatorio.',
+            'nuevoIsIndependiente.boolean' => 'El campo independiente debe ser un valor booleano.',
         ];
     }
 
@@ -170,7 +183,7 @@ class CreateCalendarioForm extends Form
         // Cálculo de Semanas Exactas (Sin forzar Lunes-Domingo)
         $inicioReal = \Carbon\Carbon::parse($this->dia_inicio_calendario_academico);
         $finReal = \Carbon\Carbon::parse($this->dia_fin_calendario_academico);
-        
+
         // Validar que la duración no supere los 18 meses máximo
         $limite18Meses = $inicioReal->copy()->addMonthsNoOverflow(18);
 
@@ -262,7 +275,7 @@ class CreateCalendarioForm extends Form
                 $regFin = $reg['fin'] ?? null;
 
                 $calFuera = ($regInicio && ($regInicio < $calInicio || $regInicio > $calFin)) ||
-                            ($regFin && ($regFin < $calInicio || $regFin > $calFin));
+                    ($regFin && ($regFin < $calInicio || $regFin > $calFin));
 
                 if ($calFuera) {
                     $msg = "El evento \"{$evento->nombre_evento}\" debe estar comprendido dentro del período académico ({$calInicio} al {$calFin}).";
@@ -275,7 +288,7 @@ class CreateCalendarioForm extends Form
                 if (!$isIndependiente) {
                     if ($inicioLapso && $finLapso) {
                         $lapsoFuera = ($regInicio && ($regInicio < $inicioLapso || $regInicio > $finLapso)) ||
-                                      ($regFin && ($regFin < $inicioLapso || $regFin > $finLapso));
+                            ($regFin && ($regFin < $inicioLapso || $regFin > $finLapso));
 
                         if ($lapsoFuera) {
                             $msg = "El evento \"{$evento->nombre_evento}\" debe estar comprendido dentro del lapso académico ({$inicioLapso} al {$finLapso}).";
@@ -288,7 +301,7 @@ class CreateCalendarioForm extends Form
                 // Validar que los eventos no repetibles (como feriados de tipo 1 y 2) solo ocurran 1 vez por año en toda la base de datos
                 if (!$evento->is_repetible_evento && in_array($evento->tipo_evento, ['1', '2'])) {
                     $year = date('Y', strtotime($reg['inicio']));
-                    
+
                     // Verificar si ya se asignó más de una vez en este mismo request/calendario
                     $key = $id . '_' . $year;
                     if (in_array($key, $visitados)) {
