@@ -52,7 +52,6 @@ class CalendarioUpdateRepo
                 'dia_inicio_calendario_academico' => $data['dia_inicio_calendario_academico'],
                 'dia_fin_calendario_academico' => $data['dia_fin_calendario_academico'],
                 'semana_calendario_academico' => $semanas,
-                'tipo_calendario' => $data['tipo_calendario'] ?? '1',
                 'estatus' => $data['estatus'] ?? '2' // En revisión por defecto en update
             ];
 

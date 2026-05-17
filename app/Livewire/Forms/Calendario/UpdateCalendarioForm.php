@@ -160,53 +160,19 @@ class UpdateCalendarioForm extends Form
         $this->validate([
             'dia_inicio_calendario_academico' => $allRules['dia_inicio_calendario_academico'],
             'dia_fin_calendario_academico' => $allRules['dia_fin_calendario_academico'],
-            'tipo_calendario' => $allRules['tipo_calendario'],
         ]);
 
-        // Cálculo de Semanas (Normalizado a Lunes-Domingo para Tipo 1)
-        $inicioNorm = \Carbon\Carbon::parse($this->dia_inicio_calendario_academico)->startOfWeek();
-        $finNorm = \Carbon\Carbon::parse($this->dia_fin_calendario_academico)->endOfWeek();
-        $semanasNorm = (int) ceil($inicioNorm->diffInDays($finNorm->addDay(1)) / 7);
-
-        // Cálculo de Días Exactos (Para Tipo 2)
+        // Cálculo de Semanas Exactas (Sin forzar Lunes-Domingo)
         $inicioReal = \Carbon\Carbon::parse($this->dia_inicio_calendario_academico);
         $finReal = \Carbon\Carbon::parse($this->dia_fin_calendario_academico);
-        $diasReales = $inicioReal->diffInDays($finReal) + 1;
+        
+        // Validar que la duración no supere los 18 meses máximo
+        $limite18Meses = $inicioReal->copy()->addMonthsNoOverflow(18);
 
-        if ($this->tipo_calendario == '1') {
-            if ($semanasNorm != 18) {
-                $msg = "Para un calendario SEMESTRAL, el período debe cubrir exactamente 18 semanas (actualmente cubre {$semanasNorm} semanas).";
-                $this->addError('form.dia_fin_calendario_academico', $msg);
-                throw \Illuminate\Validation\ValidationException::withMessages(['form.dia_fin_calendario_academico' => [$msg]]);
-            }
-        } else if ($this->tipo_calendario == '2') {
-            // Determinar si el rango incluye un 29 de febrero
-            $tieneBisiesto = false;
-            $temp = clone $inicioReal;
-            while ($temp <= $finReal) {
-                if ($temp->month == 2 && $temp->day == 29) {
-                    $tieneBisiesto = true;
-                    break;
-                }
-                $temp->addMonth(); // Salto rápido
-                if ($temp->month > 2 && $temp->day > 29) $temp->subMonth()->addDay();
-                else if ($temp->month == 2) {
-                    $temp->startOfMonth();
-                    while($temp->month == 2 && $temp <= $finReal){
-                        if($temp->day == 29) { $tieneBisiesto = true; break 2; }
-                        $temp->addDay();
-                    }
-                }
-            }
-            
-            $diasEsperados = $tieneBisiesto ? 366 : 365;
-
-            if ($diasReales != $diasEsperados) {
-                $detalle = $tieneBisiesto ? "(52 semanas + 2 días por ser bisiesto)" : "(52 semanas + 1 día)";
-                $msg = "Para un calendario ANUAL, el período debe durar exactamente {$diasEsperados} días {$detalle}. Actualmente tiene {$diasReales} días.";
-                $this->addError('form.dia_fin_calendario_academico', $msg);
-                throw \Illuminate\Validation\ValidationException::withMessages(['form.dia_fin_calendario_academico' => [$msg]]);
-            }
+        if ($finReal->gt($limite18Meses)) {
+            $msg = "El período académico no puede durar más de 18 meses.";
+            $this->addError('dia_fin_calendario_academico', $msg);
+            throw \Illuminate\Validation\ValidationException::withMessages(['form.dia_fin_calendario_academico' => [$msg]]);
         }
     }
 

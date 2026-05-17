@@ -55,7 +55,6 @@ class CalendarioCreateRepo
                         'semana_calendario_academico' => $data['semana_calendario_academico'],
                         'dia_inicio_calendario_academico' => $data['dia_inicio_calendario_academico'],
                         'dia_fin_calendario_academico' => $data['dia_fin_calendario_academico'],
-                        'tipo_calendario' => $data['tipo_calendario'] ?? '1',
                         'estatus' => '2', // Al confirmar, pasa a En revisión
                     ]);
                 $finalId = $id;
