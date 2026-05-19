@@ -95,7 +95,8 @@ class CalendarioCreateRepo
                 'de.dia_fin_detalle_evento as fin',
                 'e.nombre_evento as nombre',
                 'e.tipo_evento as tipo',
-                'c.codigo_color as color'
+                'c.codigo_color as color',
+                'e.especial_evento as especial_evento'
             )
             ->get();
     }

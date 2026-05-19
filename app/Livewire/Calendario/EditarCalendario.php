@@ -64,6 +64,7 @@ class EditarCalendario extends Component
                 'color' => (string) $ev->color,
                 'is_rango_dias_evento' => (bool) ($ev->is_rango_dias_evento ?? false),
                 'rango_dias_evento' => $ev->rango_dias_evento ?? null,
+                'especial_evento' => isset($ev->especial_evento) ? (string)$ev->especial_evento : null,
             ];
         }
 
@@ -231,6 +232,7 @@ class EditarCalendario extends Component
                 'color' => (string)$color,
                 'is_rango_dias_evento' => $eventoInfo ? (bool)$eventoInfo->is_rango_dias_evento : false,
                 'rango_dias_evento' => $eventoInfo ? $eventoInfo->rango_dias_evento : null,
+                'especial_evento' => $eventoInfo ? (string)$eventoInfo->especial_evento : null,
             ];
 
             $this->eventosRegistrados[] = $nuevoEvento;
@@ -261,7 +263,8 @@ class EditarCalendario extends Component
                     'color' => $ev['color'] ?? '#333',
                     'inicio' => $ev['inicio'] ?? $fechaStr,
                     'fin' => $ev['fin'] ?? $fechaStr,
-                    'tipo' => $ev['tipo'] ?? '1'
+                    'tipo' => $ev['tipo'] ?? '1',
+                    'especial_evento' => $ev['especial_evento'] ?? null
                 ];
                 $actual->addDay();
             }

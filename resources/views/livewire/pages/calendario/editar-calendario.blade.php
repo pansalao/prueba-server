@@ -42,8 +42,24 @@
             .sogat-datepicker-container .vanilla-calendar-grid {
                 display: grid !important;
                 gap: 1.5rem;
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
                 justify-items: center !important;
+            }
+
+            .vanilla-calendar-week {
+                display: grid !important;
+                grid-template-columns: repeat(9, 1fr) !important;
+            }
+
+            .vanilla-calendar-days {
+                display: grid !important;
+                grid-template-columns: repeat(9, 1fr) !important;
+            }
+
+            .sogat-week-col-tr,
+            .sogat-week-col-ni {
+                min-height: 38px;
+                margin: 2px 0;
             }
 
             .sogat-datepicker-container .vanilla-calendar-content {
@@ -356,6 +372,10 @@
                                             this.$nextTick(() => this.refrescarEventosVisuales());
                                         });
 
+                                        this.$watch('eventosAlpine', () => {
+                                            this.$nextTick(() => this.refrescarEventosVisuales());
+                                        });
+
                                         // Delegación de eventos para tooltips
                                         this.$nextTick(() => {
                                             [this.$refs.calendar1, this.$refs.calendar2, this.$refs.calendar3, this.$refs.calendar4].forEach(calendarEl => {
@@ -436,6 +456,201 @@
                                                 }
                                             }
                                             });
+
+                                            // 1. Modificar headers de la semana para agregar columnas TR y NI
+                                            const weekHeaders = calendarEl.querySelectorAll('.vanilla-calendar-week');
+                                            weekHeaders.forEach(weekEl => {
+                                                if (weekEl && !weekEl.querySelector('.sogat-week-hdr-tr')) {
+                                                    const trHdr = document.createElement('div');
+                                                    trHdr.className = 'vanilla-calendar-week-day sogat-week-hdr-tr font-black text-[10px] text-gray-500 dark:text-gray-400 border-l border-gray-100 dark:border-gray-700 flex items-center justify-center';
+                                                    trHdr.style.setProperty('color', '#ef4444', 'important'); // color rojo como Sábado/Domingo en el diseño
+                                                    trHdr.innerText = 'TR';
+                                                    
+                                                    const niHdr = document.createElement('div');
+                                                    niHdr.className = 'vanilla-calendar-week-day sogat-week-hdr-ni font-black text-[10px] text-gray-500 dark:text-gray-400 border-l border-gray-100 dark:border-gray-700 flex items-center justify-center';
+                                                    niHdr.style.setProperty('color', '#ef4444', 'important');
+                                                    niHdr.innerText = 'NI';
+                                                    
+                                                    weekEl.appendChild(trHdr);
+                                                    weekEl.appendChild(niHdr);
+                                                }
+                                            });
+
+                                            // 2. Modificar los días para agregar las celdas semanales
+                                            const daysContainers = calendarEl.querySelectorAll('.vanilla-calendar-days');
+                                            daysContainers.forEach(daysContainer => {
+                                                // Filtrar cabeceras y celdas previas de TR/NI para reconstruir con datos frescos
+                                                const dayElements = Array.from(daysContainer.children).filter(el => {
+                                                    return !el.classList.contains('sogat-week-col-tr') && !el.classList.contains('sogat-week-col-ni');
+                                                });
+                                                if (dayElements.length === 0) return;
+
+                                                // Encontrar todas las fechas de inicio y fin de lapsos (especial_evento 2 y 3)
+                                                let inicios = [];
+                                                let fines = [];
+                                                // Encontrar todas las semanas festivas (Semana Santa = 4 y Carnaval = 5)
+                                                let semanasFestivas = new Set();
+
+                                                if (this.eventosAlpine) {
+                                                    this.eventosAlpine.forEach(ev => {
+                                                        const esp = ev.especial_evento ? String(ev.especial_evento) : null;
+                                                         const nombreEv = ev.nombre_evento ? ev.nombre_evento.toLowerCase() : (ev.nombre ? ev.nombre.toLowerCase() : '');
+                                                        if (esp === '2') {
+                                                            inicios.push(ev.inicio);
+                                                        } else if (esp === '3') {
+                                                            fines.push(ev.fin);
+                                                        } else if (esp === '4' || esp === '5' || nombreEv.includes('semana santa') || nombreEv.includes('carnaval')) {
+                                                            // Marcar cada lunes de semana festiva
+                                                            let d = new Date(ev.inicio + 'T00:00:00');
+                                                            let dFin = new Date(ev.fin + 'T00:00:00');
+                                                            while (d <= dFin) {
+                                                                const dayOfWeek = d.getDay();
+                                                                const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                                                                const monday = new Date(d);
+                                                                monday.setDate(monday.getDate() + offset);
+
+                                                                const y = monday.getFullYear();
+                                                                const m = String(monday.getMonth() + 1).padStart(2, '0');
+                                                                const dayStr = String(monday.getDate()).padStart(2, '0');
+                                                                semanasFestivas.add(`${y}-${m}-${dayStr}`);
+
+                                                                d.setDate(d.getDate() + 1);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                                inicios.sort();
+                                                fines.sort();
+
+                                                daysContainer.innerHTML = '';
+                                                for (let i = 0; i < dayElements.length; i += 7) {
+                                                    const weekDays = dayElements.slice(i, i + 7);
+                                                    weekDays.forEach(d => daysContainer.appendChild(d));
+
+                                                    // Obtener fechas reales de la semana
+                                                    const weekDates = weekDays
+                                                        .map(d => {
+                                                            if (d.dataset && d.dataset.calendarDay) return d.dataset.calendarDay;
+                                                            const btn = d.querySelector('[data-calendar-day]');
+                                                            return btn ? btn.dataset.calendarDay : null;
+                                                        })
+                                                        .filter(dateStr => !!dateStr);
+
+                                                    // Determinar si esta semana pertenece a algún lapso
+                                                    let activeLapsoIndex = -1;
+                                                    let activeLapsoInicio = null;
+                                                    let activeLapsoFin = null;
+
+                                                    for (let k = 0; k < inicios.length; k++) {
+                                                        const iniL = inicios[k];
+                                                        const finL = fines[k] || fin;
+                                                        let hasLapso = false;
+                                                        for (let dStr of weekDates) {
+                                                            if (dStr >= iniL && dStr <= finL) {
+                                                                hasLapso = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (hasLapso) {
+                                                            activeLapsoIndex = k;
+                                                            activeLapsoInicio = iniL;
+                                                            activeLapsoFin = finL;
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    let trVal = '';
+                                                    let niVal = '';
+
+                                                    if (activeLapsoIndex !== -1 && weekDates.length > 0) {
+                                                         // Calcular índice de la semana en base a la fecha de inicio del lapso activo
+                                                         const firstDateStr = weekDates[0];
+                                                         const firstDate = new Date(firstDateStr + 'T00:00:00');
+                                                         const lapsoDate = new Date(activeLapsoInicio + 'T00:00:00');
+
+                                                         // Lunes de la semana de inicio del lapso
+                                                         const dayOfWeek = lapsoDate.getDay();
+                                                         const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                                                         const mondayInicioLapso = new Date(lapsoDate);
+                                                         mondayInicioLapso.setDate(mondayInicioLapso.getDate() + offset);
+
+                                                         // Lunes de la semana actual
+                                                         const currentDayOfWeek = firstDate.getDay();
+                                                         const currentOffset = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+                                                         const mondayCurrent = new Date(firstDate);
+                                                         mondayCurrent.setDate(mondayCurrent.getDate() + currentOffset);
+
+                                                         // Formatear lunes actual a string YYYY-MM-DD
+                                                         const yCurr = mondayCurrent.getFullYear();
+                                                         const mCurr = String(mondayCurrent.getMonth() + 1).padStart(2, '0');
+                                                         const dCurr = String(mondayCurrent.getDate()).padStart(2, '0');
+                                                         const mondayCurrentStr = `${yCurr}-${mCurr}-${dCurr}`;
+
+                                                         if (semanasFestivas.has(mondayCurrentStr)) {
+                                                             trVal = '';
+                                                             niVal = '';
+                                                         } else {
+                                                             // Contar cuántas semanas desde el inicio del lapso hasta el lunes actual NO son festivas
+                                                             let weekIndex = 0;
+                                                             let tempMonday = new Date(mondayInicioLapso);
+                                                             while (tempMonday <= mondayCurrent) {
+                                                                 const yTemp = tempMonday.getFullYear();
+                                                                 const mTemp = String(tempMonday.getMonth() + 1).padStart(2, '0');
+                                                                 const dTemp = String(tempMonday.getDate()).padStart(2, '0');
+                                                                 const tempMondayStr = `${yTemp}-${mTemp}-${dTemp}`;
+
+                                                                 if (!semanasFestivas.has(tempMondayStr)) {
+                                                                     weekIndex++;
+                                                                 }
+
+                                                                 // Avanzar 1 semana
+                                                                 tempMonday.setDate(tempMonday.getDate() + 7);
+                                                             }
+
+                                                             const suffixes = ['I', 'II', 'III', 'IV', 'V'];
+                                                             const suffix = suffixes[activeLapsoIndex] || 'I';
+
+                                                             trVal = `${weekIndex}${suffix}`;
+                                                             niVal = `${weekIndex}${suffix}`;
+                                                         }
+                                                    }
+
+                                                    const trCell = document.createElement('div');
+                                                    trCell.className = 'sogat-week-col-tr flex items-center justify-center text-xs font-black text-gray-900 dark:text-gray-100 border-l border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 rounded-md';
+                                                    trCell.innerText = trVal;
+
+                                                    const niCell = document.createElement('div');
+                                                    niCell.className = 'sogat-week-col-ni flex items-center justify-center text-xs font-bold text-blue-500 border-l border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 rounded-md';
+                                                    niCell.innerText = niVal;
+
+                                                    daysContainer.appendChild(trCell);
+                                                    daysContainer.appendChild(niCell);
+                                                }
+                                            });
+
+                                            // Implementar delegación de eventos para el tooltip (más estable que listeners individuales)
+                                            if (!calendarEl._hasTooltipListeners) {
+                                                calendarEl.addEventListener('mouseover', (e) => {
+                                                    clearTimeout(this.tooltipTimeout);
+
+                                                    const btn = e.target.closest('[data-calendar-day]');
+                                                    if (btn && btn.classList.contains('sogat-evento-registrado')) {
+                                                        const day = btn.dataset.calendarDay;
+                                                        const events = this.mapaEventosAlpine[day];
+
+                                                        if (events && events.length > 0) {
+                                                            const rect = btn.getBoundingClientRect();
+                                                            this.tooltip.content = events;
+                                                            this.tooltip.visible = true;
+                                                            this.tooltip.x = rect.left + (rect.width / 2);
+                                                            this.tooltip.y = rect.top;
+                                                            return;
+                                                        }
+                                                    }
+
+                                                    this.tooltipTimeout = setTimeout(() => {
+                                                        if (!this.isOverTooltip) {
+                                                            this.tooltip.visible = false;
                                                             this.tooltip.content = null;
                                                         }
                                                     }, 300);

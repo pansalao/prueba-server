@@ -97,6 +97,7 @@ class CreateCalendario extends Component
                         'nombre' => $ev->nombre,
                         'tipo' => $ev->tipo,
                         'color' => $ev->color,
+                        'especial_evento' => isset($ev->especial_evento) ? (string)$ev->especial_evento : null,
                     ];
                 }
                 $this->actualizarMapaEventos();
@@ -204,6 +205,7 @@ class CreateCalendario extends Component
                 'color' => (string)$color,
                 'is_rango_dias_evento' => $eventoInfo ? (bool)$eventoInfo->is_rango_dias_evento : false,
                 'rango_dias_evento' => $eventoInfo ? $eventoInfo->rango_dias_evento : null,
+                'especial_evento' => $eventoInfo ? (string)$eventoInfo->especial_evento : null,
             ];
 
             $this->eventosRegistrados[] = $nuevoEvento;
@@ -253,7 +255,8 @@ class CreateCalendario extends Component
                     'color' => $ev['color'] ?? '#333',
                     'inicio' => $ev['inicio'] ?? $fechaStr,
                     'fin' => $ev['fin'] ?? $fechaStr,
-                    'tipo' => $ev['tipo'] ?? '1'
+                    'tipo' => $ev['tipo'] ?? '1',
+                    'especial_evento' => $ev['especial_evento'] ?? null
                 ];
                 $actual->addDay();
             }
