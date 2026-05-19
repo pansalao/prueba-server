@@ -67,6 +67,22 @@ class UpdateEvento extends Component
                 $this->form->is_rango_dias = false;
                 $this->form->rango_dias = '';
                 $this->form->is_independiente = true;
+            } elseif ($this->form->especial_evento == '4') { // Semana Santa
+                $this->form->is_laborable = false;
+                $this->form->is_repetible = false;
+                $this->form->tipo_evento = '1';
+                $this->form->is_rango_dias = false;
+                $this->form->rango_dias = '';
+                $this->form->is_independiente = true;
+                $this->form->cantidad_dias_evento = '';
+            } elseif ($this->form->especial_evento == '5') { // Carnaval
+                $this->form->is_laborable = false;
+                $this->form->is_repetible = false;
+                $this->form->tipo_evento = '1';
+                $this->form->is_rango_dias = false;
+                $this->form->rango_dias = '';
+                $this->form->is_independiente = true;
+                $this->form->cantidad_dias_evento = '';
             } else {
                 $this->form->cantidad_dias_evento = '';
             }
@@ -85,7 +101,7 @@ class UpdateEvento extends Component
                 $this->form->is_independiente = false;
             }
 
-            if (!in_array($this->form->especial_evento, ['1', '2', '3'])) {
+            if (!in_array($this->form->especial_evento, ['1', '2', '3', '4', '5'])) {
                 if ($this->form->tipo_evento == '1' || $this->form->tipo_evento == '2') {
                     $this->form->is_laborable = false;
                     $this->form->is_repetible = false;

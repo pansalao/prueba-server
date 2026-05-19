@@ -58,6 +58,10 @@
                                     Inicio del Lapso Académico
                                 @elseif($evento->especial_evento == 3)
                                     Fin del Lapso Académico
+                                @elseif($evento->especial_evento == 4)
+                                    Semana Santa
+                                @elseif($evento->especial_evento == 5)
+                                    Carnaval
                                 @else
                                     Ninguno
                                 @endif

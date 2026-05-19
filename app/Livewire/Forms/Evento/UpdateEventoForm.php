@@ -87,15 +87,17 @@ class UpdateEventoForm extends Form
                 function ($attribute, $value, $fail) {
                     if ($this->is_especial) {
                         if (in_array($this->especial_evento, ['2', '3']) && $value != '4') {
-                            $fail('Para este evento especial, el tipo de evento debe ser obligatoriamente Académico.');
+                            $fail('Para este evento especial, el tipo de evento debe ser obligatoria mente Académico.');
                         } elseif ($this->especial_evento == '1' && $value != '5') {
                             $fail('Para Vacaciones Colectivas, el tipo de evento debe ser obligatoriamente Administrativo/Académico.');
+                        } elseif (in_array($this->especial_evento, ['4', '5']) && !in_array($value, ['1', '2'])) {
+                            $fail('Para Semana Santa y Carnaval, el tipo de evento debe ser Feriado Nacional o Feriado Local.');
                         }
                     }
                 }
             ],
             'is_especial' => ['required', 'boolean'],
-            'especial_evento' => ['required_if:is_especial,true', 'nullable', 'in:1,2,3'],
+            'especial_evento' => ['required_if:is_especial,true', 'nullable', 'in:1,2,3,4,5'],
             'is_laborable' => [
                 'required',
                 'boolean',
@@ -103,8 +105,8 @@ class UpdateEventoForm extends Form
                     if ($this->is_especial) {
                         if (in_array($this->especial_evento, ['2', '3']) && !$value) {
                             $fail('Para este evento especial, debe ser obligatoriamente Laborable.');
-                        } elseif ($this->especial_evento == '1' && $value) {
-                            $fail('Para Vacaciones Colectivas, no debe ser Laborable.');
+                        } elseif (in_array($this->especial_evento, ['1', '4', '5']) && $value) {
+                            $fail('Para este evento especial, no debe ser Laborable.');
                         }
                     }
                 }
@@ -114,10 +116,10 @@ class UpdateEventoForm extends Form
                 'boolean',
                 function ($attribute, $value, $fail) {
                     if ($this->is_especial) {
-                        if (in_array($this->especial_evento, ['2', '3']) && !$value) {
+                        if (in_array($this->especial_evento, ['1', '2', '3']) && !$value) {
                             $fail('Para este evento especial, debe ser obligatoriamente Repetible.');
-                        } elseif ($this->especial_evento == '1' && !$value) {
-                            $fail('Para Vacaciones Colectivas, debe ser obligatoriamente Repetible.');
+                        } elseif (in_array($this->especial_evento, ['4', '5']) && $value) {
+                            $fail('Para este evento especial, no debe ser Repetible.');
                         }
                     }
                 }
@@ -139,8 +141,8 @@ class UpdateEventoForm extends Form
                     if ($this->is_especial) {
                         if (in_array($this->especial_evento, ['2', '3']) && !$value) {
                             $fail('Para este evento especial, debe tener obligatoriamente cantidad específica de días.');
-                        } elseif ($this->especial_evento == '1' && $value) {
-                            $fail('Para Vacaciones Colectivas, no debe tener cantidad específica de días.');
+                        } elseif (in_array($this->especial_evento, ['1', '4', '5']) && $value) {
+                            $fail('Para este evento especial, no debe tener cantidad específica de días.');
                         }
                     }
                 }
@@ -155,8 +157,8 @@ class UpdateEventoForm extends Form
                     if ($this->is_especial) {
                         if (in_array($this->especial_evento, ['2', '3']) && $value != 1) {
                             $fail('Para este evento especial, la cantidad de días debe ser obligatoriamente 1.');
-                        } elseif ($this->especial_evento == '1' && !empty($value)) {
-                            $fail('Para Vacaciones Colectivas, no se debe definir cantidad de días.');
+                        } elseif (in_array($this->especial_evento, ['1', '4', '5']) && !empty($value)) {
+                            $fail('Para este evento especial, no se debe definir cantidad de días.');
                         }
                     }
                 }

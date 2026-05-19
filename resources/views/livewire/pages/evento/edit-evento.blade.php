@@ -28,6 +28,8 @@
                             <option value="1">Vacaciones Colectivas</option>
                             <option value="2">Inicio del Lapso Académico</option>
                             <option value="3">Fin del Lapso Académico</option>
+                            <option value="4">Semana Santa</option>
+                            <option value="5">Carnaval</option>
                         </select>
                         <x-input-error :messages="$errors->first('form.especial_evento')" class="mt-2" />
                     </div>
