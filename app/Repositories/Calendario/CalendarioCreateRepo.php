@@ -215,4 +215,51 @@ class CalendarioCreateRepo
 
         return DB::table('evento')->insertGetId($insert);
     }
+
+    /**
+     * Obtiene el evento de vacaciones colectivas (especial_evento = 1) activo.
+     */
+    public function obtenerEventoVacacionesActivo()
+    {
+        return DB::table('evento')
+            ->where('especial_evento', '1')
+            ->where('estatus', '1')
+            ->first();
+    }
+
+    /**
+     * Obtiene la suma de días de vacaciones colectivas ya asignados en otros calendarios activos para un año específico.
+     */
+    public function obtenerDiasVacacionesEnOtrosCalendarios($idEvento, $year, $excluirCalendarioId = null)
+    {
+        $query = DB::table('detalle_evento as de')
+            ->join('calendario_academico as ca', 'de.id_calendario_academico', '=', 'ca.id_calendario_academico')
+            ->where('de.id_evento', $idEvento)
+            ->where('de.estatus', 1)
+            ->where('ca.estatus', 1)
+            ->where(function($q) use ($year) {
+                $q->whereYear('de.dia_inicio_detalle_evento', $year)
+                  ->orWhereYear('de.dia_fin_detalle_evento', $year);
+            });
+
+        if ($excluirCalendarioId) {
+            $query->where('ca.id_calendario_academico', '!=', $excluirCalendarioId);
+        }
+
+        $otrosDetalles = $query->select('de.dia_inicio_detalle_evento', 'de.dia_fin_detalle_evento')->get();
+        $diasEnOtrosCalendarios = 0;
+        foreach ($otrosDetalles as $det) {
+            $start = new \DateTime($det->dia_inicio_detalle_evento);
+            $end = new \DateTime($det->dia_fin_detalle_evento);
+            
+            $interval = new \DateInterval('P1D');
+            $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
+            foreach ($period as $date) {
+                if ($date->format('Y') == $year) {
+                    $diasEnOtrosCalendarios++;
+                }
+            }
+        }
+        return $diasEnOtrosCalendarios;
+    }
 }

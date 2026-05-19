@@ -136,18 +136,79 @@ class CreateCalendario extends Component
             $tipo = (string)$eventoInfo->id_tipo_evento;
         }
 
-        $nuevoEvento = [
-            'id' => (int)$id_evento,
-            'inicio' => (string)$inicio,
-            'fin' => (string)$fin,
-            'nombre_evento' => (string)$nombre,
-            'tipo' => (string)$tipo,
-            'color' => (string)$color,
-            'is_rango_dias_evento' => $eventoInfo ? (bool)$eventoInfo->is_rango_dias_evento : false,
-            'rango_dias_evento' => $eventoInfo ? $eventoInfo->rango_dias_evento : null,
-        ];
+        // Analizar si el rango contiene fines de semana
+        $start = new \DateTime($inicio);
+        $end = new \DateTime($fin);
+        $contieneWeekend = false;
+        $todoEsWeekend = true;
 
-        $this->eventosRegistrados[] = $nuevoEvento;
+        $interval = new \DateInterval('P1D');
+        $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
+
+        foreach ($period as $date) {
+            $dayOfWeek = (int)$date->format('N'); // 1 (Lunes) a 7 (Domingo)
+            if ($dayOfWeek >= 6) {
+                $contieneWeekend = true;
+            } else {
+                $todoEsWeekend = false;
+            }
+        }
+
+        // Validar usando el objeto Form
+        try {
+            $this->form->validarRangoEvento($inicio, $fin, $tipo);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->showAlert('error', $e->validator->errors()->first());
+            return;
+        }
+
+        $subrangos = [];
+
+        // Feriados nacionales y locales (1 y 2), o si el rango completo está en fin de semana
+        if (in_array($tipo, ['1', '2']) || $todoEsWeekend) {
+            $subrangos[] = ['inicio' => $inicio, 'fin' => $fin];
+        } else {
+            // Otros eventos: dividimos omitiendo los fines de semana
+            $currentStart = null;
+            $currentEnd = null;
+
+            foreach ($period as $date) {
+                $dayOfWeek = (int)$date->format('N');
+                $isWeekend = ($dayOfWeek >= 6);
+
+                if (!$isWeekend) {
+                    if ($currentStart === null) {
+                        $currentStart = $date->format('Y-m-d');
+                    }
+                    $currentEnd = $date->format('Y-m-d');
+                } else {
+                    if ($currentStart !== null) {
+                        $subrangos[] = ['inicio' => $currentStart, 'fin' => $currentEnd];
+                        $currentStart = null;
+                    }
+                }
+            }
+
+            if ($currentStart !== null) {
+                $subrangos[] = ['inicio' => $currentStart, 'fin' => $currentEnd];
+            }
+        }
+
+        foreach ($subrangos as $sub) {
+            $nuevoEvento = [
+                'id' => (int)$id_evento,
+                'inicio' => (string)$sub['inicio'],
+                'fin' => (string)$sub['fin'],
+                'nombre_evento' => (string)$nombre,
+                'tipo' => (string)$tipo,
+                'color' => (string)$color,
+                'is_rango_dias_evento' => $eventoInfo ? (bool)$eventoInfo->is_rango_dias_evento : false,
+                'rango_dias_evento' => $eventoInfo ? $eventoInfo->rango_dias_evento : null,
+            ];
+
+            $this->eventosRegistrados[] = $nuevoEvento;
+        }
+
         $this->actualizarMapaEventos();
         $this->guardarBorrador();
     }
@@ -212,6 +273,14 @@ class CreateCalendario extends Component
 
     public function crearYAgregarEvento($inicio, $fin, $nombre, $tipo, $id_color, $is_laborable, $is_repetible, $is_rango_dias, $rango_dias)
     {
+        // Validar usando el objeto Form
+        try {
+            $this->form->validarRangoEvento($inicio, $fin, $tipo);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->showAlert('error', $e->validator->errors()->first());
+            return false;
+        }
+
         if ($tipo == '1' || $tipo == '2') {
             $is_laborable = false;
             $is_repetible = false;
@@ -375,6 +444,60 @@ class CreateCalendario extends Component
             // Si NO es repetible, solo aparece si NO ha sido asignado aún en este año.
             return $evento->is_repetible_evento || !in_array($evento->id_evento, $idsAsignadosEsteAnio);
         })->values();
+    }
+
+    #[Computed]
+    public function vacacionesContador()
+    {
+        $repo = new CalendarioCreateRepo();
+        $eventoVacaciones = $repo->obtenerEventoVacacionesActivo();
+        if (!$eventoVacaciones) {
+            return null;
+        }
+
+        // Determinar el año seleccionado
+        $targetYear = $this->selectedYearTemporal;
+        if (!$targetYear && $this->form->dia_inicio_calendario_academico) {
+            $targetYear = date('Y', strtotime($this->form->dia_inicio_calendario_academico));
+        }
+        if (!$targetYear) {
+            $targetYear = date('Y');
+        }
+
+        // Sumar días de vacaciones colectivas asignados en el período actual para este año
+        $diasActuales = 0;
+        foreach ($this->eventosRegistrados as $reg) {
+            if (($reg['id'] ?? null) == $eventoVacaciones->id_evento) {
+                $start = new \DateTime($reg['inicio']);
+                $end = new \DateTime($reg['fin']);
+                
+                $interval = new \DateInterval('P1D');
+                $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
+                foreach ($period as $date) {
+                    if ($date->format('Y') == $targetYear) {
+                        $diasActuales++;
+                    }
+                }
+            }
+        }
+
+        // Sumar días ya asignados en otros calendarios para este año
+        $excluirId = $this->id_calendario_borrador;
+        $diasEnOtrosCalendarios = $repo->obtenerDiasVacacionesEnOtrosCalendarios($eventoVacaciones->id_evento, $targetYear, $excluirId);
+
+        $totalAsignados = $diasActuales + $diasEnOtrosCalendarios;
+        $cantidadRequerida = $eventoVacaciones->cantidad_dias_evento ?? 60;
+        $faltantes = $cantidadRequerida - $totalAsignados;
+
+        return [
+            'anio' => $targetYear,
+            'requeridos' => $cantidadRequerida,
+            'asignados_actual' => $diasActuales,
+            'asignados_otros' => $diasEnOtrosCalendarios,
+            'total_asignados' => $totalAsignados,
+            'faltantes' => max(0, $faltantes),
+            'excedidos' => $faltantes < 0 ? abs($faltantes) : 0,
+        ];
     }
 
     public function render()

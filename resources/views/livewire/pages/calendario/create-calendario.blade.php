@@ -33,18 +33,7 @@
                 color: #999 !important;
             }
 
-            /* Fines de semana DENTRO del rango válido en rojo intenso */
-            .sogat-weekend-in-range {
-                opacity: 1 !important;
-                color: #ff0000 !important;
-                font-weight: normal !important;
-                cursor: not-allowed !important;
-            }
 
-            .dark .sogat-weekend-in-range {
-                color: #ff4d4d !important;
-                opacity: 1 !important;
-            }
 
             .sogat-datepicker-container {
                 width: 100%;
@@ -284,8 +273,7 @@
                                                     min: inicio, 
                                                     max: fin, 
                                                     disablePast: false, 
-                                                    disableAllDays: false,
-                                                    disableWeekday: [0, 6] 
+                                                    disableAllDays: false
                                                 },
                                                 selection: { day: 'single' },
                                                 visibility: { daysOutside: false, today: false, theme: isDark ? 'dark' : 'light' }
@@ -403,14 +391,7 @@
                                                 const day = btn.dataset.calendarDay;
                                                 const dObj = new Date(day + 'T00:00:00');
                                                 const dayOfWeek = dObj.getDay();
-                                                const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-                                                const isInRange = (day >= inicio && day <= fin);
 
-                                                if (isWeekend && isInRange) {
-                                                    btn.classList.add('sogat-weekend-in-range');
-                                                } else {
-                                                    btn.classList.remove('sogat-weekend-in-range');
-                                                }
 
                                                 btn.style.backgroundColor = ''; btn.style.color = ''; btn.style.border = '';
                                                 btn.classList.remove('sogat-evento-registrado');
@@ -636,6 +617,40 @@
                                         style="font-family: 'Verdana', sans-serif; letter-spacing: -0.05em;"></span>
                                 </div>
                             </template>
+
+                            @if ($this->vacacionesContador)
+                                <div class="flex justify-center mb-6 -mt-4">
+                                    @if ($this->vacacionesContador['faltantes'] > 0)
+                                        <div class="px-4 py-1.5 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-full text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center">
+                                            <span>
+                                                Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados {{ $this->vacacionesContador['total_asignados'] }} de {{ $this->vacacionesContador['requeridos'] }} días
+                                                @if ($this->vacacionesContador['asignados_otros'] > 0)
+                                                    <span class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }} días en otros períodos)</span>
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @elseif ($this->vacacionesContador['excedidos'] > 0)
+                                        <div class="px-4 py-1.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-full text-red-600 dark:text-red-400 text-xs font-bold flex items-center">
+                                            <span>
+                                                Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados {{ $this->vacacionesContador['total_asignados'] }} de {{ $this->vacacionesContador['requeridos'] }} días
+                                                @if ($this->vacacionesContador['asignados_otros'] > 0)
+                                                    <span class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }} días en otros períodos)</span>
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @else
+                                        <div class="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-full text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center">
+                                            <span>
+                                                Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados {{ $this->vacacionesContador['total_asignados'] }} de {{ $this->vacacionesContador['requeridos'] }} días
+                                                @if ($this->vacacionesContador['asignados_otros'] > 0)
+                                                    <span class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }} días en otros períodos)</span>
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+
 
                             {{-- Indicador de fecha seleccionada (siempre visible) --}}
                             <div x-show="selectedEventStart" class="flex justify-center mb-6 -mt-4">

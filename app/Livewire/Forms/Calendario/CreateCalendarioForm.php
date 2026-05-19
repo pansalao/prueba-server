@@ -31,23 +31,11 @@ class CreateCalendarioForm extends Form
             'dia_inicio_calendario_academico' => [
                 'required',
                 'date',
-                function ($attribute, $value, $fail) {
-                    $dayOfWeek = date('N', strtotime($value));
-                    if ($dayOfWeek >= 6) {
-                        $fail('El período no puede comenzar un fin de semana.');
-                    }
-                },
             ],
             'dia_fin_calendario_academico' => [
                 'required',
                 'date',
                 'after_or_equal:dia_inicio_calendario_academico',
-                function ($attribute, $value, $fail) {
-                    $dayOfWeek = date('N', strtotime($value));
-                    if ($dayOfWeek >= 6) {
-                        $fail('El período no puede finalizar un fin de semana.');
-                    }
-                },
             ],
         ];
 
@@ -261,6 +249,26 @@ class CreateCalendarioForm extends Form
                     }
                 }
 
+                // Validar que los únicos eventos para sábados y domingos sean Feriados (tipo 1 y 2)
+                $tipo = (string)$evento->tipo_evento;
+                $start = new \DateTime($reg['inicio']);
+                $end = new \DateTime($reg['fin']);
+                $todoEsWeekend = true;
+                $interval = new \DateInterval('P1D');
+                $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
+                foreach ($period as $date) {
+                    if ((int)$date->format('N') < 6) {
+                        $todoEsWeekend = false;
+                        break;
+                    }
+                }
+
+                if ($todoEsWeekend && !in_array($tipo, ['1', '2'])) {
+                    $msg = "El evento \"{$evento->nombre_evento}\" está asignado en fin de semana, lo cual solo se permite para Feriados Nacionales o Locales.";
+                    $this->addError('eventosRegistrados', $msg);
+                    $errores[] = [$msg];
+                }
+
                 $esp = $evento->especial_evento;
                 if ($esp == '2') {
                     $countInicio++;
@@ -347,6 +355,51 @@ class CreateCalendarioForm extends Form
             $errores[] = [$msg];
         }
 
+        // 4. Validar suma de días de vacaciones colectivas (evento especial 1) por año
+        $repo = new \App\Repositories\Calendario\CalendarioCreateRepo();
+        $eventoVacaciones = $repo->obtenerEventoVacacionesActivo();
+        if ($eventoVacaciones) {
+            $diasPorAnio = [];
+            foreach ($eventosRegistrados as $reg) {
+                if (($reg['id'] ?? null) == $eventoVacaciones->id_evento) {
+                    $start = new \DateTime($reg['inicio']);
+                    $end = new \DateTime($reg['fin']);
+                    
+                    $interval = new \DateInterval('P1D');
+                    $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
+                    foreach ($period as $date) {
+                        $year = $date->format('Y');
+                        if (!isset($diasPorAnio[$year])) {
+                            $diasPorAnio[$year] = 0;
+                        }
+                        $diasPorAnio[$year]++;
+                    }
+                }
+            }
+
+            foreach ($diasPorAnio as $year => $diasActuales) {
+                $excluirId = (isset($this->id_calendario_academico) && !empty($this->id_calendario_academico)) ? $this->id_calendario_academico : null;
+                $diasEnOtrosCalendarios = $repo->obtenerDiasVacacionesEnOtrosCalendarios($eventoVacaciones->id_evento, $year, $excluirId);
+
+                $totalDiasVacaciones = $diasActuales + $diasEnOtrosCalendarios;
+                $cantidadRequerida = $eventoVacaciones->cantidad_dias_evento ?? 60;
+
+                if ($totalDiasVacaciones != $cantidadRequerida) {
+                    $msg = "La suma total de días de vacaciones colectivas asignados para el año {$year} ({$totalDiasVacaciones} días) debe ser exactamente igual a los {$cantidadRequerida} días configurados en el evento. ";
+                    if ($diasEnOtrosCalendarios > 0) {
+                        $diasRestantes = $cantidadRequerida - $diasEnOtrosCalendarios;
+                        if ($diasRestantes > 0) {
+                            $msg .= "(Ya se encuentran asignados {$diasEnOtrosCalendarios} días en otros períodos de este año, por lo que debe asignar exactamente {$diasRestantes} días en este período).";
+                        } else {
+                            $msg .= "(Ya se encuentran asignados {$diasEnOtrosCalendarios} días en otros períodos de este año, superando o completando la cantidad permitida).";
+                        }
+                    }
+                    $this->addError('eventosRegistrados', $msg);
+                    $errores[] = [$msg];
+                }
+            }
+        }
+
         if (count($errores) > 0) {
             // Aplanar array de errores si es necesario
             $todosLosErrores = [];
@@ -362,5 +415,29 @@ class CreateCalendarioForm extends Form
         }
 
         return ['valido' => true, 'errores' => []];
+    }
+
+    /**
+     * Valida que si el rango de asignación del evento es fin de semana, el evento sea Feriado (tipo 1 o 2).
+     */
+    public function validarRangoEvento($inicio, $fin, $tipo)
+    {
+        $start = new \DateTime($inicio);
+        $end = new \DateTime($fin);
+        $todoEsWeekend = true;
+        $interval = new \DateInterval('P1D');
+        $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
+        foreach ($period as $date) {
+            if ((int)$date->format('N') < 6) {
+                $todoEsWeekend = false;
+                break;
+            }
+        }
+
+        if ($todoEsWeekend && !in_array($tipo, ['1', '2'])) {
+            $msg = "Los fines de semana (sábados y domingos) solo admiten eventos de tipo Feriado Nacional o Feriado Local.";
+            $this->addError('eventosRegistrados', $msg);
+            throw \Illuminate\Validation\ValidationException::withMessages(['eventosRegistrados' => [$msg]]);
+        }
     }
 }
