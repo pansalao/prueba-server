@@ -31,11 +31,25 @@ class UpdateCalendarioForm extends Form
             'dia_inicio_calendario_academico' => [
                 'required',
                 'date',
+                function ($attribute, $value, $fail) {
+                    $year = date('Y', strtotime($value));
+                    $currentYear = date('Y');
+                    if ($year < $currentYear - 2 || $year > $currentYear + 2) {
+                        $fail('La fecha de inicio no puede ser más de 2 años anterior ni posterior al año actual (' . $currentYear . ').');
+                    }
+                }
             ],
             'dia_fin_calendario_academico' => [
                 'required',
                 'date',
                 'after_or_equal:dia_inicio_calendario_academico',
+                function ($attribute, $value, $fail) {
+                    $year = date('Y', strtotime($value));
+                    $currentYear = date('Y');
+                    if ($year < $currentYear - 2 || $year > $currentYear + 2) {
+                        $fail('La fecha de fin no puede ser más de 2 años anterior ni posterior al año actual (' . $currentYear . ').');
+                    }
+                }
             ],
         ];
 
@@ -207,23 +221,26 @@ class UpdateCalendarioForm extends Form
 
         // 3. Validar eventos especiales y eventos no repetibles
         $eventosDb = \App\Models\Evento::whereIn('id_evento', $idsRegistrados)->get()->keyBy('id_evento');
-        $countInicio = 0;
-        $countFin = 0;
+        $inicios = [];
+        $fines = [];
         $visitados = [];
 
-        $inicioLapso = null;
-        $finLapso = null;
         foreach ($eventosRegistrados as $reg) {
             $id = $reg['id'] ?? null;
             if ($id && isset($eventosDb[$id])) {
                 $evento = $eventosDb[$id];
                 if ($evento->especial_evento == '2') {
-                    $inicioLapso = $reg['inicio'] ?? null;
+                    $inicios[] = $reg['inicio'] ?? null;
                 } elseif ($evento->especial_evento == '3') {
-                    $finLapso = $reg['fin'] ?? null;
+                    $fines[] = $reg['fin'] ?? null;
                 }
             }
         }
+
+        $inicios = array_filter(array_unique($inicios));
+        $fines = array_filter(array_unique($fines));
+        sort($inicios);
+        sort($fines);
 
         foreach ($eventosRegistrados as $reg) {
             $id = $reg['id'] ?? null;
@@ -262,12 +279,7 @@ class UpdateCalendarioForm extends Form
                     $errores[] = [$msg];
                 }
 
-                $esp = $evento->especial_evento;
-                if ($esp == '2') {
-                    $countInicio++;
-                } elseif ($esp == '3') {
-                    $countFin++;
-                }
+                // Los contadores se validan al final usando los arrays ordenados
 
                 // Validar que las fechas del evento estén comprendidas dentro del rango del calendario académico
                 $calInicio = $this->dia_inicio_calendario_academico;
@@ -284,18 +296,27 @@ class UpdateCalendarioForm extends Form
                     $errores[] = [$msg];
                 }
 
-                // Validar que eventos con is_independiente false estén dentro del rango del lapso académico
+                // Validar que eventos con is_independiente false estén dentro del rango de alguno de los dos lapsos académicos
                 $isIndependiente = $evento->is_independiente ?? $evento->is_independiente_evento ?? false;
                 if (!$isIndependiente) {
-                    if ($inicioLapso && $finLapso) {
-                        $lapsoFuera = ($regInicio && ($regInicio < $inicioLapso || $regInicio > $finLapso)) ||
-                                      ($regFin && ($regFin < $inicioLapso || $regFin > $finLapso));
+                    if (count($inicios) === 2 && count($fines) === 2) {
+                        $S1 = $inicios[0];
+                        $E1 = $fines[0];
+                        $S2 = $inicios[1];
+                        $E2 = $fines[1];
 
-                        if ($lapsoFuera) {
-                            $msg = "El evento \"{$evento->nombre_evento}\" debe estar comprendido dentro del lapso académico ({$inicioLapso} al {$finLapso}).";
+                        $dentroLapso1 = ($regInicio && $regInicio >= $S1 && $regFin && $regFin <= $E1);
+                        $dentroLapso2 = ($regInicio && $regInicio >= $S2 && $regFin && $regFin <= $E2);
+
+                        if (!$dentroLapso1 && !$dentroLapso2) {
+                            $msg = "El evento \"{$evento->nombre_evento}\" debe estar comprendido dentro de alguno de los dos lapsos académicos (Primer Lapso: {$S1} al {$E1}, Segundo Lapso: {$S2} al {$E2}).";
                             $this->addError('eventosRegistrados', $msg);
                             $errores[] = [$msg];
                         }
+                    } else {
+                        $msg = "El evento \"{$evento->nombre_evento}\" requiere que estén registrados exactamente dos lapsos académicos para validar su ubicación.";
+                        $this->addError('eventosRegistrados', $msg);
+                        $errores[] = [$msg];
                     }
                 }
 
@@ -336,16 +357,41 @@ class UpdateCalendarioForm extends Form
             }
         }
 
-        if ($countInicio !== 1) {
-            $msg = "El calendario debe contener exactamente un evento especial de tipo \"Inicio del Lapso Académico\".";
+        if (count($inicios) !== 2) {
+            $msg = "El calendario debe contener exactamente dos eventos especiales de tipo \"Inicio del Lapso Académico\".";
             $this->addError('eventosRegistrados', $msg);
             $errores[] = [$msg];
         }
 
-        if ($countFin !== 1) {
-            $msg = "El calendario debe contener exactamente un evento especial de tipo \"Fin del Lapso Académico\".";
+        if (count($fines) !== 2) {
+            $msg = "El calendario debe contener exactamente dos eventos especiales de tipo \"Fin del Lapso Académico\".";
             $this->addError('eventosRegistrados', $msg);
             $errores[] = [$msg];
+        }
+
+        if (count($inicios) === 2 && count($fines) === 2) {
+            $S1 = $inicios[0];
+            $E1 = $fines[0];
+            $S2 = $inicios[1];
+            $E2 = $fines[1];
+
+            if ($S1 > $E1) {
+                $msg = "El primer lapso académico tiene una fecha de inicio ({$S1}) posterior a su fecha de fin ({$E1}).";
+                $this->addError('eventosRegistrados', $msg);
+                $errores[] = [$msg];
+            }
+
+            if ($S2 > $E2) {
+                $msg = "El segundo lapso académico tiene una fecha de inicio ({$S2}) posterior a su fecha de fin ({$E2}).";
+                $this->addError('eventosRegistrados', $msg);
+                $errores[] = [$msg];
+            }
+
+            if ($S2 < $E1) {
+                $msg = "Los lapsos académicos no pueden solaparse ni estar contenidos uno dentro del otro. El segundo lapso debe iniciar el mismo día o después de que termine el primer lapso (Fin del primer lapso: {$E1}, Inicio del segundo lapso: {$S2}).";
+                $this->addError('eventosRegistrados', $msg);
+                $errores[] = [$msg];
+            }
         }
 
         // 4. Validar suma de días de vacaciones colectivas (evento especial 1) por año

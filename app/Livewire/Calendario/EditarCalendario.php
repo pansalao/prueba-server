@@ -85,11 +85,6 @@ class EditarCalendario extends Component
     {
         $this->validateOnly($propertyName);
 
-        // Actualización dinámica de la fecha de fin
-        if ($propertyName === 'form.dia_inicio_calendario_academico') {
-            $this->calcularFechaFin();
-        }
-
         if ($propertyName == 'form.dia_inicio_calendario_academico' || $propertyName == 'form.dia_fin_calendario_academico') {
             $this->guardarBorrador();
         }
@@ -104,25 +99,6 @@ class EditarCalendario extends Component
                 $this->form->nuevoRepetible = true;
                 $this->form->nuevoIsIndependiente = false;
             }
-        }
-    }
-
-    public function calcularFechaFin()
-    {
-        if (!$this->form->dia_inicio_calendario_academico) {
-            return;
-        }
-
-        try {
-            $inicio = \Carbon\Carbon::parse($this->form->dia_inicio_calendario_academico);
-            
-            // Semestral por defecto: 18 semanas (Semana 1 a Semana 18 el mismo día) = 17 semanas de diferencia
-            $fin = $inicio->copy()->addWeeks(17);
-
-            $this->form->dia_fin_calendario_academico = $fin->format('Y-m-d');
-            $this->guardarBorrador();
-        } catch (\Exception $e) {
-            // Error silencioso si la fecha no es válida aún
         }
     }
 

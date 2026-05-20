@@ -112,26 +112,7 @@
         </style>        <div class="space-y-6" x-data="{ 
                     openSection: 'fechas',
                     inicio: @entangle('form.dia_inicio_calendario_academico'),
-                    fin: @entangle('form.dia_fin_calendario_academico'),
-                    
-                    init() {
-                        this.$watch('inicio', () => this.calculateFin());
-                    },
-
-                    calculateFin() {
-                        if (!this.inicio) return;
-                        
-                        let date = new Date(this.inicio + 'T12:00:00');
-                        if (isNaN(date.getTime())) return;
-
-                        // Semestral por defecto: +17 semanas (119 días) para terminar el mismo día de la semana 18
-                        date.setDate(date.getDate() + 119);
-
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        this.fin = `${year}-${month}-${day}`;
-                    }
+                    fin: @entangle('form.dia_fin_calendario_academico')
                 }">
 
             {{-- Acordeón 1: Fechas --}}
@@ -523,7 +504,8 @@
 
                                                     for (let k = 0; k < inicios.length; k++) {
                                                         const iniL = inicios[k];
-                                                        const finL = fines[k] || fin;
+                                                        const finL = fines[k];
+                                                        if (!finL) continue;
                                                         let hasLapso = false;
                                                         for (let dStr of weekDates) {
                                                             if (dStr >= iniL && dStr <= finL) {

@@ -34,11 +34,6 @@ class CreateCalendario extends Component
     {
         $this->validateOnly($propertyName);
 
-        // Si cambia el inicio, recalculamos el fin automáticamente
-        if ($propertyName === 'form.dia_inicio_calendario_academico') {
-            $this->calcularFechaFin();
-        }
-
         if ($propertyName == 'form.dia_inicio_calendario_academico' || $propertyName == 'form.dia_fin_calendario_academico') {
             $this->filtrarEventosFueraDeRango();
             $this->guardarBorrador();
@@ -102,6 +97,9 @@ class CreateCalendario extends Component
                 }
                 $this->actualizarMapaEventos();
             }
+        } else {
+            $this->form->dia_inicio_calendario_academico = date('Y-01-01');
+            $this->form->dia_fin_calendario_academico = date('Y-12-31');
         }
 
         // Cargar la biblioteca de eventos (templates)
@@ -213,28 +211,6 @@ class CreateCalendario extends Component
 
         $this->actualizarMapaEventos();
         $this->guardarBorrador();
-    }
-
-    /**
-     * Organiza los eventos en un mapa indexado por fecha para que Alpine no tenga que filtrar
-     */
-    public function calcularFechaFin()
-    {
-        if (!$this->form->dia_inicio_calendario_academico) {
-            return;
-        }
-
-        try {
-            $inicio = \Carbon\Carbon::parse($this->form->dia_inicio_calendario_academico);
-            
-            // Semestral por defecto: 18 semanas (Semana 1 a Semana 18 el mismo día) = 17 semanas de diferencia
-            $fin = $inicio->copy()->addWeeks(17);
-
-            $this->form->dia_fin_calendario_academico = $fin->format('Y-m-d');
-            $this->filtrarEventosFueraDeRango();
-        } catch (\Exception $e) {
-            // Error silencioso si la fecha no es válida aún
-        }
     }
 
     public function actualizarMapaEventos()
