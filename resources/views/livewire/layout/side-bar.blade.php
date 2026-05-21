@@ -254,6 +254,9 @@
                             <li><a href="{{ route('planificacion/crear') }}" class="sogat-sidebar-link">Crear Planificación</a></li>
                         @endcan
                         <li><a href="{{ route('planificacion/listar') }}" class="sogat-sidebar-link">Gestionar Planificaciones</a></li>
+                        @if(in_array(auth()->user()->usu_cod_rol, [1, 5, 11]))
+                            <li><a href="{{ route('planificacion.reporte.cumplimiento') }}" class="sogat-sidebar-link">Estadísticas de Entrega</a></li>
+                        @endif
                     </ul>
                 </div>
             @endcan

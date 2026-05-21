@@ -67,6 +67,7 @@
                                                 'LOGIN' => 'text-purple-800 bg-purple-100 dark:bg-purple-900 dark:text-purple-300',
                                                 'LOGOUT' => 'text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300',
                                                 'MOSTRAR' => 'text-indigo-800 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300',
+                                                'REPORTE' => 'text-pink-800 bg-pink-100 dark:bg-pink-900 dark:text-pink-300',
                                                 default => 'text-gray-800 bg-gray-100 dark:bg-gray-900 dark:text-gray-300',
                                             };
                                         @endphp

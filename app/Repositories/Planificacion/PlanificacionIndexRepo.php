@@ -80,8 +80,10 @@ class PlanificacionIndexRepo
             }
 
             // Actualizar todas las unidades asociadas a la planificación
-            \App\Models\UnidadCorte::where('id_planificacion', $planificacionId)
-                ->update(['estatus' => 1]);
+            $unidades = \App\Models\UnidadCorte::where('id_planificacion', $planificacionId)->get();
+            foreach ($unidades as $unidad) {
+                $unidad->update(['estatus' => 1]);
+            }
 
             DB::commit();
             return true;

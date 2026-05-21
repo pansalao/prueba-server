@@ -58,6 +58,12 @@ class ShowPlanificacion extends Component
 
         // Cargar el path del contrato si existe
         $this->contratoPath = $this->planificacion->archivo_contrato ?? null;
+
+        // Registrar visualización en la bitácora
+        $planificacionModel = Planificacion::find($this->planificacionId);
+        if ($planificacionModel) {
+            Planificacion::logMostrar($planificacionModel);
+        }
     }
 
     public function saveContrato()
@@ -69,10 +75,11 @@ class ShowPlanificacion extends Component
         try {
             $path = $this->contratoEstudiantes->store('contratos', 'public');
             
-            // Guardar en la base de datos
-            DB::table('planificacion')
-                ->where('id_planificacion', $this->planificacionId)
-                ->update(['archivo_contrato' => $path]);
+            // Guardar en la base de datos a través de Eloquent
+            $planificacionModel = Planificacion::find($this->planificacionId);
+            if ($planificacionModel) {
+                $planificacionModel->update(['archivo_contrato' => $path]);
+            }
 
             $this->contratoPath = $path;
             $this->contratoEstudiantes = null;

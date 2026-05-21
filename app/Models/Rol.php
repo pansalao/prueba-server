@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
+
 class Rol extends DaeceModel
 {
+    use Auditable;
+
     protected $table = 'rol';
     protected $primaryKey = 'rol_codigo';
     protected $fillable = ['rol_nombre', 'rol_estatus'];

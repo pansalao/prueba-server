@@ -106,6 +106,7 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
     Route::get('planificacion/create', CreatePlanificacion::class)->middleware('can:crear-planificacion')->name('planificacion/crear');
     Route::get('planificacion/update/{planificacionId}', UpdatePlanificacion::class)->middleware('can:editar-planificacion')->name('planificaciones.update');
     Route::get('planificacion/show/{planificacionId}', ShowPlanificacion::class)->middleware('can:ver-planificacion')->name('planificacion/show');
+    Route::get('planificacion/reporte-cumplimiento', [\App\Http\Controllers\ReporteController::class, 'cumplimiento'])->middleware(['log.activity:REPORTE'])->name('planificacion.reporte.cumplimiento');
     // Rutas para Reportes PDF (Abrir en pestaña)
     Route::get('planificacion/reporte-general', [\App\Http\Controllers\ReportePlanificacionController::class, 'reporteGeneral'])->middleware(['can:listar-planificacion', 'log.activity:REPORTE'])->name('planificacion.reporte.general');
     Route::get('planificacion/reporte-detalle/{id}', [\App\Http\Controllers\ReportePlanificacionController::class, 'reporteDetalle'])->middleware(['can:ver-planificacion', 'log.activity:REPORTE'])->name('planificacion.reporte.detalle');

@@ -372,8 +372,10 @@ class CreatePlanificacion extends Component
                     'unidades' => $this->form->unidades
                 ]);
                 // Cambiar estatus a '2' (enviada para aprobación)
-                \App\Models\Planificacion::where('id_planificacion', $this->planificacionDraftId)
-                    ->update(['estatus' => '2']);
+                $draft = \App\Models\Planificacion::find($this->planificacionDraftId);
+                if ($draft) {
+                    $draft->update(['estatus' => '2']);
+                }
             } else {
                 $this->planificacionRepository->savePlanificacionTransaccion(
                     $this->form->id_profesor_asignado,

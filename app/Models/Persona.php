@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
+
 class Persona extends DaeceModel
 {
+    use Auditable;
+
     protected $table = 'persona';
     protected $primaryKey = 'per_cedula';
     public $incrementing = false;
