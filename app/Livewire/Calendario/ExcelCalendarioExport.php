@@ -141,7 +141,7 @@ class ExcelCalendarioExport implements FromView, WithStyles, WithDrawings, WithE
                 $sheet->getStyle('Z11:AB' . $lastRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
                 $sheet->getStyle('Z11:AB' . $lastRow)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
                 $sheet->getStyle('Z11:AB' . $lastRow)->getAlignment()->setIndent(1); // Pequeño margen
-
+    
                 // Fecha y Condición (AC-AG): Centro
                 $sheet->getStyle('AC11:AG' . $lastRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('AC11:AG' . $lastRow)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -188,7 +188,7 @@ class ExcelCalendarioExport implements FromView, WithStyles, WithDrawings, WithE
                                             ->getText()
                                             ->createTextRun($commentText);
                                         $run->getFont()->setSize(12); // Texto más grande
-
+    
                                         // ─── Calcular ancho dinámico para la nota ───
                                         $maxNoteLen = 10;
                                         foreach ($eventNames as $name) {
@@ -199,8 +199,9 @@ class ExcelCalendarioExport implements FromView, WithStyles, WithDrawings, WithE
                                         }
                                         // Escala: aprox 6.5pt de ancho por carácter en fuente 12pt
                                         $noteWidth = $maxNoteLen * 6.5;
-                                        if ($noteWidth < 150) $noteWidth = 150; // Ancho mínimo
-
+                                        if ($noteWidth < 150)
+                                            $noteWidth = 150; // Ancho mínimo
+    
                                         $height = 45 + (count($eventNames) * 18);
                                         $sheet->getComment($cellCoord)->setWidth($noteWidth . 'pt');
                                         $sheet->getComment($cellCoord)->setHeight($height . 'pt');

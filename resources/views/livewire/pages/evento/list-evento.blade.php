@@ -36,13 +36,17 @@
                             @php
                                 $tipos = [
                                     1 => 'Feriado Nacional',
-                                    2 => 'Administrativo/Académico',
-                                    3 => 'Otros'
+                                    2 => 'Feriado Local',
+                                    3 => 'Administrativo',
+                                    4 => 'Académico',
+                                    5 => 'Administrativo/Académico'
                                 ];
                                 $defaultColors = [
-                                    1 => '#DC3545',
-                                    2 => '#007BFF',
-                                    3 => '#6c757d'
+                                    1 => '#DC3545', // Rojo
+                                    2 => '#FFC107', // Amarillo/Naranja
+                                    3 => '#007BFF', // Azul
+                                    4 => '#28A745', // Verde
+                                    5 => '#6c757d'  // Gris
                                 ];
                             @endphp
                             @foreach ($eventos as $evento)

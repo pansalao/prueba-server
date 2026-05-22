@@ -10,22 +10,32 @@
         $startDate = \Carbon\Carbon::parse($calendario->dia_inicio_calendario_academico)->startOfDay();
         $endDate = \Carbon\Carbon::parse($calendario->dia_fin_calendario_academico)->endOfDay();
         $mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        $academicos = $eventos->where('tipo_evento', 1)->sortBy('dia_inicio_evento');
-        $festivos   = $eventos->where('tipo_evento', 2)->sortBy('dia_inicio_evento');
-        $otros      = $eventos->where('tipo_evento', 3)->sortBy('dia_inicio_evento');
+        $f_nacionales = $eventos->where('tipo_evento', 1)->sortBy('dia_inicio_evento');
+        $f_locales    = $eventos->where('tipo_evento', 2)->sortBy('dia_inicio_evento');
+        $administrativos = $eventos->where('tipo_evento', 3)->sortBy('dia_inicio_evento');
+        $academicos   = $eventos->where('tipo_evento', 4)->sortBy('dia_inicio_evento');
+        $admin_acad   = $eventos->where('tipo_evento', 5)->sortBy('dia_inicio_evento');
 
         $eventosAgrupados = [];
+        if ($f_nacionales->count() > 0) {
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'FERIADOS NACIONALES'];
+            foreach ($f_nacionales as $e) { $eventosAgrupados[] = $e; }
+        }
+        if ($f_locales->count() > 0) {
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'FERIADOS LOCALES'];
+            foreach ($f_locales as $e) { $eventosAgrupados[] = $e; }
+        }
+        if ($administrativos->count() > 0) {
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'ADMINISTRATIVO'];
+            foreach ($administrativos as $e) { $eventosAgrupados[] = $e; }
+        }
         if ($academicos->count() > 0) {
-            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'ACADÉMICOS'];
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'ACADÉMICO'];
             foreach ($academicos as $e) { $eventosAgrupados[] = $e; }
         }
-        if ($festivos->count() > 0) {
-            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'FESTIVOS'];
-            foreach ($festivos as $e) { $eventosAgrupados[] = $e; }
-        }
-        if ($otros->count() > 0) {
-            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'OTROS'];
-            foreach ($otros as $e) { $eventosAgrupados[] = $e; }
+        if ($admin_acad->count() > 0) {
+            $eventosAgrupados[] = (object)['isHeader' => true, 'label' => 'ADMINISTRATIVO/ACADÉMICO'];
+            foreach ($admin_acad as $e) { $eventosAgrupados[] = $e; }
         }
 
         $eventosSorted = collect($eventosAgrupados);
@@ -37,11 +47,11 @@
     {{-- Título General con Rango de Años --}}
     <thead style="font-weight: bold;">
         <tr>
-            <th colspan="25" style="text-align: center; font-size: 14pt;">CALENDARIO ACADÉMICO {{ $startYear }} -
+            <th colspan="33" style="text-align: center; font-size: 14pt;">CALENDARIO ACADÉMICO {{ $startYear }} -
                 {{ $endYear }}</th>
         </tr>
         <tr>
-            <th colspan="25" style="text-align: center;"><strong>Vigencia:</strong>
+            <th colspan="33" style="text-align: center;"><strong>Vigencia:</strong>
                 {{ \Carbon\Carbon::parse($calendario->dia_inicio_calendario_academico)->format('d/m/Y') }} hasta
                 {{ \Carbon\Carbon::parse($calendario->dia_fin_calendario_academico)->format('d/m/Y') }}</th>
         </tr>
@@ -103,6 +113,9 @@
                         {{ $mesesNombres[$m - 1] }} {{ $y }}</td>
                     <td style="width: 20px;"></td>
                 @endforeach
+                @if(count($chunk) < 3)
+                    <td colspan="{{ (3 - count($chunk)) * 8 }}"></td>
+                @endif
                 @if($chunkIndex == 0)
                     <td colspan="9" style="text-align: center; background-color: #f2f2f2; border: 1px solid #000; font-size: 11pt; font-weight: bold;">EVENTOS DEL
                         CALENDARIO</td>
@@ -140,6 +153,9 @@
                     <td style="border: 0.5px solid #000; text-align: center; font-size: 11pt;">S</td>
                     <td></td>
                 @endforeach
+                @if(count($chunk) < 3)
+                    <td colspan="{{ (3 - count($chunk)) * 8 }}"></td>
+                @endif
                 @if($chunkIndex == 0)
                     <td colspan="4" style="border: 1px solid #000; background-color: #f2f2f2; font-size: 11pt; font-weight: bold; text-align: left; padding-left: 5px;">Evento</td>
                     <td colspan="3" style="border: 1px solid #000; background-color: #f2f2f2; font-size: 11pt; font-weight: bold; text-align: center;">Fecha</td>
@@ -190,12 +206,12 @@
                                 $eventId = $eventData ? $eventData['ids'][0] : null;
                                 $isWeekend = ($col == 0 || $col == 6);
 
-                                if ($eventId) {
+                                if ($eventId && !$isWeekend) {
                                     $bgColor = $eventColors[$eventId] ?? '#ffffff';
-                                    $textColor = $isWeekend ? '#DC3545' : '#ffffff';
-                                } elseif ($isVigente && $isWeekend) {
+                                    $textColor = '#ffffff';
+                                } elseif ($isWeekend) {
                                     $bgColor = '#ffffff';
-                                    $textColor = '#DC3545';
+                                    $textColor = ($isVigente || $cellDate) ? '#DC3545' : '#ffffff';
                                 } else {
                                     $bgColor = '#ffffff';
                                     $textColor = $isVigente ? '#000000' : ($cellDate ? '#bbbbbb' : '#ffffff');
@@ -208,6 +224,9 @@
                         @endfor
                         <td></td>
                     @endforeach
+                    @if(count($chunk) < 3)
+                        <td colspan="{{ (3 - count($chunk)) * 8 }}"></td>
+                    @endif
 
                     {{-- Eventos --}}
                     @if($eventoIndex < $totalEventos)

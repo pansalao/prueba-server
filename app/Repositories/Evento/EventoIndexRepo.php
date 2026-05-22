@@ -47,7 +47,32 @@ class EventoIndexRepo
         return DB::table('evento as e')
             ->join('color as c', 'e.id_color', '=', 'c.id_color')
             ->where('e.estatus', 1)
-            ->select('e.id_evento', 'e.nombre_evento', 'e.tipo_evento', 'e.is_laborable_evento', 'e.is_repetible_evento', 'c.codigo_color')
+            ->select('e.id_evento', 'e.nombre_evento', 'e.tipo_evento', 'e.is_laborable_evento', 'e.is_repetible_evento', 'e.is_rango_dias_evento', 'e.rango_dias_evento', 'c.codigo_color')
             ->get();
+    }
+
+    /**
+     * Obtiene los colores que aún no están asignados a ningún evento activo.
+     */
+    public function obtenerColoresDisponibles()
+    {
+        return DB::table('color')
+            ->where('estatus', '1')
+            ->whereNotIn('id_color', function ($query) {
+                $query->select('id_color')
+                    ->from('evento')
+                    ->whereNotNull('id_color')
+                    ->where('estatus', '!=', '3');
+            })
+            ->get();
+    }
+
+
+    /**
+     * Obtiene un color específico por su ID.
+     */
+    public function obtenerColorPorId($id)
+    {
+        return DB::table('color')->where('id_color', $id)->first();
     }
 }

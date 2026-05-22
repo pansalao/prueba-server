@@ -33,6 +33,8 @@
                 color: #999 !important;
             }
 
+
+
             .sogat-datepicker-container {
                 width: 100%;
             }
@@ -40,8 +42,24 @@
             .sogat-datepicker-container .vanilla-calendar-grid {
                 display: grid !important;
                 gap: 1.5rem;
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
                 justify-items: center !important;
+            }
+
+            .vanilla-calendar-week {
+                display: grid !important;
+                grid-template-columns: repeat(9, 1fr) !important;
+            }
+
+            .vanilla-calendar-days {
+                display: grid !important;
+                grid-template-columns: repeat(9, 1fr) !important;
+            }
+
+            .sogat-week-col-tr,
+            .sogat-week-col-ni {
+                min-height: 38px;
+                margin: 2px 0;
             }
 
             .sogat-datepicker-container .vanilla-calendar-content {
@@ -92,7 +110,6 @@
                 display: none !important;
             }
         </style>
-
         <div class="space-y-6" x-data="{ 
                     openSection: 'fechas',
                     inicio: @entangle('form.dia_inicio_calendario_academico'),
@@ -112,7 +129,9 @@
                         :class="openSection === 'fechas' ? 'rotate-180' : ''">expand_more</span>
                 </div>
                 <div x-show="openSection === 'fechas'" x-collapse class="p-4 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto mt-4">
+
+                    {{-- Selección de Fechas --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto mb-6">
                         <div class="w-full">
                             <x-input-label for="dia_inicio_calendario_academico" :value="__('Inicio del Período')" />
                             <x-text-input id="dia_inicio_calendario_academico" type="date"
@@ -127,6 +146,44 @@
                                 wire:model.live="form.dia_fin_calendario_academico" class="w-full mt-1 date-input-dark"
                                 required />
                             <x-input-error :messages="$errors->first('form.dia_fin_calendario_academico')"
+                                class="mt-2" />
+                        </div>
+                    </div>
+
+                    {{-- Selección de Semanas por Lapso --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto">
+                        <div class="w-full">
+                            <x-input-label for="semana_lapso_uno_calendario_academico" :value="__('Cantidad de Semanas (Lapso 1)')" />
+                            <x-text-input id="semana_lapso_uno_calendario_academico" type="number" min="1" max="99"
+                                wire:model.live="form.semana_lapso_uno_calendario_academico"
+                                class="w-full mt-1" placeholder="Ej: 18" required />
+                            <x-input-error :messages="$errors->first('form.semana_lapso_uno_calendario_academico')"
+                                class="mt-2" />
+                        </div>
+                        <div class="w-full">
+                            <x-input-label for="semana_lapso_dos_calendario_academico" :value="__('Cantidad de Semanas (Lapso 2)')" />
+                            <x-text-input id="semana_lapso_dos_calendario_academico" type="number" min="1" max="99"
+                                wire:model.live="form.semana_lapso_dos_calendario_academico" class="w-full mt-1"
+                                placeholder="Ej: 18" required />
+                            <x-input-error :messages="$errors->first('form.semana_lapso_dos_calendario_academico')"
+                                class="mt-2" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto mt-6">
+                        <div class="w-full">
+                            <x-input-label for="semana_lapso_introductorio_calendario_academico" :value="__('Cantidad de Semanas (Lapso Introductorio)')" />
+                            <x-text-input id="semana_lapso_introductorio_calendario_academico" type="number" min="1" max="99"
+                                wire:model.live="form.semana_lapso_introductorio_calendario_academico"
+                                class="w-full mt-1" placeholder="Opcional" />
+                            <x-input-error :messages="$errors->first('form.semana_lapso_introductorio_calendario_academico')"
+                                class="mt-2" />
+                        </div>
+                        <div class="w-full">
+                            <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Cantidad de Semanas (Intensivo)')" />
+                            <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" min="1" max="99"
+                                wire:model.live="form.semana_intensibo_introductorio_calendario_academico" class="w-full mt-1"
+                                placeholder="Opcional" />
+                            <x-input-error :messages="$errors->first('form.semana_intensibo_introductorio_calendario_academico')"
                                 class="mt-2" />
                         </div>
                     </div>
@@ -178,10 +235,15 @@
                                     eventoColor: '',
                                     eventoSeleccionado: '',
                                     clickCount: 0,
+                                    mapaEventosAlpine: @entangle('eventosPorFecha'),
+                                    bibliotecaAlpine: @entangle('bibliotecaEventos'),
                                     eventosAlpine: @entangle('eventosRegistrados'),
-                                    bibliotecaAlpine: @js($bibliotecaEventos),
+
+
+
                                     tooltip: { visible: false, x: 0, y: 0, content: null },
                                     tooltipTimeout: null,
+                                    isOverTooltip: false,
                                     currentYear: null,
                                     calStartYear: null,
                                     calEndYear: null,
@@ -192,8 +254,12 @@
                                     nuevoColorId: @entangle('form.nuevoColorId'),
                                     nuevoTipo: @entangle('form.nuevoTipo'),
                                     nuevoLaborable: @entangle('form.nuevoLaborable'),
-                                    nuevoRepetible: @entangle('form.nuevoRepetible'),
-                                    isCreatingEvento: @entangle('form.isCreatingEvento'),
+                                     nuevoRepetible: @entangle('form.nuevoRepetible'),
+                                      nuevoIsRangoDias: @entangle('form.nuevoIsRangoDias'),
+                                      nuevoRangoDias: @entangle('form.nuevoRangoDias'),
+                                      nuevoIsIndependiente: @entangle('form.nuevoIsIndependiente'),
+
+                                     isCreatingEvento: @entangle('form.isCreatingEvento'),
 
                                     formatDate(dateStr) {
                                         if (!dateStr) return '';
@@ -239,7 +305,12 @@
                                                     month: monthIndex,
                                                     year: year
                                                 },
-                                                range: { min: inicio, max: fin, disablePast: false, disableAllDays: false },
+                                                range: { 
+                                                    min: inicio, 
+                                                    max: fin, 
+                                                    disablePast: false, 
+                                                    disableAllDays: false
+                                                },
                                                 selection: { day: 'single' },
                                                 visibility: { daysOutside: false, today: false, theme: isDark ? 'dark' : 'light' }
                                             },
@@ -270,6 +341,8 @@
                                                         this.clickCount  = 0;
                                                         this._savedStart = '';
                                                         this._savedCount = 0;
+                                                        let targetYear = new Date(this.selectedEventStart + 'T00:00:00').getFullYear();
+                                                        $wire.set('selectedYearTemporal', targetYear);
                                                         this.showEventModal = true;
                                                         this.$nextTick(() => this.refrescarEventosVisuales());
                                                     }
@@ -299,11 +372,25 @@
                                         this.clickCount = 0;
                                         this.$watch('inicio', (val) => { if(val && fin) this.setupCalendar(); });
                                         this.$watch('fin', (val) => { if(val && inicio) this.setupCalendar(); });
-                                        this.$watch('eventosAlpine', () => {
+                                        this.$watch('nuevoTipo', (val) => {
+                                            if (val == '1' || val == '2') {
+                                                this.nuevoLaborable = false;
+                                                this.nuevoRepetible = false;
+                                                this.nuevoIsRangoDias = false;
+                                                this.nuevoRangoDias = '';
+                                                this.nuevoIsIndependiente = true;
+                                            } else {
+                                                this.nuevoRepetible = true;
+                                            }
+                                        });
+                                        this.$watch('mapaEventosAlpine', () => {
                                             if (this.picker1) this.picker1.update();
                                             if (this.picker2) this.picker2.update();
                                             if (this.picker3) this.picker3.update();
                                             if (this.picker4) this.picker4.update();
+                                            this.$nextTick(() => this.refrescarEventosVisuales());
+                                        });
+                                        this.$watch('eventosAlpine', () => {
                                             this.$nextTick(() => this.refrescarEventosVisuales());
                                         });
                                         // initial setup if dates exist
@@ -327,29 +414,29 @@
                                     },
                                     refrescarEventosVisuales() {
                                         if (!this.picker1 && !this.picker2 && !this.picker3 && !this.picker4) return;
-                                        let dayColors = {};
-                                        let dayEventsCount = {};
-                                        if (this.eventosAlpine && this.eventosAlpine.length > 0) {
-                                            this.eventosAlpine.forEach(ev => {
-                                                let startD = new Date(ev.inicio + 'T00:00:00');
-                                                let endD   = new Date(ev.fin + 'T00:00:00');
-                                                while (startD <= endD) {
-                                                    let y = startD.getFullYear();
-                                                    let m = String(startD.getMonth() + 1).padStart(2, '0');
-                                                    let d = String(startD.getDate()).padStart(2, '0');
-                                                    let dateStr = `${y}-${m}-${d}`;
-                                                    dayColors[dateStr] = ev.color;
-                                                    dayEventsCount[dateStr] = (dayEventsCount[dateStr] || 0) + 1;
-                                                    startD.setDate(startD.getDate() + 1);
-                                                }
-                                            });
-                                        }
+                                        this.mapaEventosAlpine = this.mapaEventosAlpine || {};
+                                        const dayColors = {};
+                                        const dayEventsCount = {};
+                                        
+                                        Object.keys(this.mapaEventosAlpine).forEach(fecha => {
+                                            const eventos = this.mapaEventosAlpine[fecha];
+                                            if (eventos && eventos.length > 0) {
+                                                // Tomar el color del primer evento para el fondo del día
+                                                dayColors[fecha] = eventos[0].color;
+                                                dayEventsCount[fecha] = eventos.length;
+                                            }
+                                        });
+
                                         [this.$refs.calendar1, this.$refs.calendar2, this.$refs.calendar3, this.$refs.calendar4].forEach(calendarEl => {
                                             if (!calendarEl) return;
                                             calendarEl.querySelectorAll('[data-calendar-day]').forEach(btn => {
-                                            const day = btn.dataset.calendarDay;
-                                            btn.style.backgroundColor = ''; btn.style.color = ''; btn.style.border = '';
-                                            btn.classList.remove('sogat-evento-registrado');
+                                                const day = btn.dataset.calendarDay;
+                                                const dObj = new Date(day + 'T00:00:00');
+                                                const dayOfWeek = dObj.getDay();
+
+
+                                                btn.style.backgroundColor = ''; btn.style.color = ''; btn.style.border = '';
+                                                btn.classList.remove('sogat-evento-registrado');
                                             
                                             // Limpiar contador previo
                                             const existingBadge = btn.querySelector('.sogat-event-counter');
@@ -370,70 +457,345 @@
                                                     btn.style.position = 'relative';
                                                     btn.appendChild(badge);
                                                 }
-                                                const matchingEvents = this.eventosAlpine.filter(ev => {
-                                                    let s = new Date(ev.inicio + 'T00:00:00');
-                                                    let e = new Date(ev.fin + 'T00:00:00');
-                                                    let d = new Date(day + 'T00:00:00');
-                                                    return d >= s && d <= e;
-                                                });
-                                                btn.addEventListener('mouseenter', (e) => { 
-                                                    clearTimeout(this.tooltipTimeout); 
-                                                    const rect = btn.getBoundingClientRect();
-                                                    this.tooltip.content = matchingEvents; 
-                                                    this.tooltip.visible = true; 
-                                                    this.tooltip.x = rect.left + (rect.width / 2); 
-                                                    this.tooltip.y = rect.top; 
-                                                });
-                                                btn.addEventListener('mouseleave', () => { 
-                                                    this.tooltipTimeout = setTimeout(() => {
-                                                        this.tooltip.visible = false; 
-                                                        this.tooltip.content = null; 
-                                                    }, 300);
-                                                });
                                             }
                                             });
+
+                                            // 1. Modificar headers de la semana para agregar columnas TR y NI
+                                            const weekHeaders = calendarEl.querySelectorAll('.vanilla-calendar-week');
+                                            weekHeaders.forEach(weekEl => {
+                                                if (weekEl && !weekEl.querySelector('.sogat-week-hdr-tr')) {
+                                                    const trHdr = document.createElement('div');
+                                                    trHdr.className = 'vanilla-calendar-week-day sogat-week-hdr-tr font-black text-[10px] text-gray-500 dark:text-gray-400 border-l border-gray-100 dark:border-gray-700 flex items-center justify-center';
+                                                    trHdr.style.setProperty('color', '#ef4444', 'important'); // color rojo como Sábado/Domingo en el diseño
+                                                    trHdr.innerText = 'TR';
+                                                    
+                                                    const niHdr = document.createElement('div');
+                                                    niHdr.className = 'vanilla-calendar-week-day sogat-week-hdr-ni font-black text-[10px] text-gray-500 dark:text-gray-400 border-l border-gray-100 dark:border-gray-700 flex items-center justify-center';
+                                                    niHdr.style.setProperty('color', '#0ea5e9', 'important'); // azul celeste
+                                                    niHdr.innerText = 'NI';
+                                                    
+                                                    weekEl.appendChild(trHdr);
+                                                    weekEl.appendChild(niHdr);
+                                                }
+                                            });
+
+                                            // 2. Modificar los días para agregar las celdas semanales
+                                            const daysContainers = calendarEl.querySelectorAll('.vanilla-calendar-days');
+                                            daysContainers.forEach(daysContainer => {
+                                                // Filtrar cabeceras y celdas previas de TR/NI para reconstruir con datos frescos
+                                                const dayElements = Array.from(daysContainer.children).filter(el => {
+                                                    return !el.classList.contains('sogat-week-col-tr') && !el.classList.contains('sogat-week-col-ni');
+                                                });
+                                                if (dayElements.length === 0) return;
+
+                                                // Encontrar todas las fechas de inicio y fin de lapsos (especial_evento 2 y 3)
+                                                let inicios = [];
+                                                let fines = [];
+                                                let iniciosIntro = [];
+                                                let finesIntro = [];
+                                                let iniciosIntensivo = [];
+                                                let finesIntensivo = [];
+                                                // Encontrar todas las semanas festivas (Semana Santa = 4 y Carnaval = 5)
+                                                let semanasFestivas = new Set();
+
+                                                if (this.eventosAlpine) {
+                                                    this.eventosAlpine.forEach(ev => {
+                                                        const esp = ev.especial_evento ? String(ev.especial_evento) : null;
+                                                         const nombreEv = ev.nombre_evento ? ev.nombre_evento.toLowerCase() : (ev.nombre ? ev.nombre.toLowerCase() : '');
+                                                        if (esp === '2') {
+                                                            inicios.push(ev.inicio);
+                                                        } else if (esp === '3') {
+                                                            fines.push(ev.fin);
+                                                        } else if (esp === '7') {
+                                                            iniciosIntro.push(ev.inicio);
+                                                        } else if (esp === '8') {
+                                                            finesIntro.push(ev.fin);
+                                                        } else if (esp === '9') {
+                                                            iniciosIntensivo.push(ev.inicio);
+                                                        } else if (esp === '10') {
+                                                            finesIntensivo.push(ev.fin);
+                                                        } else if (esp === '4' || esp === '5' || nombreEv.includes('semana santa') || nombreEv.includes('carnaval') || nombreEv.includes('viernes santo') || nombreEv.includes('jueves santo')) {
+                                                            // Marcar cada lunes de semana festiva
+                                                            let d = new Date(ev.inicio + 'T00:00:00');
+                                                            let dFin = new Date(ev.fin + 'T00:00:00');
+                                                            while (d <= dFin) {
+                                                                const dayOfWeek = d.getDay();
+                                                                const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                                                                const monday = new Date(d);
+                                                                monday.setDate(monday.getDate() + offset);
+
+                                                                const y = monday.getFullYear();
+                                                                const m = String(monday.getMonth() + 1).padStart(2, '0');
+                                                                const dayStr = String(monday.getDate()).padStart(2, '0');
+                                                                semanasFestivas.add(`${y}-${m}-${dayStr}`);
+
+                                                                d.setDate(d.getDate() + 1);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                                inicios.sort();
+                                                fines.sort();
+                                                iniciosIntro.sort();
+                                                finesIntro.sort();
+                                                iniciosIntensivo.sort();
+                                                finesIntensivo.sort();
+
+                                                daysContainer.innerHTML = '';
+                                                for (let i = 0; i < dayElements.length; i += 7) {
+                                                    const weekDays = dayElements.slice(i, i + 7);
+                                                    weekDays.forEach(d => daysContainer.appendChild(d));
+
+                                                    // Obtener fechas reales de la semana
+                                                    const weekDates = weekDays
+                                                        .map(d => {
+                                                            if (d.dataset && d.dataset.calendarDay) return d.dataset.calendarDay;
+                                                            const btn = d.querySelector('[data-calendar-day]');
+                                                            return btn ? btn.dataset.calendarDay : null;
+                                                        })
+                                                        .filter(dateStr => !!dateStr);
+
+                                                    // Determinar si esta semana pertenece a algún lapso
+                                                    let activeLapsoIndex = -1;
+                                                    let activeLapsoInicio = null;
+                                                    let activeLapsoFin = null;
+
+                                                    for (let k = 0; k < inicios.length; k++) {
+                                                        const iniL = inicios[k];
+                                                        const finL = fines[k];
+                                                        if (!finL) continue;
+                                                        let hasLapso = false;
+                                                        for (let dStr of weekDates) {
+                                                            if (dStr >= iniL && dStr <= finL) {
+                                                                hasLapso = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (hasLapso) {
+                                                            activeLapsoIndex = k;
+                                                            activeLapsoInicio = iniL;
+                                                            activeLapsoFin = finL;
+                                                            break;
+                                                        }
+                                                    }
+                                                    
+                                                    // Determinar si esta semana pertenece a un lapso introductorio
+                                                    let activeIntroIndex = -1;
+                                                    let activeIntroInicio = null;
+                                                    let activeIntroFin = null;
+
+                                                    for (let k = 0; k < iniciosIntro.length; k++) {
+                                                        const iniL = iniciosIntro[k];
+                                                        const finL = finesIntro[k];
+                                                        if (!finL) continue;
+                                                        let hasLapso = false;
+                                                        for (let dStr of weekDates) {
+                                                            if (dStr >= iniL && dStr <= finL) {
+                                                                hasLapso = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (hasLapso) {
+                                                            activeIntroIndex = k;
+                                                            activeIntroInicio = iniL;
+                                                            activeIntroFin = finL;
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    // Determinar si esta semana pertenece a un curso intensivo
+                                                    let activeIntensivoIndex = -1;
+                                                    let activeIntensivoInicio = null;
+                                                    let activeIntensivoFin = null;
+
+                                                    for (let k = 0; k < iniciosIntensivo.length; k++) {
+                                                        const iniL = iniciosIntensivo[k];
+                                                        const finL = finesIntensivo[k];
+                                                        if (!finL) continue;
+                                                        let hasLapso = false;
+                                                        for (let dStr of weekDates) {
+                                                            if (dStr >= iniL && dStr <= finL) {
+                                                                hasLapso = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (hasLapso) {
+                                                            activeIntensivoIndex = k;
+                                                            activeIntensivoInicio = iniL;
+                                                            activeIntensivoFin = finL;
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    let trVal = '';
+                                                    let niVal = '';
+
+                                                    const getWeekCount = (lapsoInicioStr) => {
+                                                         const firstDateStr = weekDates[0];
+                                                         const firstDate = new Date(firstDateStr + 'T00:00:00');
+                                                         const lapsoDate = new Date(lapsoInicioStr + 'T00:00:00');
+
+                                                         const dayOfWeek = lapsoDate.getDay();
+                                                         const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                                                         const mondayInicioLapso = new Date(lapsoDate);
+                                                         mondayInicioLapso.setDate(mondayInicioLapso.getDate() + offset);
+
+                                                         const currentDayOfWeek = firstDate.getDay();
+                                                         const currentOffset = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+                                                         const mondayCurrent = new Date(firstDate);
+                                                         mondayCurrent.setDate(mondayCurrent.getDate() + currentOffset);
+
+                                                         const yCurr = mondayCurrent.getFullYear();
+                                                         const mCurr = String(mondayCurrent.getMonth() + 1).padStart(2, '0');
+                                                         const dCurr = String(mondayCurrent.getDate()).padStart(2, '0');
+                                                         const mondayCurrentStr = `${yCurr}-${mCurr}-${dCurr}`;
+
+                                                         if (semanasFestivas.has(mondayCurrentStr)) {
+                                                             return '';
+                                                         }
+                                                         
+                                                         let weekIndex = 0;
+                                                         let tempMonday = new Date(mondayInicioLapso);
+                                                         while (tempMonday <= mondayCurrent) {
+                                                             const yTemp = tempMonday.getFullYear();
+                                                             const mTemp = String(tempMonday.getMonth() + 1).padStart(2, '0');
+                                                             const dTemp = String(tempMonday.getDate()).padStart(2, '0');
+                                                             const tempMondayStr = `${yTemp}-${mTemp}-${dTemp}`;
+
+                                                             if (!semanasFestivas.has(tempMondayStr)) {
+                                                                 weekIndex++;
+                                                             }
+
+                                                             tempMonday.setDate(tempMonday.getDate() + 7);
+                                                         }
+                                                         return weekIndex;
+                                                    };
+
+                                                    if (activeLapsoIndex !== -1 && weekDates.length > 0) {
+                                                         const weekIndex = getWeekCount(activeLapsoInicio);
+                                                         if (weekIndex !== '') {
+                                                             const suffixes = ['I', 'II', 'III', 'IV', 'V'];
+                                                             const suffix = suffixes[activeLapsoIndex] || 'I';
+                                                             trVal = `${weekIndex}${suffix}`;
+                                                         }
+                                                    } else if (activeIntensivoIndex !== -1 && weekDates.length > 0) {
+                                                         const weekIndex = getWeekCount(activeIntensivoInicio);
+                                                         if (weekIndex !== '') {
+                                                             trVal = `${weekIndex}IN`;
+                                                         }
+                                                    }
+                                                    
+                                                    if (activeIntroIndex !== -1 && weekDates.length > 0) {
+                                                         const weekIndex = getWeekCount(activeIntroInicio);
+                                                         if (weekIndex !== '') {
+                                                             niVal = `${weekIndex}`;
+                                                         }
+                                                    }
+
+                                                    const trCell = document.createElement('div');
+                                                    trCell.className = 'sogat-week-col-tr flex items-center justify-center text-xs font-black text-gray-900 dark:text-gray-100 border-l border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 rounded-md';
+                                                    trCell.innerText = trVal;
+
+                                                    const niCell = document.createElement('div');
+                                                    niCell.className = 'sogat-week-col-ni flex items-center justify-center text-xs font-black text-sky-500 border-l border-gray-100 dark:border-gray-700 bg-sky-50/50 dark:bg-sky-900/20 rounded-md';
+                                                    niCell.innerText = niVal;
+
+                                                    daysContainer.appendChild(trCell);
+                                                    daysContainer.appendChild(niCell);
+                                                }
+                                            });
+
+                                             // Implementar delegación de eventos para el tooltip (más estable que listeners individuales)
+                                             if (!calendarEl._hasTooltipListeners) {
+                                                 calendarEl.addEventListener('mouseover', (e) => {
+                                                     clearTimeout(this.tooltipTimeout);
+
+                                                     const btn = e.target.closest('[data-calendar-day]');
+                                                     if (btn && btn.classList.contains('sogat-evento-registrado')) {
+                                                         const day = btn.dataset.calendarDay;
+                                                         const events = this.mapaEventosAlpine[day];
+
+                                                         if (events && events.length > 0) {
+                                                             const rect = btn.getBoundingClientRect();
+                                                             this.tooltip.content = events;
+                                                             this.tooltip.visible = true;
+                                                             this.tooltip.x = rect.left + (rect.width / 2);
+                                                             this.tooltip.y = rect.top;
+                                                             return;
+                                                         }
+                                                     }
+
+                                                     this.tooltipTimeout = setTimeout(() => {
+                                                         if (!this.isOverTooltip) {
+                                                             this.tooltip.visible = false;
+                                                             this.tooltip.content = null;
+                                                         }
+                                                     }, 300);
+                                                 });
+
+                                                 calendarEl.addEventListener('mouseleave', () => {
+                                                     this.tooltipTimeout = setTimeout(() => {
+                                                         if (!this.isOverTooltip) {
+                                                             this.tooltip.visible = false;
+                                                             this.tooltip.content = null;
+                                                         }
+                                                     }, 300);
+                                                 });
+                                                 calendarEl._hasTooltipListeners = true;
+                                             }
                                         });
                                     },
                                     guardarEvento() {
-                                         if(!this.eventoNombre || !this.eventoNombre.trim()) { alert('Debe ingresar un nombre para el evento.'); return; }
-                                         
-                                         // Buscar si el nombre existe en la biblioteca
-                                         const existing = this.bibliotecaAlpine.find(o => o.nombre_evento.toUpperCase() === this.eventoNombre.trim().toUpperCase());
-                                         
-                                         if (existing) {
-                                             this.eventoSeleccionado = existing.id_evento;
-                                             this.eventoTipo = existing.tipo_evento;
-                                             this.eventoColor = existing.codigo_color;
-                                             $wire.agregarEvento(this.selectedEventStart, this.selectedEventEnd, this.eventoSeleccionado, this.eventoNombre, this.eventoTipo, this.eventoColor);
-                                             this.closeModal();
-                                         } else {
-                                             // No existe, abrir el modal de registro rápido
-                                             this.showEventModal = false;
-                                             this.showQuickModal = true;
-                                             this.isCreatingEvento = true;
-                                         }
-                                     },
+                                        if(!this.eventoNombre || !this.eventoNombre.trim()) { alert('Debe ingresar un nombre para el evento.'); return; }
+                                        
+                                        // Buscar si el nombre existe en la biblioteca
+                                        const existing = this.bibliotecaAlpine.find(o => o.nombre_evento.trim().toUpperCase() === this.eventoNombre.trim().toUpperCase());
+                                        
+                                        if (existing) {
+                                            if (this._clickLock) return;
+                                            this._clickLock = true;
+                                            this.eventoSeleccionado = existing.id_evento;
+                                            this.eventoTipo = existing.tipo_evento;
+                                            this.eventoColor = existing.codigo_color;
+                                            $wire.agregarEvento(this.selectedEventStart, this.selectedEventEnd, this.eventoSeleccionado, this.eventoNombre, this.eventoTipo, this.eventoColor)
+                                                .then(() => { 
+                                                    this._clickLock = false; 
+                                                    this.closeModal(); 
+                                                });
+                                        } else {
+                                            // No existe, abrir el modal de registro rápido
+                                            this.showEventModal = false;
+                                            this.showQuickModal = true;
+                                            this.isCreatingEvento = true;
+                                        }
+                                    },
 
-                                     confirmarNuevoEvento() {
-                                         if (!this.nuevoColorId) { alert('Debe seleccionar un color para el nuevo evento.'); return; }
-                                         
-                                         $wire.crearYAgregarEvento(
-                                             this.selectedEventStart, 
-                                             this.selectedEventEnd, 
-                                             this.eventoNombre, 
-                                             this.nuevoTipo, 
-                                             this.nuevoColorId, 
-                                             this.nuevoLaborable, 
-                                             this.nuevoRepetible
-                                         ).then(success => {
-                                             if (success) {
-                                                 this.showQuickModal = false;
-                                                 this.closeModal();
-                                             }
-                                         });
-                                     },
+                                    confirmarNuevoEvento() {
+                                        if (!this.nuevoColorId) { alert('Debe seleccionar un color para el nuevo evento.'); return; }
+                                        if (this._clickLock) return;
+                                        this._clickLock = true;
+                                        
+                                        $wire.crearYAgregarEvento(
+                                            this.selectedEventStart, 
+                                            this.selectedEventEnd, 
+                                            this.eventoNombre, 
+                                            this.nuevoTipo, 
+                                            this.nuevoColorId, 
+                                            this.nuevoLaborable, 
+                                            this.nuevoRepetible,
+                                            this.nuevoIsRangoDias,
+                                            this.nuevoRangoDias
+                                        ).then(success => {
+                                            this._clickLock = false;
+                                            if (success) {
+                                                this.showQuickModal = false;
+                                                this.closeModal();
+                                            }
+                                        });
+                                    },
 
                                      closeModal() {
+                                         $wire.set('selectedYearTemporal', null);
                                          this.showEventModal = false;
                                          this.showQuickModal = false;
                                          if(this.picker1) {
@@ -445,7 +807,7 @@
                                          }
                                          this.selectedEventStart = ''; this.selectedEventEnd = ''; this.eventoNombre = '';
                                          this.eventoSeleccionado = ''; this.clickCount = 0;
-                                                                                   this.nuevoColorId = ''; this.nuevoTipo = '1'; this.nuevoLaborable = false; this.nuevoRepetible = false; this.isCreatingEvento = false;
+                                                                                   this.nuevoColorId = ''; this.nuevoTipo = '1'; this.nuevoLaborable = false; this.nuevoRepetible = false; this.nuevoIsRangoDias = false; this.nuevoRangoDias = ''; this.nuevoIsIndependiente = true; this.isCreatingEvento = false;
 
                                      },
                                     eliminarEventoDesdeTooltip(ev) {
@@ -469,10 +831,11 @@
                                 }" class="space-y-6 pt-4">
 
                             {{-- Tooltip --}}
-                            <div x-show="tooltip.visible" x-cloak @mouseenter="clearTimeout(tooltipTimeout)"
-                                @mouseleave="tooltipTimeout = setTimeout(() => { tooltip.visible = false; tooltip.content = null; }, 300)"
-                                :style="`position: fixed; top: ${tooltip.y - 8}px; left: ${tooltip.x}px; z-index: 9999; transform: translate(-50%, -100%); pointer-events: auto;`"
-                                class="sogat-tooltip-card bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 p-4 min-w-[250px]">
+                            <div x-show="tooltip.visible" x-cloak wire:ignore
+                                @mouseenter="isOverTooltip = true; clearTimeout(tooltipTimeout)"
+                                @mouseleave="isOverTooltip = false; tooltipTimeout = setTimeout(() => { tooltip.visible = false; tooltip.content = null; }, 300)"
+                                :style="`position: fixed; top: ${tooltip.y - 8}px; left: ${tooltip.x}px; z-index: 9999; transform: translate(-50%, -100%); pointer-events: auto; min-width: 250px;`"
+                                class="sogat-tooltip-card bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                                 <template x-if="tooltip.content && tooltip.content.length > 0">
                                     <div>
                                         <template x-for="(ev, i) in tooltip.content" :key="i">
@@ -484,7 +847,7 @@
                                                             :style="`background-color: ${ev.color}`"></span>
                                                         <span
                                                             class="font-extrabold text-sm text-gray-800 dark:text-gray-100"
-                                                            x-text="ev.nombre"></span>
+                                                            x-text="ev.nombre_evento || 'Evento sin nombre'"></span>
                                                     </div>
                                                     <div
                                                         class="text-[11px] mt-1 opacity-90 text-gray-600 dark:text-gray-400">
@@ -542,12 +905,47 @@
                                 </div>
                             </template>
 
+                            @if ($this->vacacionesContador)
+                            <div class="flex justify-center mb-6 -mt-4">
+                                @if ($this->vacacionesContador['faltantes'] > 0)
+                                <div class="px-4 py-1.5 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-full text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center">
+                                    <span>
+                                        Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados {{ $this->vacacionesContador['total_asignados'] }} de {{ $this->vacacionesContador['requeridos'] }} días
+                                        @if ($this->vacacionesContador['asignados_otros'] > 0)
+                                        <span class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }} días en otros períodos)</span>
+                                        @endif
+                                    </span>
+                                </div>
+                                @elseif ($this->vacacionesContador['excedidos'] > 0)
+                                <div class="px-4 py-1.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-full text-red-600 dark:text-red-400 text-xs font-bold flex items-center">
+                                    <span>
+                                        Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados {{ $this->vacacionesContador['total_asignados'] }} de {{ $this->vacacionesContador['requeridos'] }} días
+                                        @if ($this->vacacionesContador['asignados_otros'] > 0)
+                                        <span class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }} días en otros períodos)</span>
+                                        @endif
+                                    </span>
+                                </div>
+                                @else
+                                <div class="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-full text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center">
+                                    <span>
+                                        Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados {{ $this->vacacionesContador['total_asignados'] }} de {{ $this->vacacionesContador['requeridos'] }} días
+                                        @if ($this->vacacionesContador['asignados_otros'] > 0)
+                                        <span class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }} días en otros períodos)</span>
+                                        @endif
+                                    </span>
+                                </div>
+                                @endif
+                            </div>
+                            @endif
+
+
                             {{-- Indicador de fecha seleccionada (siempre visible) --}}
-                            <div x-show="selectedEventStart"
-                                 class="flex justify-center mb-6 -mt-4">
-                                <div class="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-full text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center gap-2">
+                            <div x-show="selectedEventStart" class="flex justify-center mb-6 -mt-4">
+                                <div
+                                    class="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-full text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center gap-2">
                                     <span class="material-icons text-sm">event</span>
-                                    <span x-text="'Fecha de inicio seleccionada para el evento: ' + formatDate(selectedEventStart)"></span>
+                                    <span
+                                        x-text="'Fecha de inicio seleccionada para el evento: ' + formatDate(selectedEventStart)"></span>
                                 </div>
                             </div>
 
@@ -560,15 +958,17 @@
                                         @click="if(isTrimestreHabilitado(1)) openTrimestre = openTrimestre === 1 ? null : 1">
                                         <h4
                                             class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Primer Trimestre del Año 
+                                            Primer Trimestre del Año
                                             <template x-if="isTrimestreHabilitado(1)">
-                                                <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(0, 2)"></span></span>
+                                                <span>| Eventos Asignados: <span
+                                                        x-text="contarEventosTrimestre(0, 2)"></span></span>
                                             </template>
                                         </h4>
                                         <span class="material-icons transition-transform duration-200"
                                             x-show="isTrimestreHabilitado(1)"
                                             :class="openTrimestre === 1 ? 'rotate-180' : ''">expand_more</span>
-                                        <span class="material-icons text-gray-400" x-show="!isTrimestreHabilitado(1)">lock</span>
+                                        <span class="material-icons text-gray-400"
+                                            x-show="!isTrimestreHabilitado(1)">lock</span>
                                     </div>
                                     <div x-show="openTrimestre === 1" x-collapse
                                         class="p-4 flex justify-center flex-col items-center">
@@ -584,15 +984,17 @@
                                         @click="if(isTrimestreHabilitado(2)) openTrimestre = openTrimestre === 2 ? null : 2">
                                         <h4
                                             class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Segundo Trimestre del Año 
+                                            Segundo Trimestre del Año
                                             <template x-if="isTrimestreHabilitado(2)">
-                                                <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(3, 5)"></span></span>
+                                                <span>| Eventos Asignados: <span
+                                                        x-text="contarEventosTrimestre(3, 5)"></span></span>
                                             </template>
                                         </h4>
                                         <span class="material-icons transition-transform duration-200"
                                             x-show="isTrimestreHabilitado(2)"
                                             :class="openTrimestre === 2 ? 'rotate-180' : ''">expand_more</span>
-                                        <span class="material-icons text-gray-400" x-show="!isTrimestreHabilitado(2)">lock</span>
+                                        <span class="material-icons text-gray-400"
+                                            x-show="!isTrimestreHabilitado(2)">lock</span>
                                     </div>
                                     <div x-show="openTrimestre === 2" x-collapse
                                         class="p-4 flex justify-center flex-col items-center">
@@ -608,15 +1010,17 @@
                                         @click="if(isTrimestreHabilitado(3)) openTrimestre = openTrimestre === 3 ? null : 3">
                                         <h4
                                             class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Tercer Trimestre del Año 
+                                            Tercer Trimestre del Año
                                             <template x-if="isTrimestreHabilitado(3)">
-                                                <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(6, 8)"></span></span>
+                                                <span>| Eventos Asignados: <span
+                                                        x-text="contarEventosTrimestre(6, 8)"></span></span>
                                             </template>
                                         </h4>
                                         <span class="material-icons transition-transform duration-200"
                                             x-show="isTrimestreHabilitado(3)"
                                             :class="openTrimestre === 3 ? 'rotate-180' : ''">expand_more</span>
-                                        <span class="material-icons text-gray-400" x-show="!isTrimestreHabilitado(3)">lock</span>
+                                        <span class="material-icons text-gray-400"
+                                            x-show="!isTrimestreHabilitado(3)">lock</span>
                                     </div>
                                     <div x-show="openTrimestre === 3" x-collapse
                                         class="p-4 flex justify-center flex-col items-center">
@@ -632,15 +1036,17 @@
                                         @click="if(isTrimestreHabilitado(4)) openTrimestre = openTrimestre === 4 ? null : 4">
                                         <h4
                                             class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                                            Cuarto Trimestre del Año 
+                                            Cuarto Trimestre del Año
                                             <template x-if="isTrimestreHabilitado(4)">
-                                                <span>| Eventos Asignados: <span x-text="contarEventosTrimestre(9, 11)"></span></span>
+                                                <span>| Eventos Asignados: <span
+                                                        x-text="contarEventosTrimestre(9, 11)"></span></span>
                                             </template>
                                         </h4>
                                         <span class="material-icons transition-transform duration-200"
                                             x-show="isTrimestreHabilitado(4)"
                                             :class="openTrimestre === 4 ? 'rotate-180' : ''">expand_more</span>
-                                        <span class="material-icons text-gray-400" x-show="!isTrimestreHabilitado(4)">lock</span>
+                                        <span class="material-icons text-gray-400"
+                                            x-show="!isTrimestreHabilitado(4)">lock</span>
                                     </div>
                                     <div x-show="openTrimestre === 4" x-collapse
                                         class="p-4 flex justify-center flex-col items-center">
@@ -650,94 +1056,163 @@
                                 </div>
                             </div>
 
-                             {{-- Modal Registro Rápido (Nuevo Evento) --}}
-                             <div x-show="showQuickModal" style="display: none;"
-                                 class="fixed inset-0 z-50 flex items-center justify-center px-4">
-                                 <div @click.away="closeModal()" x-transition:enter="ease-out duration-300"
-                                     x-transition:enter-start="opacity-0 scale-90"
-                                     x-transition:enter-end="opacity-100 scale-100"
-                                     class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-lg border border-gray-200 dark:border-gray-700">
-                                     <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 uppercase tracking-widest text-center">
-                                         Nuevo Evento Detectado
-                                     </h3>
-                                     <p class="text-center text-gray-500 dark:text-gray-400 text-sm mb-6">
-                                         El evento "<span class="font-bold text-gray-700 dark:text-gray-200" x-text="eventoNombre"></span>" no existe en la biblioteca. Por favor, configúrelo:
-                                     </p>
+                            {{-- Modal Registro Rápido (Nuevo Evento) --}}
+                            <div x-show="showQuickModal" style="display: none;"
+                                class="fixed inset-0 z-50 flex items-center justify-center px-4">
+                                <div @click.away="closeModal()" x-transition:enter="ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 scale-90"
+                                    x-transition:enter-end="opacity-100 scale-100"
+                                    class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-3xl border border-gray-200 dark:border-gray-700">
+                                    <h3
+                                        class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 uppercase tracking-widest text-center">
+                                        Nuevo Evento Detectado
+                                    </h3>
+                                    <p class="text-center text-gray-500 dark:text-gray-400 text-sm mb-6">
+                                        El evento "<span class="font-bold text-gray-700 dark:text-gray-200"
+                                            x-text="eventoNombre"></span>" no existe en la biblioteca. Por favor,
+                                        configúrelo:
+                                    </p>
+                                    <div class="space-y-6">
+                                        {{-- Lógica PHP de Control de Deshabilitación --}}
+                                        @php
+                                        $deshabilitarIndependienteLaborable = in_array($form->nuevoTipo, ['1', '2', '6'], true);
+                                        // La cantidad de días se deshabilita únicamente si el switch de rango está apagado
+                                        $deshabilitarCantidadRango = !$form->nuevoIsRangoDias;
+                                        @endphp
 
-                                     <div class="space-y-6">
-                                         {{-- Selección de Color (Estilo Modulo Eventos) --}}
-                                         <div>
-                                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Color del Evento</label>
-                                             <div x-data="{ 
-                                                     openColores: false, 
-                                                     colores: @entangle('colores'),
-                                                     get selectedHex() {
-                                                         let color = this.colores.find(c => c.id_color == nuevoColorId);
-                                                         return color ? color.codigo_color : null;
-                                                     },
-                                                     get selectedName() {
-                                                         let color = this.colores.find(c => c.id_color == nuevoColorId);
-                                                         return color ? color.nombre_color : 'Seleccione un color';
-                                                     }
-                                                 }" 
-                                                 class="relative w-full">
-                                                 
-                                                 <button @click="openColores = !openColores" type="button" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl pl-4 pr-10 py-3 text-left focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-sm min-h-[48px]">
-                                                     <span class="flex items-center gap-3">
-                                                         <template x-if="selectedHex">
-                                                             <span class="w-6 h-6 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm" :style="`background-color: ${selectedHex}`"></span>
-                                                         </template>
-                                                         <span class="block truncate text-sm font-medium" :class="nuevoColorId ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'" x-text="selectedName"></span>
-                                                     </span>
-                                                     <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                                                         <span class="material-icons">expand_more</span>
-                                                     </span>
-                                                 </button>
+                                        {{-- Cuadrícula Principal de 3 Columnas Uniformes (3x3) --}}
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-2 items-start">
 
-                                                 <div x-show="openColores" @click.away="openColores = false" x-transition.opacity class="absolute z-10 mt-2 w-full bg-white dark:bg-gray-800 shadow-2xl max-h-60 rounded-2xl py-2 border border-gray-100 dark:border-gray-700 overflow-auto focus:outline-none" style="display: none;">
-                                                     <ul class="flex flex-col w-full">
-                                                         @foreach($colores as $color)
-                                                             <li @click="nuevoColorId = {{ $color->id_color }}; openColores = false" 
-                                                                 class="cursor-pointer select-none w-full px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 flex items-center transition-colors" 
-                                                                 :class="nuevoColorId == {{ $color->id_color }} ? 'bg-gray-50 dark:bg-gray-700/50' : ''">
-                                                                 <div class="flex items-center gap-4">
-                                                                     <span class="w-7 h-7 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm" style="background-color: {{ $color->codigo_color }}"></span>
-                                                                     <span class="text-gray-900 dark:text-gray-200 text-sm font-semibold">{{ mb_strtoupper($color->nombre_color) }}</span>
-                                                                 </div>
-                                                             </li>
-                                                         @endforeach
-                                                     </ul>
-                                                 </div>
-                                             </div>
-                                         </div>
+                                            {{-- FILA 1 --}}
+                                            {{-- Columna 1: Tipo de Evento --}}
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tipo de Evento</label>
+                                                <select x-model="nuevoTipo" wire:model.live="form.nuevoTipo"
+                                                    class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400">
+                                                    <option value="1">FERIADOS NACIONALES</option>
+                                                    <option value="2">FERIADOS LOCALES</option>
+                                                    <option value="6">FERIADO MUNDIAL</option>
+                                                    <option value="3">ADMINISTRATIVO</option>
+                                                    <option value="4">ACADÉMICO</option>
+                                                    <option value="5">ADMINISTRATIVO/ACADÉMICO</option>
+                                                </select>
+                                            </div>
 
-                                         {{-- Tipo de Evento --}}
-                                         <div>
-                                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tipo de Evento</label>
-                                             <select x-model="nuevoTipo" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400">
-                                                 <option value="1">FERIADO NACIONAL</option>
-                                                 <option value="2">ADMINISTRATIVO/ACADÉMICO</option>
-                                                 <option value="3">OTROS</option>
-                                             </select>
-                                         </div>
+                                            {{-- Columna 2: Nombre del Evento (Texto estático que se envía al backend) --}}
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre del Evento</label>
+                                                <div class="w-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-700 dark:text-gray-300 font-semibold shadow-sm">
+                                                    <span x-text="eventoNombre ? eventoNombre.toUpperCase() : 'EJ: CONGRESO NACIONAL'"></span>
+                                                </div>
+                                            </div>
 
-                                         {{-- Opciones adicionales --}}
-                                         <div class="space-y-4 pt-2" x-show="nuevoTipo != '1'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
-                                             <x-toggle-switch id="laborable_switch" :label="__('¿Es un día laborable?')" model="form.nuevoLaborable" />
-                                             <x-toggle-switch id="repetible_switch" :label="__('¿Es un evento repetible?')" model="form.nuevoRepetible" />
-                                         </div>
-                                     </div>
+                                            {{-- Columna 3: Selección de Color --}}
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Color del Evento *</label>
+                                                <div x-data="{ 
+                     openColores: false, 
+                     colores: @entangle('colores'),
+                     get selectedHex() {
+                         let color = this.colores.find(c => c.id_color == nuevoColorId);
+                         return color ? color.codigo_color : null;
+                     },
+                     get selectedName() {
+                         let color = this.colores.find(c => c.id_color == nuevoColorId);
+                         return color ? color.nombre_color : 'Seleccione un color';
+                     }
+                 }" class="relative">
 
-                                     <div class="flex flex-col gap-3 mt-8">
-                                         <x-primary-button @click="confirmarNuevoEvento()" class="w-full justify-center py-3 rounded-xl">
-                                             REGISTRAR Y ASIGNAR
-                                         </x-primary-button>
-                                         <x-secondary-button @click="closeModal()" class="w-full justify-center py-3 rounded-xl">
-                                             CANCELAR
-                                         </x-secondary-button>
-                                     </div>
-                                 </div>
-                             </div>
+                                                    <button @click="openColores = !openColores" type="button"
+                                                        class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-left focus:ring-2 focus:ring-gray-400 flex items-center justify-between transition-all">
+                                                        <div class="flex items-center gap-3 overflow-hidden">
+                                                            <div x-show="selectedHex"
+                                                                class="flex-shrink-0 w-5 h-5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm"
+                                                                :style="'background-color: ' + selectedHex"></div>
+                                                            <span class="text-sm text-gray-500 dark:text-gray-400 font-medium truncate"
+                                                                :class="nuevoColorId ? 'text-gray-700 dark:text-gray-200 font-semibold' : ''"
+                                                                x-text="selectedName.toUpperCase()"></span>
+                                                        </div>
+                                                        <span class="material-icons text-gray-400 transition-transform duration-200"
+                                                            :class="openColores ? 'rotate-180' : ''">expand_more</span>
+                                                    </button>
+
+                                                    <div x-show="openColores" @click.away="openColores = false"
+                                                        x-transition:enter="transition ease-out duration-200"
+                                                        x-transition:enter-start="opacity-0 translate-y-2"
+                                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                                        class="absolute z-[60] mt-2 w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 max-h-60 overflow-y-auto sogat-scrollbar">
+                                                        <ul class="divide-y divide-gray-50 dark:divide-gray-700/50">
+                                                            @foreach($colores as $color)
+                                                            <li @click="nuevoColorId = {{ $color->id_color }}; openColores = false"
+                                                                class="cursor-pointer select-none w-full px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 flex items-center transition-colors"
+                                                                :class="nuevoColorId == {{ $color->id_color }} ? 'bg-gray-50 dark:bg-gray-700/50' : ''">
+                                                                <div class="flex items-center gap-4">
+                                                                    <span class="w-7 h-7 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm"
+                                                                        style="background-color: {{ $color->codigo_color }}"></span>
+                                                                    <span class="text-gray-900 dark:text-gray-200 text-sm font-semibold">{{ mb_strtoupper($color->nombre_color) }}</span>
+                                                                </div>
+                                                            </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {{-- FILA 2 --}}
+                                            {{-- Columna 1: ¿Puede registrarse fuera de un semestre? --}}
+                                            <div>
+                                                <x-toggle-switch id="nuevo_is_independiente_switch" :label="__('¿Puede registrarse fuera de un semestre?')"
+                                                    model="form.nuevoIsIndependiente" :disabled="$deshabilitarIndependienteLaborable" />
+                                                <x-input-error :messages="$errors->get('form.nuevoIsIndependiente')" class="mt-2" />
+                                            </div>
+
+                                            {{-- Columna 2: ¿Es Laborable? --}}
+                                            <div>
+                                                <x-toggle-switch id="laborable_switch" :label="__('¿Es Laborable?')"
+                                                    model="form.nuevoLaborable" :disabled="$deshabilitarIndependienteLaborable" />
+                                            </div>
+
+                                            {{-- Columna 3: ¿Se puede repetir? --}}
+                                            <div>
+                                                <x-toggle-switch id="repetible_switch" :label="__('¿Se puede repetir?')"
+                                                    model="form.nuevoRepetible" :disabled="true" />
+                                            </div>
+
+                                            {{-- FILA 3 --}}
+                                            {{-- Columna 1: ¿Tiene cantidad específica de días de duración? --}}
+                                            <div>
+                                                <x-toggle-switch id="is_rango_dias_switch" :label="__('¿Tiene cantidad específica de días de duración?')"
+                                                    model="form.nuevoIsRangoDias" />
+                                            </div>
+
+                                            {{-- Columna 2: Cantidad de Días --}}
+                                            <div class="w-full">
+                                                <x-input-label for="nuevo_rango_dias_input" :value="__('Cantidad de días que debe durar el evento')" class="mb-2" />
+                                                <x-text-input id="nuevo_rango_dias_input" type="number"
+                                                    class="w-full block" wire:model.live="form.nuevoRangoDias"
+                                                    placeholder="EJ: 5" min="1" max="90" :disabled="$deshabilitarCantidadRango" />
+                                                <x-input-error :messages="$errors->get('form.nuevoRangoDias')" class="mt-2" />
+                                            </div>
+
+                                            {{-- Columna 3: Div vacío para mantener la simetría perfecta del bloque inferior --}}
+                                            <div class="hidden lg:block"></div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-col gap-3 mt-8">
+                                        <x-primary-button @click="confirmarNuevoEvento()" wire:loading.attr="disabled"
+                                            class="w-full justify-center py-3 rounded-xl">
+                                            <span wire:loading.remove>REGISTRAR Y ASIGNAR</span>
+                                            <span wire:loading>PROCESANDO...</span>
+                                        </x-primary-button>
+                                        <x-secondary-button @click="closeModal()"
+                                            class="w-full justify-center py-3 rounded-xl">
+                                            CANCELAR
+                                        </x-secondary-button>
+                                    </div>
+                                </div>
+                            </div>
 
                             {{-- Modal Registro --}}
                             <div x-show="showEventModal" style="display: none;"
@@ -756,8 +1231,6 @@
                                             <div class="text-gray-900 dark:text-gray-200 font-extrabold text-sm"
                                                 x-text="selectedEventStart"></div>
                                         </div>
-                                        <div class="text-gray-400 dark:text-gray-600 px-4"><span
-                                                class="material-icons text-sm">arrow_forward</span></div>
                                         <div class="text-right"><label
                                                 class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Fin</label>
                                             <div class="text-gray-900 dark:text-gray-200 font-extrabold text-sm"
@@ -765,16 +1238,13 @@
                                         </div>
                                     </div>
                                     <div class="space-y-5">
-                                         <div>
-                                             <x-datalist 
-                                                 label="Nombre del Evento"
-                                                 :options="collect($bibliotecaEventos)"
-                                                 textField="nombre_evento"
-                                                 wire:model.live="form.nombreEventoTemporal"
-                                                 placeholder="ESCRIBA O SELECCIONE UN EVENTO"
-                                             />
-                                         </div>
-                                     </div>
+                                        <div>
+                                            <x-datalist wire:key="datalist-register-{{ count($bibliotecaFiltrada) }}"
+                                                label="Nombre del Evento" :options="$bibliotecaFiltrada"
+                                                textField="nombre_evento" wire:model.live="form.nombreEventoTemporal"
+                                                placeholder="ESCRIBA O SELECCIONE UN EVENTO" />
+                                        </div>
+                                    </div>
                                     <div
                                         class="mt-8 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                                         <x-secondary-button type="button"

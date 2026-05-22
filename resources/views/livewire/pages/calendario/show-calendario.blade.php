@@ -13,9 +13,9 @@
 
                     {{-- Semana --}}
                     <div>
-                        <x-input-label value="Número de Semana:" />
+                        <x-input-label value="Semanas por Lapso:" />
                         <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">
-                            Semana {{ $calendario->semana_calendario_academico }}
+                            L1: {{ $calendario->semana_lapso_uno_calendario_academico }} | L2: {{ $calendario->semana_lapso_dos_calendario_academico }}
                         </p>
                     </div>
 

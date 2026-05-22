@@ -17,6 +17,10 @@ class Evento extends Model
     protected $casts = [
         'is_laborable_evento' => 'boolean',
         'is_repetible_evento' => 'boolean',
+        'is_rango_dias_evento' => 'boolean',
+        'is_independiente' => 'boolean',
+        'is_independiente_evento' => 'boolean',
+        'cantidad_dias_evento' => 'integer',
     ];
 
     public function color_rel()
@@ -41,8 +45,10 @@ class Evento extends Model
     {
         $tipos = [
             1 => 'Feriado Nacional', 
-            2 => 'Administrativo/Académico', 
-            3 => 'Otros'
+            2 => 'Feriado Local', 
+            3 => 'Administrativo',
+            4 => 'Académico',
+            5 => 'Administrativo/Académico'
         ];
         return $tipos[$this->tipo_evento] ?? 'Desconocido';
     }
@@ -50,7 +56,13 @@ class Evento extends Model
     public function getColorAttribute()
     {
         // Map tipo_evento to a color for visual compatibility
-        $colors = [1 => '#DC3545', 2 => '#007BFF', 3 => '#6c757d'];
+        $colors = [
+            1 => '#DC3545', 
+            2 => '#FFC107', 
+            3 => '#007BFF',
+            4 => '#28A745',
+            5 => '#6c757d'
+        ];
         return $this->color_rel->codigo_color ?? ($colors[$this->tipo_evento] ?? '#6c757d');
     }
 
