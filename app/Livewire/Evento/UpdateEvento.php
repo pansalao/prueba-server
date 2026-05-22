@@ -61,7 +61,15 @@ class UpdateEvento extends Component
                 $this->form->rango_dias = '1';
                 $this->form->is_independiente = true;
                 $this->form->cantidad_dias_evento = 0;
-            } elseif (in_array($this->form->especial_evento, ['7', '8', '9', '10'])) {
+            } elseif (in_array($this->form->especial_evento, ['7', '8'])) {
+                $this->form->is_laborable = true;
+                $this->form->is_repetible = true;
+                $this->form->tipo_evento = '4';
+                $this->form->is_rango_dias = true;
+                $this->form->rango_dias = '1';
+                $this->form->is_independiente = true;
+                $this->form->cantidad_dias_evento = 0;
+            } elseif (in_array($this->form->especial_evento, ['9', '10'])) {
                 $this->form->is_laborable = true;
                 $this->form->is_repetible = false;
                 $this->form->tipo_evento = '4';
