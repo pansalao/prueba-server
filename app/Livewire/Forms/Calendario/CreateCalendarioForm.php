@@ -202,7 +202,8 @@ class CreateCalendarioForm extends Form
             'dia_fin_calendario_academico' => $allRules['dia_fin_calendario_academico'],
             'semana_lapso_uno_calendario_academico' => $allRules['semana_lapso_uno_calendario_academico'],
             'semana_lapso_dos_calendario_academico' => $allRules['semana_lapso_dos_calendario_academico'],
-            'semana_lapso_introductorio_calendario_academico' => $allRules['semana_lapso_introductorio_calendario_academico'],
+            'semana_lapso_uno_introductorio_calendario_academico' => $allRules['semana_lapso_uno_introductorio_calendario_academico'],
+            'semana_lapso_dos_introductorio_calendario_academico' => $allRules['semana_lapso_dos_introductorio_calendario_academico'],
             'semana_intensibo_introductorio_calendario_academico' => $allRules['semana_intensibo_introductorio_calendario_academico'],
         ]);
 
@@ -223,12 +224,13 @@ class CreateCalendarioForm extends Form
         $semanasFechas = ceil(($inicioReal->diffInDays($finReal) + 1) / 7);
         $semanasLapso1 = (int)$this->semana_lapso_uno_calendario_academico;
         $semanasLapso2 = (int)$this->semana_lapso_dos_calendario_academico;
-        $semanasIntro = (int)$this->semana_lapso_introductorio_calendario_academico;
+        $semanasIntro1 = (int)$this->semana_lapso_uno_introductorio_calendario_academico;
+        $semanasIntro2 = (int)$this->semana_lapso_dos_introductorio_calendario_academico;
         $semanasIntensivo = (int)$this->semana_intensibo_introductorio_calendario_academico;
-        $totalSemanasLapsos = $semanasLapso1 + $semanasLapso2 + $semanasIntro + $semanasIntensivo;
+        $totalSemanasLapsos = $semanasLapso1 + $semanasLapso2 + $semanasIntro1 + $semanasIntro2 + $semanasIntensivo;
 
         if ($semanasFechas < $totalSemanasLapsos) {
-            $msg = "El período seleccionado solo dura {$semanasFechas} semanas físicas, lo cual no es suficiente para albergar las {$totalSemanasLapsos} semanas sumadas de los cuatro periodos (Lapsos, Introductorio e Intensivo). Extienda la fecha de fin o reduzca las semanas de los periodos.";
+            $msg = "El período seleccionado solo dura {$semanasFechas} semanas físicas, lo cual no es suficiente para albergar las {$totalSemanasLapsos} semanas sumadas de los periodos. Extienda la fecha de fin o reduzca las semanas de los periodos.";
             $this->addError('dia_fin_calendario_academico', $msg);
             throw \Illuminate\Validation\ValidationException::withMessages(['form.dia_fin_calendario_academico' => [$msg]]);
         }
