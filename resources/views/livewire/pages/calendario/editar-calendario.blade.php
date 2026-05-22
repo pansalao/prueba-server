@@ -167,18 +167,26 @@
                                 class="mt-2" />
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto mt-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mx-auto mt-6">
                         <div class="w-full">
-                            <x-input-label for="semana_lapso_introductorio_calendario_academico" :value="__('Cantidad de Semanas (Lapso Introductorio)')" />
-                            <x-text-input id="semana_lapso_introductorio_calendario_academico" type="number" min="1" max="99"
-                                wire:model.live="form.semana_lapso_introductorio_calendario_academico"
+                            <x-input-label for="semana_lapso_uno_introductorio_calendario_academico" :value="__('Semanas (Lapso 1 Introductorio)')" />
+                            <x-text-input id="semana_lapso_uno_introductorio_calendario_academico" type="number" min="0" max="99"
+                                wire:model.live="form.semana_lapso_uno_introductorio_calendario_academico"
                                 class="w-full mt-1" placeholder="Opcional" />
-                            <x-input-error :messages="$errors->first('form.semana_lapso_introductorio_calendario_academico')"
+                            <x-input-error :messages="$errors->first('form.semana_lapso_uno_introductorio_calendario_academico')"
                                 class="mt-2" />
                         </div>
                         <div class="w-full">
-                            <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Cantidad de Semanas (Intensivo)')" />
-                            <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" min="1" max="99"
+                            <x-input-label for="semana_lapso_dos_introductorio_calendario_academico" :value="__('Semanas (Lapso 2 Introductorio)')" />
+                            <x-text-input id="semana_lapso_dos_introductorio_calendario_academico" type="number" min="0" max="99"
+                                wire:model.live="form.semana_lapso_dos_introductorio_calendario_academico"
+                                class="w-full mt-1" placeholder="Opcional" />
+                            <x-input-error :messages="$errors->first('form.semana_lapso_dos_introductorio_calendario_academico')"
+                                class="mt-2" />
+                        </div>
+                        <div class="w-full">
+                            <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Semanas (Intensivo)')" />
+                            <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" min="0" max="99"
                                 wire:model.live="form.semana_intensibo_introductorio_calendario_academico" class="w-full mt-1"
                                 placeholder="Opcional" />
                             <x-input-error :messages="$errors->first('form.semana_intensibo_introductorio_calendario_academico')"
@@ -708,11 +716,13 @@
                                                     }
                                                     
                                                     if (activeIntroIndex !== -1 && weekDates.length > 0) {
-                                                         const weekIndex = getWeekCount(activeIntroInicio);
-                                                         if (weekIndex !== '') {
-                                                             niVal = `${weekIndex}`;
-                                                         }
-                                                    }
+                                                          const weekIndex = getWeekCount(activeIntroInicio);
+                                                          if (weekIndex !== '') {
+                                                              const suffixes = ['I', 'II', 'III', 'IV'];
+                                                              const suffix = suffixes[activeIntroIndex] || 'I';
+                                                              niVal = `${weekIndex}${suffix}`;
+                                                          }
+                                                     }
 
                                                     const trCell = document.createElement('div');
                                                     trCell.className = 'sogat-week-col-tr flex items-center justify-center text-xs font-black text-gray-900 dark:text-gray-100 border-l border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 rounded-md';

@@ -9,7 +9,8 @@ class CreateCalendarioForm extends Form
 {
     public $semana_lapso_uno_calendario_academico = '';
     public $semana_lapso_dos_calendario_academico = '';
-    public $semana_lapso_introductorio_calendario_academico = '';
+    public $semana_lapso_uno_introductorio_calendario_academico = '';
+    public $semana_lapso_dos_introductorio_calendario_academico = '';
     public $semana_intensibo_introductorio_calendario_academico = '';
     public $dia_inicio_calendario_academico = '';
     public $dia_fin_calendario_academico = '';
@@ -33,8 +34,9 @@ class CreateCalendarioForm extends Form
         $rules = [
             'semana_lapso_uno_calendario_academico' => ['required', 'integer', 'min:1', 'max:99'],
             'semana_lapso_dos_calendario_academico' => ['required', 'integer', 'min:1', 'max:99'],
-            'semana_lapso_introductorio_calendario_academico' => ['required', 'integer', 'min:1', 'max:99'],
-            'semana_intensibo_introductorio_calendario_academico' => ['required', 'integer', 'min:1', 'max:99'],
+            'semana_lapso_uno_introductorio_calendario_academico' => ['required', 'integer', 'min:0', 'max:99'],
+            'semana_lapso_dos_introductorio_calendario_academico' => ['required', 'integer', 'min:0', 'max:99'],
+            'semana_intensibo_introductorio_calendario_academico' => ['required', 'integer', 'min:0', 'max:99'],
             'dia_inicio_calendario_academico' => [
                 'required',
                 'date',
@@ -368,8 +370,13 @@ class CreateCalendarioForm extends Form
                         $dentroDeAlgunPeriodo = $dentroDeAlgunPeriodo || ($regInicio && $regInicio >= $inicios[1] && $regFin && $regFin <= $fines[1]);
                     }
                     // Comprobar Introductorio
-                    if (count($inicios_intro) === 1 && count($fines_intro) === 1) {
-                        $dentroDeAlgunPeriodo = $dentroDeAlgunPeriodo || ($regInicio && $regInicio >= $inicios_intro[0] && $regFin && $regFin <= $fines_intro[0]);
+                    if (count($inicios_intro) > 0 && count($fines_intro) > 0 && count($inicios_intro) === count($fines_intro)) {
+                        if (isset($inicios_intro[0]) && isset($fines_intro[0])) {
+                            $dentroDeAlgunPeriodo = $dentroDeAlgunPeriodo || ($regInicio && $regInicio >= $inicios_intro[0] && $regFin && $regFin <= $fines_intro[0]);
+                        }
+                        if (isset($inicios_intro[1]) && isset($fines_intro[1])) {
+                            $dentroDeAlgunPeriodo = $dentroDeAlgunPeriodo || ($regInicio && $regInicio >= $inicios_intro[1] && $regFin && $regFin <= $fines_intro[1]);
+                        }
                     }
                     // Comprobar Intensivo
                     if (count($inicios_intensi) === 1 && count($fines_intensi) === 1) {
@@ -431,10 +438,13 @@ class CreateCalendarioForm extends Form
             $this->addError('eventosRegistrados', $msg);
             $errores[] = [$msg];
         }
-        
-        if ($this->semana_lapso_introductorio_calendario_academico > 0) {
-            if (count($inicios_intro) !== 1 || count($fines_intro) !== 1) {
-                $msg = "Debe haber exactamente un Inicio y un Fin de Lapso Introductorio si configuró semanas mayores a 0.";
+        $expectedIntros = 0;
+        if ($this->semana_lapso_uno_introductorio_calendario_academico > 0) $expectedIntros++;
+        if ($this->semana_lapso_dos_introductorio_calendario_academico > 0) $expectedIntros++;
+
+        if ($expectedIntros > 0) {
+            if (count($inicios_intro) !== $expectedIntros || count($fines_intro) !== $expectedIntros) {
+                $msg = "Debe haber exactamente {$expectedIntros} Inicio(s) y {$expectedIntros} Fin(es) de Lapso Introductorio basado en la configuración de semanas.";
                 $this->addError('eventosRegistrados', $msg);
                 $errores[] = [$msg];
             }
@@ -462,8 +472,13 @@ class CreateCalendarioForm extends Form
             $periodosRegistrados['Lapso 1'] = ['nombre' => 'Lapso 1', 'inicio' => $inicios[0], 'fin' => $fines[0], 'semanas_configuradas' => $this->semana_lapso_uno_calendario_academico];
             $periodosRegistrados['Lapso 2'] = ['nombre' => 'Lapso 2', 'inicio' => $inicios[1], 'fin' => $fines[1], 'semanas_configuradas' => $this->semana_lapso_dos_calendario_academico];
         }
-        if (count($inicios_intro) === 1 && count($fines_intro) === 1) {
-            $periodosRegistrados['Lapso Introductorio'] = ['nombre' => 'Lapso Introductorio', 'inicio' => $inicios_intro[0], 'fin' => $fines_intro[0], 'semanas_configuradas' => $this->semana_lapso_introductorio_calendario_academico];
+        if (count($inicios_intro) > 0 && count($fines_intro) > 0 && count($inicios_intro) === count($fines_intro)) {
+            if (isset($inicios_intro[0]) && isset($fines_intro[0]) && $this->semana_lapso_uno_introductorio_calendario_academico > 0) {
+                $periodosRegistrados['Lapso 1 Introductorio'] = ['nombre' => 'Lapso 1 Introductorio', 'inicio' => $inicios_intro[0], 'fin' => $fines_intro[0], 'semanas_configuradas' => $this->semana_lapso_uno_introductorio_calendario_academico];
+            }
+            if (isset($inicios_intro[1]) && isset($fines_intro[1]) && $this->semana_lapso_dos_introductorio_calendario_academico > 0) {
+                $periodosRegistrados['Lapso 2 Introductorio'] = ['nombre' => 'Lapso 2 Introductorio', 'inicio' => $inicios_intro[1], 'fin' => $fines_intro[1], 'semanas_configuradas' => $this->semana_lapso_dos_introductorio_calendario_academico];
+            }
         }
         if (count($inicios_intensi) === 1 && count($fines_intensi) === 1) {
             $periodosRegistrados['Curso Intensivo'] = ['nombre' => 'Curso Intensivo', 'inicio' => $inicios_intensi[0], 'fin' => $fines_intensi[0], 'semanas_configuradas' => $this->semana_intensibo_introductorio_calendario_academico];
@@ -485,13 +500,13 @@ class CreateCalendarioForm extends Form
             }
         }
 
-        // Definir qué periodos NO pueden solaparse entre sí.
-        // Nota: Lapso Introductorio SÍ puede solaparse con Lapso 1 y Lapso 2, por eso no se incluyen esos pares.
         $paresNoSolapables = [
             ['Lapso 1', 'Lapso 2'],
             ['Lapso 1', 'Curso Intensivo'],
             ['Lapso 2', 'Curso Intensivo'],
-            ['Lapso Introductorio', 'Curso Intensivo']
+            ['Lapso 1 Introductorio', 'Lapso 2 Introductorio'],
+            ['Lapso 1 Introductorio', 'Curso Intensivo'],
+            ['Lapso 2 Introductorio', 'Curso Intensivo']
         ];
 
         foreach ($paresNoSolapables as $par) {

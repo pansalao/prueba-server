@@ -316,8 +316,10 @@ class CreateCalendario extends Component
             ->sortBy('inicio')
             ->values();
 
-        foreach ($iniciosIntro as $inicioEv) {
-            $semanas = (int) $this->form->semana_lapso_introductorio_calendario_academico;
+        foreach ($iniciosIntro as $index => $inicioEv) {
+            $semanas = $index === 0
+                ? (int) $this->form->semana_lapso_uno_introductorio_calendario_academico
+                : (int) $this->form->semana_lapso_dos_introductorio_calendario_academico;
             $generarFin($inicioEv, $semanas, '8');
         }
 

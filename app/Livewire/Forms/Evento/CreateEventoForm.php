@@ -113,15 +113,15 @@ class CreateEventoForm extends Form
                 'boolean',
                 function ($attribute, $value, $fail) {
                     if (in_array($this->tipo_evento, ['3', '4', '5']) && !$value) {
-                        if (!($this->is_especial && in_array($this->especial_evento, ['7', '8', '9', '10']))) {
+                        if (!($this->is_especial && in_array($this->especial_evento, ['9', '10']))) {
                             $fail('Para este tipo de evento, debe ser obligatoriamente Repetible.');
                         }
                     }
                     if ($this->is_especial) {
-                        if (in_array($this->especial_evento, ['1', '2', '3']) && !$value) {
-                            $fail('Para este evento especial, debe ser obligatoriamente Repetible.');
-                        } elseif (in_array($this->especial_evento, ['4', '5', '7', '8', '9', '10']) && $value) {
-                            $fail('Para este evento especial, no debe ser Repetible.');
+                        if (in_array($this->especial_evento, ['1', '2', '3', '7', '8']) && !$value) {
+                             $fail('Para este tipo de evento, debe ser obligatoriamente Repetible.');
+                        } elseif (in_array($this->especial_evento, ['4', '5', '9', '10']) && $value) {
+                             $fail('Para este tipo de evento, debe ser obligatoriamente No Repetible.');
                         }
                     }
                 }
