@@ -63,6 +63,11 @@ use App\Livewire\Calendario\ShowCalendario;
 use App\Livewire\Calendario\ExcelCalendarioExport;
 use App\Livewire\Calendario\EditarCalendario;
 
+use App\Livewire\Color\CreateColor;
+use App\Livewire\Color\ListColor;
+use App\Livewire\Color\UpdateColor;
+use App\Livewire\Color\ShowColor;
+
 
 
 use App\Livewire\Bitacora\ListBitacora;
@@ -163,6 +168,12 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
     Route::get('calendario/create/{id?}', CreateCalendario::class)->middleware('can:crear-calendario')->name('calendario.create');
     Route::get('calendario/show/{id}', ShowCalendario::class)->middleware('can:ver-calendario')->name('calendario.show');
     Route::get('calendario/editar/{id}', EditarCalendario::class)->middleware('can:cambiar-estatus-calendario')->name('calendario.editar');
+
+    // Rutas para Colores
+    Route::get('color/list', ListColor::class)->middleware('can:listar-color')->name('color.list');
+    Route::get('color/create', CreateColor::class)->middleware('can:crear-color')->name('color.create');
+    Route::get('color/update/{id}', UpdateColor::class)->middleware('can:editar-color')->name('color.update');
+    Route::get('color/show/{id}', ShowColor::class)->middleware('can:ver-color')->name('color.show');
 
 
     // Módulo de Permisos (DAECE)

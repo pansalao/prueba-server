@@ -266,6 +266,23 @@ class AuthServiceProvider extends ServiceProvider
             return $accesoRepository->checkPermission('Cambiar Estatus de Planificacion');
         });
 
+        // --- GATES PARA EL MÓDULO DE COLOR ---
+        Gate::define('listar-color', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Listar de Color');
+        });
+        Gate::define('crear-color', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Crear de Color');
+        });
+        Gate::define('editar-color', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Editar de Color');
+        });
+        Gate::define('ver-color', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Ver Detalles de Color');
+        });
+        Gate::define('cambiar-estatus-color', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Cambiar Estatus de Color');
+        });
+
         // ---------------------------------------------
         // NOTA: Si ya habías creado directivas personalizadas en AppServiceProvider (ej. @ifcoordinador),
         // y ahora vas a usar Gates (@can), puedes considerar eliminar esas directivas duplicadas para evitar redundancia.

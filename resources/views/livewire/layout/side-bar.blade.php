@@ -229,6 +229,23 @@
                 </div>
             @endcan
 
+            @can('listar-color')
+                <div>
+                    <button @click="openMenu === 16 ? openMenu = null : openMenu = 16" class="sogat-sidebar-item">
+                        <span>Colores</span>
+                        <svg class="w-4 h-4 ml-auto transition-transform duration-200" :class="openMenu === 16 ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <ul x-show="openMenu === 16" x-collapse class="mt-0 space-y-0" style="display: none;">
+                        @can('crear-color')
+                            <li><a href="{{ route('color.create') }}" class="sogat-sidebar-link">Crear Color</a></li>
+                        @endcan
+                        <li><a href="{{ route('color.list') }}" class="sogat-sidebar-link">Gestionar Colores</a></li>
+                    </ul>
+                </div>
+            @endcan
+
 
             @if(!in_array(auth()->user()->usu_cod_rol, [3, 4]) || $roleCount > 1)
                 <!-- Permisos (DAECE) -->
