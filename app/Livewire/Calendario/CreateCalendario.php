@@ -93,6 +93,7 @@ class CreateCalendario extends Component
                         'tipo' => $ev->tipo,
                         'color' => $ev->color,
                         'especial_evento' => isset($ev->especial_evento) ? (string) $ev->especial_evento : null,
+                        'is_superponible_evento' => (bool) ($ev->is_superponible_evento ?? false),
                     ];
                 }
                 $this->actualizarMapaEventos();
@@ -180,6 +181,30 @@ class CreateCalendario extends Component
             }
         }
 
+        // VALIDAR REGLA DE SUPERPOSICIÓN CON VACACIONES COLECTIVAS
+        $is_superponible = $eventoInfo ? (bool) $eventoInfo->is_superponible_evento : false;
+        $is_vacaciones = ($eventoInfo->especial_evento ?? '') === '1';
+
+        if (!$is_superponible && !$is_vacaciones) {
+            foreach ($this->eventosRegistrados as $evReg) {
+                if (($evReg['especial_evento'] ?? '') === '1') {
+                    if ($inicio <= $evReg['fin'] && $fin >= $evReg['inicio']) {
+                        $this->showAlert('error', "El evento '{$nombre}' no es superponible y no puede registrarse en la misma fecha que las Vacaciones Colectivas.");
+                        return;
+                    }
+                }
+            }
+        } else if ($is_vacaciones) {
+            foreach ($this->eventosRegistrados as $evReg) {
+                if (isset($evReg['is_superponible_evento']) && !$evReg['is_superponible_evento']) {
+                    if ($inicio <= $evReg['fin'] && $fin >= $evReg['inicio']) {
+                        $this->showAlert('error', "No se pueden registrar Vacaciones Colectivas en estas fechas porque choca con el evento '{$evReg['nombre_evento']}', el cual no es superponible.");
+                        return;
+                    }
+                }
+            }
+        }
+
         // Validar usando el objeto Form
         try {
             $this->form->validarRangoEvento($inicio, $fin, $tipo);
@@ -199,6 +224,7 @@ class CreateCalendario extends Component
             'is_rango_dias_evento' => $eventoInfo ? (bool) $eventoInfo->is_rango_dias_evento : false,
             'rango_dias_evento' => $eventoInfo ? $eventoInfo->rango_dias_evento : null,
             'especial_evento' => $eventoInfo ? (string) $eventoInfo->especial_evento : null,
+            'is_superponible_evento' => $eventoInfo ? (bool) $eventoInfo->is_superponible_evento : false,
         ];
 
         $this->actualizarMapaEventos();
@@ -424,6 +450,19 @@ class CreateCalendario extends Component
         if (in_array($tipo, ['1', '2', '6'])) {
             $is_laborable = false;
             $is_repetible = false;
+        }
+
+        // VALIDAR REGLA DE SUPERPOSICIÓN CON VACACIONES COLECTIVAS ANTES DE CREAR EL TEMPLATE
+        $is_superponible_nuevo = in_array($tipo, ['1', '2', '6']) ? true : false;
+        if (!$is_superponible_nuevo) {
+            foreach ($this->eventosRegistrados as $evReg) {
+                if (($evReg['especial_evento'] ?? '') === '1') {
+                    if ($inicio <= $evReg['fin'] && $fin >= $evReg['inicio']) {
+                        $this->showAlert('error', "El evento '{$nombre}' no es superponible y no puede registrarse en la misma fecha que las Vacaciones Colectivas.");
+                        return false;
+                    }
+                }
+            }
         }
 
         $this->form->isCreatingEvento = true;
