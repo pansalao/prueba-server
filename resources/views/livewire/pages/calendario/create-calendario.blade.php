@@ -503,8 +503,9 @@
                                                 let finesIntro = [];
                                                 let iniciosIntensivo = [];
                                                 let finesIntensivo = [];
-                                                // Encontrar todas las semanas festivas (Semana Santa = 4 y Carnaval = 5)
-                                                let semanasFestivas = new Set();
+                                                // Encontrar todas las semanas festivas (Semana Santa = 4 y Carnaval = 5, y Vacaciones Colectivas = 1)
+                                                let semanasFestivasNormal = new Set();
+                                                let semanasFestivasIntensivo = new Set();
 
                                                 if (this.eventosAlpine) {
                                                     this.eventosAlpine.forEach(ev => {
@@ -522,7 +523,7 @@
                                                             iniciosIntensivo.push(ev.inicio);
                                                         } else if (esp === '10') {
                                                             finesIntensivo.push(ev.fin);
-                                                        } else if (esp === '4' || esp === '5' || nombreEv.includes('semana santa') || nombreEv.includes('carnaval') || nombreEv.includes('viernes santo') || nombreEv.includes('jueves santo')) {
+                                                        } else if (esp === '4' || esp === '5' || esp === '1' || nombreEv.includes('semana santa') || nombreEv.includes('carnaval') || nombreEv.includes('viernes santo') || nombreEv.includes('jueves santo') || nombreEv.includes('vacaciones colectivas')) {
                                                             // Marcar cada lunes de semana festiva
                                                             let d = new Date(ev.inicio + 'T00:00:00');
                                                             let dFin = new Date(ev.fin + 'T00:00:00');
@@ -535,7 +536,12 @@
                                                                 const y = monday.getFullYear();
                                                                 const m = String(monday.getMonth() + 1).padStart(2, '0');
                                                                 const dayStr = String(monday.getDate()).padStart(2, '0');
-                                                                semanasFestivas.add(`${y}-${m}-${dayStr}`);
+                                                                const dStrObj = `${y}-${m}-${dayStr}`;
+
+                                                                semanasFestivasNormal.add(dStrObj);
+                                                                if (esp !== '1' && !nombreEv.includes('vacaciones colectivas')) {
+                                                                    semanasFestivasIntensivo.add(dStrObj);
+                                                                }
 
                                                                 d.setDate(d.getDate() + 1);
                                                             }
@@ -638,7 +644,7 @@
                                                     let trVal = '';
                                                     let niVal = '';
 
-                                                    const getWeekCount = (lapsoInicioStr) => {
+                                                    const getWeekCount = (lapsoInicioStr, isIntensivo = false) => {
                                                          const firstDateStr = weekDates[0];
                                                          const firstDate = new Date(firstDateStr + 'T00:00:00');
                                                          const lapsoDate = new Date(lapsoInicioStr + 'T00:00:00');
@@ -658,7 +664,9 @@
                                                          const dCurr = String(mondayCurrent.getDate()).padStart(2, '0');
                                                          const mondayCurrentStr = `${yCurr}-${mCurr}-${dCurr}`;
 
-                                                         if (semanasFestivas.has(mondayCurrentStr)) {
+                                                         const festivasSet = isIntensivo ? semanasFestivasIntensivo : semanasFestivasNormal;
+
+                                                         if (festivasSet.has(mondayCurrentStr)) {
                                                              return '';
                                                          }
                                                          
@@ -670,7 +678,7 @@
                                                              const dTemp = String(tempMonday.getDate()).padStart(2, '0');
                                                              const tempMondayStr = `${yTemp}-${mTemp}-${dTemp}`;
 
-                                                             if (!semanasFestivas.has(tempMondayStr)) {
+                                                             if (!festivasSet.has(tempMondayStr)) {
                                                                  weekIndex++;
                                                              }
 
@@ -680,21 +688,21 @@
                                                     };
 
                                                     if (activeLapsoIndex !== -1 && weekDates.length > 0) {
-                                                         const weekIndex = getWeekCount(activeLapsoInicio);
+                                                         const weekIndex = getWeekCount(activeLapsoInicio, false);
                                                          if (weekIndex !== '') {
                                                              const suffixes = ['I', 'II', 'III', 'IV', 'V'];
                                                              const suffix = suffixes[activeLapsoIndex] || 'I';
                                                              trVal = `${weekIndex}${suffix}`;
                                                          }
                                                     } else if (activeIntensivoIndex !== -1 && weekDates.length > 0) {
-                                                         const weekIndex = getWeekCount(activeIntensivoInicio);
+                                                         const weekIndex = getWeekCount(activeIntensivoInicio, true);
                                                          if (weekIndex !== '') {
                                                              trVal = `${weekIndex}IN`;
                                                          }
                                                     }
                                                     
                                                     if (activeIntroIndex !== -1 && weekDates.length > 0) {
-                                                          const weekIndex = getWeekCount(activeIntroInicio);
+                                                          const weekIndex = getWeekCount(activeIntroInicio, false);
                                                           if (weekIndex !== '') {
                                                               const suffixes = ['I', 'II', 'III', 'IV'];
                                                               const suffix = suffixes[activeIntroIndex] || 'I';

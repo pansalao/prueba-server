@@ -222,11 +222,11 @@ class CreateCalendarioForm extends Form
 
         // Validar que la duración física del calendario sea suficiente para albergar los lapsos
         $semanasFechas = ceil(($inicioReal->diffInDays($finReal) + 1) / 7);
-        $semanasLapso1 = (int)$this->semana_lapso_uno_calendario_academico;
-        $semanasLapso2 = (int)$this->semana_lapso_dos_calendario_academico;
-        $semanasIntro1 = (int)$this->semana_lapso_uno_introductorio_calendario_academico;
-        $semanasIntro2 = (int)$this->semana_lapso_dos_introductorio_calendario_academico;
-        $semanasIntensivo = (int)$this->semana_intensibo_introductorio_calendario_academico;
+        $semanasLapso1 = (int) $this->semana_lapso_uno_calendario_academico;
+        $semanasLapso2 = (int) $this->semana_lapso_dos_calendario_academico;
+        $semanasIntro1 = (int) $this->semana_lapso_uno_introductorio_calendario_academico;
+        $semanasIntro2 = (int) $this->semana_lapso_dos_introductorio_calendario_academico;
+        $semanasIntensivo = (int) $this->semana_intensibo_introductorio_calendario_academico;
         $totalSemanasLapsos = $semanasLapso1 + $semanasLapso2 + $semanasIntro1 + $semanasIntro2 + $semanasIntensivo;
 
         if ($semanasFechas < $totalSemanasLapsos) {
@@ -268,6 +268,8 @@ class CreateCalendarioForm extends Form
 
         // 3. Validar eventos especiales y eventos no repetibles
         $eventosDb = \App\Models\Evento::whereIn('id_evento', $idsRegistrados)->get()->keyBy('id_evento');
+        $inicios = [];
+        $fines = [];
         $inicios_intro = [];
         $fines_intro = [];
         $inicios_intensi = [];
@@ -299,7 +301,7 @@ class CreateCalendarioForm extends Form
         $fines_intro = array_filter(array_unique($fines_intro));
         $inicios_intensi = array_filter(array_unique($inicios_intensi));
         $fines_intensi = array_filter(array_unique($fines_intensi));
-        
+
         sort($inicios);
         sort($fines);
         sort($inicios_intro);
@@ -325,14 +327,14 @@ class CreateCalendarioForm extends Form
                 }
 
                 // Validar que los únicos eventos para sábados y domingos sean Feriados (tipo 1 y 2)
-                $tipo = (string)$evento->tipo_evento;
+                $tipo = (string) $evento->tipo_evento;
                 $start = new \DateTime($reg['inicio']);
                 $end = new \DateTime($reg['fin']);
                 $todoEsWeekend = true;
                 $interval = new \DateInterval('P1D');
                 $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
                 foreach ($period as $date) {
-                    if ((int)$date->format('N') < 6) {
+                    if ((int) $date->format('N') < 6) {
                         $todoEsWeekend = false;
                         break;
                     }
@@ -365,7 +367,7 @@ class CreateCalendarioForm extends Form
                 $isIndependiente = $evento->is_independiente ?? $evento->is_independiente_evento ?? false;
                 if (!$isIndependiente) {
                     $dentroDeAlgunPeriodo = false;
-                    
+
                     // Comprobar Lapsos 1 y 2
                     if (count($inicios) === 2 && count($fines) === 2) {
                         $dentroDeAlgunPeriodo = $dentroDeAlgunPeriodo || ($regInicio && $regInicio >= $inicios[0] && $regFin && $regFin <= $fines[0]);
@@ -441,8 +443,10 @@ class CreateCalendarioForm extends Form
             $errores[] = [$msg];
         }
         $expectedIntros = 0;
-        if ($this->semana_lapso_uno_introductorio_calendario_academico > 0) $expectedIntros++;
-        if ($this->semana_lapso_dos_introductorio_calendario_academico > 0) $expectedIntros++;
+        if ($this->semana_lapso_uno_introductorio_calendario_academico > 0)
+            $expectedIntros++;
+        if ($this->semana_lapso_dos_introductorio_calendario_academico > 0)
+            $expectedIntros++;
 
         if ($expectedIntros > 0) {
             if (count($inicios_intro) !== $expectedIntros || count($fines_intro) !== $expectedIntros) {
@@ -536,7 +540,7 @@ class CreateCalendarioForm extends Form
                 if (($reg['id'] ?? null) == $eventoVacaciones->id_evento) {
                     $start = new \DateTime($reg['inicio']);
                     $end = new \DateTime($reg['fin']);
-                    
+
                     $interval = new \DateInterval('P1D');
                     $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
                     foreach ($period as $date) {
@@ -550,22 +554,13 @@ class CreateCalendarioForm extends Form
             }
 
             foreach ($diasPorAnio as $year => $diasActuales) {
-                $excluirId = (isset($this->id_calendario_academico) && !empty($this->id_calendario_academico)) ? $this->id_calendario_academico : null;
-                $diasEnOtrosCalendarios = $repo->obtenerDiasVacacionesEnOtrosCalendarios($eventoVacaciones->id_evento, $year, $excluirId);
+                $diasEnOtrosCalendarios = 0; // REQUERIMIENTO: IGNORAR OTROS CALENDARIOS
 
                 $totalDiasVacaciones = $diasActuales + $diasEnOtrosCalendarios;
                 $cantidadRequerida = $eventoVacaciones->cantidad_dias_evento ?? 60;
 
                 if ($totalDiasVacaciones != $cantidadRequerida) {
-                    $msg = "La suma total de días de vacaciones colectivas asignados para el año {$year} ({$totalDiasVacaciones} días) debe ser exactamente igual a los {$cantidadRequerida} días configurados en el evento. ";
-                    if ($diasEnOtrosCalendarios > 0) {
-                        $diasRestantes = $cantidadRequerida - $diasEnOtrosCalendarios;
-                        if ($diasRestantes > 0) {
-                            $msg .= "(Ya se encuentran asignados {$diasEnOtrosCalendarios} días en otros períodos de este año, por lo que debe asignar exactamente {$diasRestantes} días en este período).";
-                        } else {
-                            $msg .= "(Ya se encuentran asignados {$diasEnOtrosCalendarios} días en otros períodos de este año, superando o completando la cantidad permitida).";
-                        }
-                    }
+                    $msg = "La suma total de días de vacaciones colectivas asignados para el año {$year} ({$totalDiasVacaciones} días) debe ser exactamente igual a los {$cantidadRequerida} días configurados en el evento.";
                     $this->addError('eventosRegistrados', $msg);
                     $errores[] = [$msg];
                 }
@@ -600,7 +595,7 @@ class CreateCalendarioForm extends Form
         $interval = new \DateInterval('P1D');
         $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
         foreach ($period as $date) {
-            if ((int)$date->format('N') < 6) {
+            if ((int) $date->format('N') < 6) {
                 $todoEsWeekend = false;
                 break;
             }

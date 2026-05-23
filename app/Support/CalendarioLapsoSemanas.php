@@ -23,7 +23,7 @@ class CalendarioLapsoSemanas
      * @param  array<int, array<string, mixed>>  $eventosRegistrados
      * @return array<int, true>  id_evento => true
      */
-    public static function idsEventosFestivos(array $eventosRegistrados): array
+    public static function idsEventosFestivos(array $eventosRegistrados, bool $incluirVacaciones = false): array
     {
         $ids = collect($eventosRegistrados)
             ->pluck('id')
@@ -37,7 +37,7 @@ class CalendarioLapsoSemanas
 
         if (!empty($ids)) {
             foreach (Evento::whereIn('id_evento', $ids)->get(['id_evento', 'especial_evento', 'nombre_evento']) as $evento) {
-                if (self::eventoModeloEsFestivo($evento)) {
+                if (self::eventoModeloEsFestivo($evento, $incluirVacaciones)) {
                     $festivos[(int) $evento->id_evento] = true;
                 }
             }
@@ -46,10 +46,13 @@ class CalendarioLapsoSemanas
         return $festivos;
     }
 
-    public static function eventoModeloEsFestivo(Evento $evento): bool
+    public static function eventoModeloEsFestivo(Evento $evento, bool $incluirVacaciones = false): bool
     {
         $esp = (string) ($evento->especial_evento ?? '');
         if (in_array($esp, ['4', '5'], true)) {
+            return true;
+        }
+        if ($incluirVacaciones && $esp === '1') {
             return true;
         }
 
@@ -60,7 +63,7 @@ class CalendarioLapsoSemanas
      * @param  array<string, mixed>  $ev
      * @param  array<int, true>  $idsFestivos
      */
-    public static function registroEsFestivo(array $ev, array $idsFestivos): bool
+    public static function registroEsFestivo(array $ev, array $idsFestivos, bool $incluirVacaciones = false): bool
     {
         $id = (int) ($ev['id'] ?? 0);
         if ($id && isset($idsFestivos[$id])) {
@@ -69,6 +72,9 @@ class CalendarioLapsoSemanas
 
         $esp = (string) ($ev['especial_evento'] ?? '');
         if (in_array($esp, ['4', '5'], true)) {
+            return true;
+        }
+        if ($incluirVacaciones && $esp === '1') {
             return true;
         }
 
@@ -93,13 +99,13 @@ class CalendarioLapsoSemanas
      * @param  array<int, array<string, mixed>>  $eventosRegistrados
      * @return array<string, true>
      */
-    public static function lunesSemanasFestivas(array $eventosRegistrados): array
+    public static function lunesSemanasFestivas(array $eventosRegistrados, bool $incluirVacaciones = false): array
     {
         $festivas = [];
-        $idsFestivos = self::idsEventosFestivos($eventosRegistrados);
+        $idsFestivos = self::idsEventosFestivos($eventosRegistrados, $incluirVacaciones);
 
         foreach ($eventosRegistrados as $ev) {
-            if (!self::registroEsFestivo($ev, $idsFestivos)) {
+            if (!self::registroEsFestivo($ev, $idsFestivos, $incluirVacaciones)) {
                 continue;
             }
 
@@ -126,13 +132,13 @@ class CalendarioLapsoSemanas
      *
      * @param  array<int, array<string, mixed>>  $eventosRegistrados
      */
-    public static function fechaFinLapso(string $inicio, int $semanas, array $eventosRegistrados = []): string
+    public static function fechaFinLapso(string $inicio, int $semanas, array $eventosRegistrados = [], bool $incluirVacaciones = false): string
     {
         if ($semanas < 1) {
             return $inicio;
         }
 
-        $festivas = self::lunesSemanasFestivas($eventosRegistrados);
+        $festivas = self::lunesSemanasFestivas($eventosRegistrados, $incluirVacaciones);
         $lunes = self::lunesDeSemana($inicio);
         $semanasContadas = 0;
         $maxIteraciones = $semanas + count($festivas) + 104;
@@ -160,9 +166,9 @@ class CalendarioLapsoSemanas
      *
      * @param  array<int, array<string, mixed>>  $eventosRegistrados
      */
-    public static function contarSemanas(string $inicio, string $fin, array $eventosRegistrados = []): int
+    public static function contarSemanas(string $inicio, string $fin, array $eventosRegistrados = [], bool $incluirVacaciones = false): int
     {
-        $festivas = self::lunesSemanasFestivas($eventosRegistrados);
+        $festivas = self::lunesSemanasFestivas($eventosRegistrados, $incluirVacaciones);
         $lunesInicio = self::lunesDeSemana($inicio);
         $lunesFin = self::lunesDeSemana($fin);
 

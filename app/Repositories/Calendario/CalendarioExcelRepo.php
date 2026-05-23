@@ -93,7 +93,8 @@ class CalendarioExcelRepo
         $iniciosLapso = []; $finesLapso = [];
         $iniciosIntro = []; $finesIntro = [];
         $iniciosIntensivo = []; $finesIntensivo = [];
-        $semanasFestivas = [];
+        $semanasFestivasNormal = [];
+        $semanasFestivasIntensivo = [];
 
         foreach ($eventosRaw as $ev) {
             $esp = $ev->tipo_evento == 4 || $ev->tipo_evento == 5 || $ev->tipo_evento == 6 ? collect(DB::select('SELECT especial_evento FROM evento WHERE id_evento = ?', [$ev->id_evento]))->first()->especial_evento ?? null : null;
@@ -118,12 +119,15 @@ class CalendarioExcelRepo
             elseif ($esp === '8') $finesIntro[] = $ev->dia_fin_detalle_evento;
             elseif ($esp === '9') $iniciosIntensivo[] = $ev->dia_inicio_detalle_evento;
             elseif ($esp === '10') $finesIntensivo[] = $ev->dia_fin_detalle_evento;
-            elseif ($esp === '4' || $esp === '5') {
+            elseif ($esp === '4' || $esp === '5' || $esp === '1') {
                 $d = Carbon::parse($ev->dia_inicio_detalle_evento)->startOfDay();
                 $dFin = Carbon::parse($ev->dia_fin_detalle_evento)->startOfDay();
                 while ($d <= $dFin) {
                     $monday = $d->copy()->startOfWeek();
-                    $semanasFestivas[$monday->format('Y-m-d')] = true;
+                    $semanasFestivasNormal[$monday->format('Y-m-d')] = true;
+                    if ($esp !== '1') {
+                        $semanasFestivasIntensivo[$monday->format('Y-m-d')] = true;
+                    }
                     $d->addDay();
                 }
             }
@@ -137,7 +141,8 @@ class CalendarioExcelRepo
             'iniciosLapso' => $iniciosLapso, 'finesLapso' => $finesLapso,
             'iniciosIntro' => $iniciosIntro, 'finesIntro' => $finesIntro,
             'iniciosIntensivo' => $iniciosIntensivo, 'finesIntensivo' => $finesIntensivo,
-            'semanasFestivas' => $semanasFestivas
+            'semanasFestivasNormal' => $semanasFestivasNormal,
+            'semanasFestivasIntensivo' => $semanasFestivasIntensivo
         ];
 
         return [
@@ -202,8 +207,10 @@ class CalendarioExcelRepo
         
         $mondayCurrentStr = $mondayCurrent->format('Y-m-d');
 
-        $getWeekCount = function($lapsoInicioStr) use ($mondayCurrentStr, $mondayCurrent, $weekLogic) {
-            if (isset($weekLogic['semanasFestivas'][$mondayCurrentStr])) {
+        $getWeekCount = function($lapsoInicioStr, $isIntensivo = false) use ($mondayCurrentStr, $mondayCurrent, $weekLogic) {
+            $festivas = $isIntensivo ? $weekLogic['semanasFestivasIntensivo'] : $weekLogic['semanasFestivasNormal'];
+            
+            if (isset($festivas[$mondayCurrentStr])) {
                 return '';
             }
 
@@ -213,7 +220,7 @@ class CalendarioExcelRepo
             $weekIndex = 0;
 
             while ($tempMonday <= $mondayCurrent) {
-                if (!isset($weekLogic['semanasFestivas'][$tempMonday->format('Y-m-d')])) {
+                if (!isset($festivas[$tempMonday->format('Y-m-d')])) {
                     $weekIndex++;
                 }
                 $tempMonday->addWeek();
@@ -282,21 +289,21 @@ class CalendarioExcelRepo
         }
 
         if ($activeLapsoIndex !== -1) {
-            $weekIndex = $getWeekCount($activeLapsoInicio);
+            $weekIndex = $getWeekCount($activeLapsoInicio, false);
             if ($weekIndex !== '') {
                 $suffixes = ['I', 'II', 'III', 'IV', 'V'];
                 $suffix = $suffixes[$activeLapsoIndex] ?? 'I';
                 $trVal = "{$weekIndex}{$suffix}";
             }
         } elseif ($activeIntensivoIndex !== -1) {
-            $weekIndex = $getWeekCount($activeIntensivoInicio);
+            $weekIndex = $getWeekCount($activeIntensivoInicio, true);
             if ($weekIndex !== '') {
                 $trVal = "{$weekIndex}IN";
             }
         }
 
         if ($activeIntroIndex !== -1) {
-            $weekIndex = $getWeekCount($activeIntroInicio);
+            $weekIndex = $getWeekCount($activeIntroInicio, false);
             if ($weekIndex !== '') {
                 $suffixes = ['I', 'II', 'III', 'IV'];
                 $suffix = $suffixes[$activeIntroIndex] ?? 'I';
