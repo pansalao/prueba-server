@@ -187,16 +187,14 @@ $wireKey = $wireKey ?? 'datalist-calendario';
             </div>
         </div>
 
-        <div class="flex flex-col gap-3 mt-8">
-            <x-primary-button @click="confirmarNuevoEvento()" wire:loading.attr="disabled"
-                class="w-full justify-center py-3 rounded-xl">
-                <span wire:loading.remove>{{ __('REGISTRAR Y ASIGNAR') }}</span>
-                <span wire:loading>{{ __('PROCESANDO...') }}</span>
-            </x-primary-button>
-            <x-secondary-button @click="closeModal()"
-                class="w-full justify-center py-3 rounded-xl">
-                {{ __('CANCELAR') }}
+        <div class="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <x-secondary-button type="button" class="!px-5 !py-2.5 !text-sm" @click="closeModal()">
+                {{ __('Cancelar') }}
             </x-secondary-button>
+            <x-primary-button @click="confirmarNuevoEvento()" wire:loading.attr="disabled">
+                <span wire:loading.remove>{{ __('Registrar y Asignar') }}</span>
+                <span wire:loading>{{ __('Procesando...') }}</span>
+            </x-primary-button>
         </div>
     </div>
 </div>
