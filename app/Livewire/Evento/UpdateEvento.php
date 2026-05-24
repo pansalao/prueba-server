@@ -50,6 +50,12 @@ class UpdateEvento extends Component
     public function cargarColores()
     {
         $this->colores = \App\Models\Color::where('estatus', '1')
+            ->whereNotIn('id_color', function ($query) {
+                $query->select('id_color')
+                    ->from('evento')
+                    ->whereNotNull('id_color')
+                    ->where('id_evento', '!=', $this->form->id_evento);
+            })
             ->orderBy('nombre_color')
             ->get();
     }

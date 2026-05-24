@@ -168,7 +168,7 @@
                             <x-input-label for="semana_lapso_uno_introductorio_calendario_academico" :value="__('Semanas (Lapso 1 Introductorio)')" />
                             <x-text-input id="semana_lapso_uno_introductorio_calendario_academico" type="number" min="0" max="99"
                                 wire:model.live="form.semana_lapso_uno_introductorio_calendario_academico"
-                                class="w-full mt-1" placeholder="Opcional" />
+                                class="w-full mt-1" placeholder="Ej: 18" />
                             <x-input-error :messages="$errors->first('form.semana_lapso_uno_introductorio_calendario_academico')"
                                 class="mt-2" />
                         </div>
@@ -176,7 +176,7 @@
                             <x-input-label for="semana_lapso_dos_introductorio_calendario_academico" :value="__('Semanas (Lapso 2 Introductorio)')" />
                             <x-text-input id="semana_lapso_dos_introductorio_calendario_academico" type="number" min="0" max="99"
                                 wire:model.live="form.semana_lapso_dos_introductorio_calendario_academico"
-                                class="w-full mt-1" placeholder="Opcional" />
+                                class="w-full mt-1" placeholder="Ej: 18" />
                             <x-input-error :messages="$errors->first('form.semana_lapso_dos_introductorio_calendario_academico')"
                                 class="mt-2" />
                         </div>
@@ -184,7 +184,7 @@
                             <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Semanas (Intensivo)')" />
                             <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" min="0" max="99"
                                 wire:model.live="form.semana_intensibo_introductorio_calendario_academico" class="w-full mt-1"
-                                placeholder="Opcional" />
+                                placeholder="Ej: 18" />
                             <x-input-error :messages="$errors->first('form.semana_intensibo_introductorio_calendario_academico')"
                                 class="mt-2" />
                         </div>
