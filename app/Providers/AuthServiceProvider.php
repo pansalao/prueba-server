@@ -178,22 +178,6 @@ class AuthServiceProvider extends ServiceProvider
             return $accesoRepository->checkPermission('Cambiar Estatus de Estrategia');
         });
 
-        // --- GATES PARA EL MÓDULO DE TECNICA ---
-        Gate::define('listar-tecnica', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Listar de Tecnica');
-        });
-        Gate::define('crear-tecnica', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Crear de Tecnica');
-        });
-        Gate::define('editar-tecnica', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Editar de Tecnica');
-        });
-        Gate::define('ver-tecnica', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Ver Detalles de Tecnica');
-        });
-        Gate::define('cambiar-estatus-tecnica', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Cambiar Estatus de Tecnica');
-        });
 
         // --- GATES PARA EL MÓDULO DE EVALUACION ---
         Gate::define('listar-evaluacion', function ($user) use ($accesoRepository) {
@@ -267,38 +251,11 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         // --- GATES PARA EL MÓDULO DE FIRMA ---
-        Gate::define('listar-firma', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Listar de Firma');
-        });
-        Gate::define('crear-firma', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Crear de Firma');
-        });
-        Gate::define('editar-firma', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Editar de Firma');
-        });
-        Gate::define('ver-firma', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Ver Detalles de Firma');
-        });
-        Gate::define('cambiar-estatus-firma', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Cambiar Estatus de Firma');
+        Gate::define('mi-firma', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Mi Firma de Firma');
         });
 
-        // --- GATES PARA EL MÓDULO DE COLOR ---
-        Gate::define('listar-color', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Listar de Color');
-        });
-        Gate::define('crear-color', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Crear de Color');
-        });
-        Gate::define('editar-color', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Editar de Color');
-        });
-        Gate::define('ver-color', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Ver Detalles de Color');
-        });
-        Gate::define('cambiar-estatus-color', function ($user) use ($accesoRepository) {
-            return $accesoRepository->checkPermission('Cambiar Estatus de Color');
-        });
+
 
         // ---------------------------------------------
         // NOTA: Si ya habías creado directivas personalizadas en AppServiceProvider (ej. @ifcoordinador),

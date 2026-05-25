@@ -260,7 +260,7 @@
                 </div>
             @endcan
 
-            @can('listar-firma')
+            @can('mi-firma')
                 <!-- Firmas -->
                 <div>
                     <a href="{{ route('firma/mi-firma') }}" class="sogat-sidebar-item">
