@@ -20,6 +20,8 @@ class EventoCreateRepo
             'rango_dias_evento'     => $data['is_rango_dias'] ? ($data['rango_dias'] ?? null) : null,
             'cantidad_dias_evento'  => (($data['is_especial'] ?? false) && ($data['especial_evento'] ?? '') == '1') ? ($data['cantidad_dias_evento'] ?? null) : null,
             'is_superponible_evento' => $data['is_superponible'] ?? false,
+            'is_semana_evento' => $data['is_semana_evento'] ?? (!empty($data['semanas'])),
+            'semana_evento' => (($data['is_semana_evento'] ?? !empty($data['semanas'])) && !empty($data['semanas']) && is_array($data['semanas'])) ? json_encode(array_values($data['semanas'])) : null,
             'estatus'       => '1',
         ];
 
@@ -33,18 +35,6 @@ class EventoCreateRepo
         }
 
         $evento = Evento::create($params);
-
-        if (!empty($data['semanas']) && is_array($data['semanas'])) {
-            $semanasData = [];
-            foreach ($data['semanas'] as $semana) {
-                $semanasData[] = [
-                    'id_evento' => $evento->id_evento,
-                    'numero_semana_evento' => $semana,
-                    'estatus' => '1',
-                ];
-            }
-            \App\Models\SemanaEvento::insert($semanasData);
-        }
 
         return $evento->id_evento;
     }

@@ -114,7 +114,7 @@ class EditarCalendario extends Component
 
     public function agregarEvento($inicio, $fin, $id_evento, $nombre = null, $tipo = null, $color = null)
     {
-        $eventoInfo = \App\Models\Evento::with('semanas')->find($id_evento);
+        $eventoInfo = \App\Models\Evento::find($id_evento);
 
         // Buscar info fresca de la base de datos
         if (!$eventoInfo) {
@@ -136,8 +136,8 @@ class EditarCalendario extends Component
 
         // VALIDACIÓN DE SEMANAS ESPECÍFICAS
         $semanasPermitidas = [];
-        if ($eventoInfo && $eventoInfo->semanas) {
-            $semanasPermitidas = $eventoInfo->semanas->pluck('numero_semana_evento')->toArray();
+        if ($eventoInfo && $eventoInfo->is_semana_evento) {
+            $semanasPermitidas = is_array($eventoInfo->semana_evento) ? $eventoInfo->semana_evento : (json_decode($eventoInfo->semana_evento, true) ?? []);
         }
 
         if (!empty($semanasPermitidas)) {

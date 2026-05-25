@@ -113,7 +113,9 @@
         <div class="space-y-6" x-data="{ 
                     openSection: 'fechas',
                     inicio: @entangle('form.dia_inicio_calendario_academico'),
-                    fin: @entangle('form.dia_fin_calendario_academico')
+                    fin: @entangle('form.dia_fin_calendario_academico'),
+                    showListModal: false,
+                    searchListQuery: ''
                 }">
 
             {{-- Acordeón 1: Fechas --}}
@@ -208,10 +210,22 @@
                         <span class="material-icons text-red-500">event</span>
                         Asignación de Eventos
                     </h4>
-                    <span class="material-icons transition-transform duration-200"
-                        :class="openSection === 'eventos' ? 'rotate-180' : ''">expand_more</span>
+                    <div class="flex items-center gap-4">
+                        <span class="material-icons transition-transform duration-200 cursor-pointer"
+                            :class="openSection === 'eventos' ? 'rotate-180' : ''">expand_more</span>
+                    </div>
                 </div>
-                <div x-show="openSection === 'eventos'" x-collapse class="p-4 space-y-6">
+                <div x-show="openSection === 'eventos'" x-collapse class="p-4 space-y-6 relative">
+                    
+                    {{-- Botón de búsqueda de eventos (ubicado en el contenido) --}}
+                    <div class="absolute top-4 right-4 z-10" x-show="inicio && fin">
+                        <button type="button" @click="showListModal = true" 
+                            class="flex items-center justify-center gap-2 px-4 h-10 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-600 dark:hover:text-white rounded-full transition-colors shadow-sm text-sm font-medium" 
+                            title="Ver Eventos Asignados">
+                            <span class="material-icons text-[18px]">search</span>
+                            <span>Buscar un evento asignado a este calendario</span>
+                        </button>
+                    </div>
 
                     {{-- Indicador si faltan fechas --}}
                     <div x-show="!inicio || !fin" class="text-center p-8">
@@ -1072,7 +1086,8 @@
                             {{-- Modal Registro --}}
                             @include('livewire.pages.calendario.calendario-evento-modal', ['wireKey' => 'datalist-register'])
 
-
+                            {{-- Modal Listado de Eventos --}}
+                            @include('livewire.pages.calendario.calendario-list-modal')
 
                             {{-- Botón para regresar a la sección anterior --}}
                             <div class="flex justify-start mt-8 pt-4 border-t border-gray-100 dark:border-gray-700">

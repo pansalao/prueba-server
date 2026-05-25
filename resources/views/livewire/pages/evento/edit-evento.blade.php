@@ -79,6 +79,8 @@
                 <x-toggle-switch id="is_especial_edit" :label="__('¿Es un Evento Especial?')"
                     model="form.is_especial" />
 
+                <x-toggle-switch id="is_semana_evento_edit" :label="__('¿Ocurre en semanas específicas?')" model="form.is_semana_evento" />
+
                 @if($form->is_especial)
                     <div class="w-full">
                         <x-input-label for="especial" :value="__('Seleccione el tipo de Evento Especial')" />
@@ -110,48 +112,50 @@
                     </div>
                 @endif
 
-                <div class="w-full mt-4 col-span-1 md:col-span-2 lg:col-span-3">
-                    <div class="flex justify-between items-center mb-2">
-                        <x-input-label :value="__('Semanas en las que debe suceder el evento *')" />
-                        @if($form->is_repetible && !$form->is_especial)
-                            <button type="button" wire:click="agregarSemana"
-                                class="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                Agregar Semana
-                            </button>
-                        @endif
-                    </div>
+                @if($form->is_semana_evento)
+                    <div class="w-full mt-4 col-span-1 md:col-span-2 lg:col-span-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <x-input-label :value="__('Semanas en las que debe suceder el evento *')" />
+                            @if($form->is_repetible && !$form->is_especial)
+                                <button type="button" wire:click="agregarSemana"
+                                    class="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    Agregar Semana
+                                </button>
+                            @endif
+                        </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-                        @foreach($form->semanas as $index => $semana)
-                            <div wire:key="semana-item-{{ $index }}">
-                                <div class="flex items-center gap-2">
-                                    <x-text-input type="number" min="1" max="99" class="w-full"
-                                        wire:model.live="form.semanas.{{ $index }}" placeholder="Ej: 1"
-                                        :disabled="$form->is_especial" />
-                                    @if($form->is_repetible && count($form->semanas) > 1 && !$form->is_especial)
-                                        <button type="button" wire:click="removerSemana({{ $index }})"
-                                            class="text-red-500 hover:text-red-700 p-2 bg-red-50 dark:bg-red-900/20 rounded-md transition-colors"
-                                            title="Eliminar semana">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                </path>
-                                            </svg>
-                                        </button>
-                                    @endif
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                            @foreach($form->semanas as $index => $semana)
+                                <div wire:key="semana-item-{{ $index }}">
+                                    <div class="flex items-center gap-2">
+                                        <x-text-input type="number" min="1" max="99" class="w-full"
+                                            wire:model.live="form.semanas.{{ $index }}" placeholder="Ej: 1"
+                                            :disabled="$form->is_especial" />
+                                        @if($form->is_repetible && count($form->semanas) > 1 && !$form->is_especial)
+                                            <button type="button" wire:click="removerSemana({{ $index }})"
+                                                class="text-red-500 hover:text-red-700 p-2 bg-red-50 dark:bg-red-900/20 rounded-md transition-colors"
+                                                title="Eliminar semana">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        @endif
+                                    </div>
+                                    @error('form.semanas.' . $index) <span
+                                        class="text-sm text-red-600 dark:text-red-400 mt-1 block">{{ $message }}</span>
+                                    @enderror
                                 </div>
-                                @error('form.semanas.' . $index) <span
-                                    class="text-sm text-red-600 dark:text-red-400 mt-1 block">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
+                        <x-input-error :messages="$errors->first('form.semanas')" class="mt-2" />
                     </div>
-                    <x-input-error :messages="$errors->first('form.semanas')" class="mt-2" />
-                </div>
+                @endif
             </div>
 
             <div class="flex items-center justify-end gap-4">

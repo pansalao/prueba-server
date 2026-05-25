@@ -19,9 +19,10 @@ class UpdateEventoForm extends Form
     public $is_repetible = false;
     public $is_rango_dias = false;
     public $rango_dias = '';
-    public $is_independiente = false;
+    public $is_independiente = true;
     public $is_superponible = true;
-    public $cantidad_dias_evento = '';
+    public $is_semana_evento = false;
+    public $cantidad_dias_evento = 0;
     public $semanas = [];
 
     public function setEvento($evento)
@@ -38,8 +39,9 @@ class UpdateEventoForm extends Form
         $this->rango_dias = $evento->rango_dias_evento;
         $this->is_independiente = (bool) ($evento->is_independiente ?? $evento->is_independiente_evento ?? false);
         $this->is_superponible = (bool) ($evento->is_superponible_evento ?? false);
+        $this->is_semana_evento = (bool) ($evento->is_semana_evento ?? false);
         $this->cantidad_dias_evento = $evento->cantidad_dias_evento;
-        $this->semanas = $evento->semanas->pluck('numero_semana_evento')->toArray();
+        $this->semanas = is_array($evento->semana_evento) ? $evento->semana_evento : (json_decode($evento->semana_evento, true) ?? []);
     }
 
     protected function rules()
@@ -202,10 +204,14 @@ class UpdateEventoForm extends Form
                 }
             ],
             'semanas' => [
-                'required',
+                'required_if:is_semana_evento,true',
                 'array',
-                'min:1',
                 function ($attribute, $value, $fail) {
+                    if (!$this->is_semana_evento) return;
+                    if (empty($value)) {
+                        $fail('Debe seleccionar al menos una semana.');
+                        return;
+                    }
                     if (!$this->is_repetible && count($value) > 1) {
                         $fail('Si el evento no es repetible, solo puede seleccionar una (1) semana.');
                     }
@@ -252,9 +258,9 @@ class UpdateEventoForm extends Form
             'rango_dias.integer' => 'La cantidad de días debe ser un número entero.',
             'rango_dias.min' => 'La cantidad de días debe ser al menos 1.',
             'rango_dias.max' => 'La cantidad de días no debe superar los 90 días.',
-            'semanas.required' => 'Debe seleccionar al menos una semana.',
+            'rango_dias.max' => 'La cantidad de días no debe superar los 90 días.',
+            'semanas.required_if' => 'Debe seleccionar al menos una semana cuando el evento está asociado a semanas específicas.',
             'semanas.array' => 'Formato inválido de semanas.',
-            'semanas.min' => 'Debe seleccionar al menos una semana.',
         ];
     }
 }

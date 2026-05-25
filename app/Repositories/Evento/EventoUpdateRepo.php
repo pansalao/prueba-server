@@ -23,6 +23,8 @@ class EventoUpdateRepo
                 'rango_dias_evento'     => $data['is_rango_dias'] ? ($data['rango_dias'] ?? null) : null,
                 'cantidad_dias_evento'  => (($data['is_especial'] ?? false) && ($data['especial_evento'] ?? '') == '1') ? ($data['cantidad_dias_evento'] ?? null) : null,
                 'is_superponible_evento'=> $data['is_superponible'] ?? false,
+                'is_semana_evento' => $data['is_semana_evento'] ?? (!empty($data['semanas'])),
+                'semana_evento' => (($data['is_semana_evento'] ?? !empty($data['semanas'])) && !empty($data['semanas']) && is_array($data['semanas'])) ? json_encode(array_values(array_filter($data['semanas'], fn($v) => $v !== null && $v !== ''))) : null,
             ];
 
             // Guardar is_independiente de forma dinámica según la columna que exista en la BD
@@ -35,24 +37,6 @@ class EventoUpdateRepo
             }
 
             $evento->update($params);
-
-            if (!empty($data['semanas']) && is_array($data['semanas'])) {
-                \App\Models\SemanaEvento::where('id_evento', $id)->delete();
-                $semanasData = [];
-                $semanasValidas = array_unique(array_filter($data['semanas'], function($val) {
-                    return $val !== null && $val !== '';
-                }));
-                foreach ($semanasValidas as $semana) {
-                    $semanasData[] = [
-                        'id_evento' => $evento->id_evento,
-                        'numero_semana_evento' => $semana,
-                        'estatus' => '1',
-                    ];
-                }
-                if (count($semanasData) > 0) {
-                    \App\Models\SemanaEvento::insert($semanasData);
-                }
-            }
 
             return $evento;
         });

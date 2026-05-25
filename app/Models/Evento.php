@@ -21,17 +21,14 @@ class Evento extends Model
         'is_independiente' => 'boolean',
         'is_independiente_evento' => 'boolean',
         'is_superponible_evento' => 'boolean',
+        'is_semana_evento' => 'boolean',
+        'semana_evento' => 'array',
         'cantidad_dias_evento' => 'integer',
     ];
 
     public function detalles()
     {
         return $this->hasMany(DetalleEvento::class, 'id_evento');
-    }
-
-    public function semanas()
-    {
-        return $this->hasMany(SemanaEvento::class, 'id_evento');
     }
 
     /**
