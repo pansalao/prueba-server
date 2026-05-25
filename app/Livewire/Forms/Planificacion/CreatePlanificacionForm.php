@@ -11,6 +11,7 @@ class CreatePlanificacionForm extends Form
     public $id_profesor_asignado;
     public $unidades = [];
     public $tipos_seccion = [];
+    public $proposito_unidad;
     
     // Cache for performance
     protected $cachedLapso = null;
@@ -95,11 +96,77 @@ class CreatePlanificacionForm extends Form
         return true;
     }
 
+    public function areObjetivosFilled($index) {
+        $u = $this->unidades[$index] ?? null;
+        if (!$u || empty($u['objetivos'])) return false;
+        foreach ($u['objetivos'] as $obj) {
+            if (empty($obj['tema_id']) || empty($obj['objetivo_id'])) return false;
+            if (empty($obj['contenidos'])) return false;
+            foreach ($obj['contenidos'] as $cont) {
+                if (empty($cont['contenido_id'])) return false;
+            }
+        }
+        return true;
+    }
+
+    public function areContenidosFilled($index, $objIndex) {
+        $obj = $this->unidades[$index]['objetivos'][$objIndex] ?? null;
+        if (!$obj || empty($obj['contenidos'])) return false;
+        foreach ($obj['contenidos'] as $cont) {
+            if (empty($cont['contenido_id'])) return false;
+        }
+        return true;
+    }
+
+    public function areEstrategiasFilled($index) {
+        $u = $this->unidades[$index] ?? null;
+        if (!$u || empty($u['estrategias'])) return false;
+        foreach ($u['estrategias'] as $est) {
+            if (empty($est['tecnica_actividad_id']) || empty($est['actividad']) || strlen($est['actividad']) < 5) return false;
+            if (empty($est['recursos'])) return false;
+            foreach ($est['recursos'] as $rec) {
+                if (empty($rec['recurso_id'])) return false;
+            }
+        }
+        return true;
+    }
+
+    public function areRecursosFilled($index, $estIndex) {
+        $est = $this->unidades[$index]['estrategias'][$estIndex] ?? null;
+        if (!$est || empty($est['recursos'])) return false;
+        foreach ($est['recursos'] as $rec) {
+            if (empty($rec['recurso_id'])) return false;
+        }
+        return true;
+    }
+
+    public function areEvaluacionesFilled($index) {
+        $u = $this->unidades[$index] ?? null;
+        if (!$u || empty($u['evaluaciones'])) return false;
+        foreach ($u['evaluaciones'] as $eval) {
+            if (empty($eval['fecha_evaluacion']) || empty($eval['evaluacion_id']) || 
+                empty($eval['tecnica_id']) || empty($eval['forma_participacion'])) return false;
+            if ($eval['forma_participacion'] == '2' && (empty($eval['integrantes']) || $eval['integrantes'] < 2)) return false;
+            if (empty($eval['ponderacion']) || $eval['ponderacion'] < 5) return false;
+        }
+        return true;
+    }
+
+    public function areBibliografiasFilled($index) {
+        $u = $this->unidades[$index] ?? null;
+        if (!$u || empty($u['bibliografias'])) return false;
+        foreach ($u['bibliografias'] as $bib) {
+            if (empty($bib['bibliografia_id'])) return false;
+        }
+        return true;
+    }
+
     public function rules($unitIndex = null)
     {
         $rules = [
             'id_profesor_asignado' => 'required',
             'tipos_seccion' => 'required|array|min:1',
+            'proposito_unidad' => 'required|string|min:5',
         ];
 
         $unidadesToValidate = ($unitIndex !== null) ? [$unitIndex => $this->unidades[$unitIndex]] : $this->unidades;

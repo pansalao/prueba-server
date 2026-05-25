@@ -110,6 +110,7 @@ class UpdatePlanificacion extends Component
         $this->locked = $planificacion['estatus'] == 1;
         $this->nombre_lapso = $planificacion['nombre_lapso'];
         $this->docente_rol = $planificacion['docente_rol'] ?? 'Docente';
+        $this->form->proposito_unidad = $planificacion['proposito_unidad'] ?? '';
 
         $malla = $this->planificacionCreateRepo->getMallaByAsignacion($planificacion['id_detalle_profesor_asignado'] ?? null);
         $this->nombre_malla = $malla ? $malla->mal_nombre : 'No especificada';
@@ -206,18 +207,17 @@ class UpdatePlanificacion extends Component
             ];
         }
 
-        if (empty($unidades)) {
-            foreach (range(0, 3) as $idx) {
-                $unidades[] = [
-                    'numero' => $idx + 1,
-                    'estatus' => 2,
-                    'objetivos' => [['tema_id' => '', 'objetivo_id' => '', 'contenidos' => [['contenido_id' => '']]]],
-                    'estrategias' => [['tecnica_actividad_id' => '', 'actividad' => '', 'recursos' => [['recurso_id' => '']]]],
-                    'evaluaciones' => [['fecha_evaluacion' => '', 'evaluacion_id' => '', 'ponderacion' => 5, 'tecnica_id' => '', 'forma_participacion' => '', 'integrantes' => null]],
-                    'bibliografias' => [['bibliografia_id' => '']],
-                    'indicadores_logro' => ''
-                ];
-            }
+        while (count($unidades) < 4) {
+            $idx = count($unidades);
+            $unidades[] = [
+                'numero' => $idx + 1,
+                'estatus' => 2,
+                'objetivos' => [['tema_id' => '', 'objetivo_id' => '', 'contenidos' => [['contenido_id' => '']]]],
+                'estrategias' => [['tecnica_actividad_id' => '', 'actividad' => '', 'recursos' => [['recurso_id' => '']]]],
+                'evaluaciones' => [['fecha_evaluacion' => '', 'evaluacion_id' => '', 'ponderacion' => 5, 'tecnica_id' => '', 'forma_participacion' => '', 'integrantes' => null]],
+                'bibliografias' => [['bibliografia_id' => '']],
+                'indicadores_logro' => ''
+            ];
         }
 
         $this->form->unidades = $unidades;
@@ -336,6 +336,47 @@ class UpdatePlanificacion extends Component
         $this->form->lapso_fecha_inicio = $this->lapso_fecha_inicio;
         $this->form->lapso_fecha_fin = $this->lapso_fecha_fin;
         $this->form->id_lapso_academico = $this->id_lapso_academico;
+
+        $field = str_replace('form.', '', $propertyName);
+
+        if (str_contains($field, 'unidades') || str_contains($field, 'proposito_unidad')) {
+            $this->autoSaveSection();
+        }
+
+        if (str_contains($field, 'ponderacion')) {
+            if (preg_match('/unidades\.(\d+)\.evaluaciones\.(\d+)\.ponderacion/', $field, $matches)) {
+                $unidadIndex = $matches[1];
+                $evalIndex = $matches[2];
+                $val = floatval($this->form->unidades[$unidadIndex]['evaluaciones'][$evalIndex]['ponderacion'] ?? 0);
+                
+                $totalOthers = 0;
+                foreach ($this->form->unidades[$unidadIndex]['evaluaciones'] as $i => $ev) {
+                    if ($i != $evalIndex) {
+                        $totalOthers += floatval($ev['ponderacion'] ?? 0);
+                    }
+                }
+                
+                $maxAllowed = max(0, 25 - $totalOthers);
+                if ($val > $maxAllowed) {
+                    $this->form->unidades[$unidadIndex]['evaluaciones'][$evalIndex]['ponderacion'] = $maxAllowed;
+                }
+                
+                try {
+                    $this->validateOnly("form.unidades.$unidadIndex.total_ponderacion_check");
+                } catch (\Illuminate\Validation\ValidationException $e) {}
+            }
+            $this->form->validateOnly($field);
+        } elseif (str_contains($field, 'forma_participacion')) {
+            if (preg_match('/unidades\.(\d+)\./', $field, $matches)) {
+                $index = $matches[1];
+                try {
+                    $this->validateOnly("form.unidades.$index.total_ponderacion_check");
+                } catch (\Illuminate\Validation\ValidationException $e) {}
+            }
+            $this->form->validateOnly($field);
+        } else {
+            $this->form->validateOnly($field);
+        }
     }
 
     protected function showAlert($type, $message, $redirect = null)
@@ -352,7 +393,8 @@ class UpdatePlanificacion extends Component
             $this->form->id_lapso_academico = $this->id_lapso_academico;
 
             $this->planificacionEditRepo->updatePlanificacion($this->planificacionId, [
-                'unidades' => $this->form->unidades
+                'unidades' => $this->form->unidades,
+                'proposito_unidad' => $this->form->proposito_unidad
             ]);
         } catch (\Exception $e) {
             // Silencioso - no interrumpir al usuario
@@ -456,7 +498,8 @@ class UpdatePlanificacion extends Component
         $this->form->id_lapso_academico = $this->id_lapso_academico;
 
         $success = $this->planificacionEditRepo->updatePlanificacion($this->planificacionId, [
-            'unidades' => $this->form->unidades
+            'unidades' => $this->form->unidades,
+            'proposito_unidad' => $this->form->proposito_unidad
         ]);
 
         if ($success) {
@@ -476,7 +519,9 @@ class UpdatePlanificacion extends Component
             $this->form->validate();
 
             $success = $this->planificacionEditRepo->updatePlanificacion($this->planificacionId, [
-                'unidades' => $this->form->unidades
+                'unidades' => $this->form->unidades,
+                'proposito_unidad' => $this->form->proposito_unidad,
+                'estatus' => '2'
             ]);
 
             if ($success) {

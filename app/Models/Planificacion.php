@@ -11,6 +11,6 @@ class Planificacion extends Model
 
     protected $table = 'planificacion';
     protected $primaryKey = 'id_planificacion';
-    public $timestamps = true;
+    public $timestamps = false;
     protected $guarded = [];
 }

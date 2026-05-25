@@ -188,23 +188,41 @@ class CreatePlanificacion extends Component
                 }
             }
         }
-        if (str_contains($field, 'unidades') || str_contains($field, 'id_profesor_asignado') || str_contains($field, 'tipos_seccion')) {
+        if (str_contains($field, 'unidades') || str_contains($field, 'id_profesor_asignado') || str_contains($field, 'tipos_seccion') || str_contains($field, 'proposito_unidad')) {
             $this->autoSaveSection();
         }
 
-        if (str_contains($field, 'ponderacion') || str_contains($field, 'forma_participacion')) {
-            // Si cambia una ponderación o forma de participación, validamos toda la unidad
-            // para que los errores de suma total (25%) se actualicen al instante.
+        if (str_contains($field, 'ponderacion')) {
+            if (preg_match('/unidades\.(\d+)\.evaluaciones\.(\d+)\.ponderacion/', $field, $matches)) {
+                $unidadIndex = $matches[1];
+                $evalIndex = $matches[2];
+                $val = floatval($this->form->unidades[$unidadIndex]['evaluaciones'][$evalIndex]['ponderacion'] ?? 0);
+                
+                $totalOthers = 0;
+                foreach ($this->form->unidades[$unidadIndex]['evaluaciones'] as $i => $ev) {
+                    if ($i != $evalIndex) {
+                        $totalOthers += floatval($ev['ponderacion'] ?? 0);
+                    }
+                }
+                
+                $maxAllowed = max(0, 25 - $totalOthers);
+                if ($val > $maxAllowed) {
+                    $this->form->unidades[$unidadIndex]['evaluaciones'][$evalIndex]['ponderacion'] = $maxAllowed;
+                }
+                
+                try {
+                    $this->validateOnly("form.unidades.$unidadIndex.total_ponderacion_check");
+                } catch (\Illuminate\Validation\ValidationException $e) {}
+            }
+            $this->form->validateOnly($field);
+        } elseif (str_contains($field, 'forma_participacion')) {
             if (preg_match('/unidades\.(\d+)\./', $field, $matches)) {
                 $index = $matches[1];
                 try {
                     $this->validateOnly("form.unidades.$index.total_ponderacion_check");
-                } catch (\Illuminate\Validation\ValidationException $e) {
-                    // Ignoramos la excepción aquí para que no detenga el flujo, 
-                    // ya que solo queremos que los errores se disparen en la UI.
-                }
+                } catch (\Illuminate\Validation\ValidationException $e) {}
             }
-            $this->form->validate();
+            $this->form->validateOnly($field);
         } else {
             $this->form->validateOnly($field);
         }
@@ -232,9 +250,17 @@ class CreatePlanificacion extends Component
     public function addItem($unidadIndex, $arrayName, $parentIndex = null)
     {
         if ($arrayName === 'bibliografias') {
+            if (!$this->form->areBibliografiasFilled($unidadIndex)) {
+                $this->showAlert('error', 'Debe seleccionar la bibliografía actual antes de añadir otra.');
+                return;
+            }
             // Add bibliography to unit
             $this->form->unidades[$unidadIndex]['bibliografias'][] = ['bibliografia_id' => ''];
         } elseif ($arrayName === 'objetivos') {
+            if (!$this->form->areObjetivosFilled($unidadIndex)) {
+                $this->showAlert('error', 'Debe rellenar completamente el tema/objetivo actual antes de añadir otro.');
+                return;
+            }
             // Add new objective block
             $this->form->unidades[$unidadIndex]['objetivos'][] = [
                 'tema_id' => '',
@@ -248,21 +274,40 @@ class CreatePlanificacion extends Component
                 session()->flash('error', 'Debe seleccionar un objetivo primero.');
                 return;
             }
+            if (!$this->form->areContenidosFilled($unidadIndex, $parentIndex)) {
+                $this->showAlert('error', 'Debe seleccionar el contenido actual antes de añadir otro.');
+                return;
+            }
             // Add content to specific objective
             $this->form->unidades[$unidadIndex]['objetivos'][$parentIndex]['contenidos'][] = ['contenido_id' => ''];
 
         } elseif ($arrayName === 'estrategia_recursos') {
+            if (!$this->form->areRecursosFilled($unidadIndex, $parentIndex)) {
+                $this->showAlert('error', 'Debe seleccionar el recurso actual antes de añadir otro.');
+                return;
+            }
             // Add resource to specific strategy
             // $parentIndex is the strategy index
             $this->form->unidades[$unidadIndex]['estrategias'][$parentIndex]['recursos'][] = ['recurso_id' => ''];
 
         } else {
-            // Fallback for evaluations
+            // Fallback for evaluaciones and estrategias
+            if ($arrayName === 'evaluaciones') {
+                if (!$this->form->areEvaluacionesFilled($unidadIndex)) {
+                    $this->showAlert('error', 'Debe rellenar completamente la evaluación actual antes de añadir otra.');
+                    return;
+                }
+            } elseif ($arrayName === 'estrategias') {
+                if (!$this->form->areEstrategiasFilled($unidadIndex)) {
+                    $this->showAlert('error', 'Debe rellenar completamente la estrategia actual antes de añadir otra.');
+                    return;
+                }
+            }
             $defaultTemplates = [
                 'evaluaciones' => [
                     'fecha_evaluacion' => '',
                     'evaluacion_id' => '',
-                    'ponderacion' => 0,
+                    'ponderacion' => 5,
                     'tecnica_id' => '',
                     'forma_participacion' => '',
                     'integrantes' => null
@@ -341,7 +386,8 @@ class CreatePlanificacion extends Component
                 // Ya existe un borrador, actualizamos
                 $repo = new \App\Repositories\Planificacion\PlanificacionEditRepo();
                 $repo->updatePlanificacion($this->planificacionDraftId, [
-                    'unidades' => $this->form->unidades
+                    'unidades' => $this->form->unidades,
+                    'proposito_unidad' => $this->form->proposito_unidad
                 ]);
             } else {
                 // Primera vez, creamos borrador
@@ -349,7 +395,8 @@ class CreatePlanificacion extends Component
                     $this->form->id_profesor_asignado,
                     $this->form->unidades,
                     $this->form->tipos_seccion ?? [],
-                    '4' // Estatus Borrador (Incompleta)
+                    '4', // Estatus Borrador (Incompleta)
+                    $this->form->proposito_unidad
                 );
                 if ($id) {
                     $this->planificacionDraftId = $id;
@@ -369,7 +416,8 @@ class CreatePlanificacion extends Component
                 // Actualizar borrador existente a estatus final
                 $repo = new \App\Repositories\Planificacion\PlanificacionEditRepo();
                 $repo->updatePlanificacion($this->planificacionDraftId, [
-                    'unidades' => $this->form->unidades
+                    'unidades' => $this->form->unidades,
+                    'proposito_unidad' => $this->form->proposito_unidad
                 ]);
                 // Cambiar estatus a '2' (enviada para aprobación)
                 $draft = \App\Models\Planificacion::find($this->planificacionDraftId);
@@ -380,7 +428,9 @@ class CreatePlanificacion extends Component
                 $this->planificacionRepository->savePlanificacionTransaccion(
                     $this->form->id_profesor_asignado,
                     $this->form->unidades,
-                    $this->form->tipos_seccion
+                    $this->form->tipos_seccion,
+                    '2',
+                    $this->form->proposito_unidad
                 );
             }
 
@@ -393,6 +443,46 @@ class CreatePlanificacion extends Component
         } catch (\Exception $e) {
             $this->showAlert('error', 'Error al guardar la planificación: ' . $e->getMessage());
         }
+    }
+
+    public function validateSectionAndAdvance($currentSection, $nextSection, $unidadIndex)
+    {
+        $isValid = false;
+        $errorMsg = '';
+        
+        switch ($currentSection) {
+            case 'tematica':
+                $isValid = $this->form->isTematicaComplete($unidadIndex);
+                $errorMsg = 'Debe completar toda la temática general antes de avanzar.';
+                break;
+            case 'estrategias':
+                $isValid = $this->form->isEstrategiasComplete($unidadIndex);
+                $errorMsg = 'Debe completar las estrategias pedagógicas antes de avanzar.';
+                break;
+            case 'indicadores':
+                $isValid = $this->form->isIndicadoresComplete($unidadIndex);
+                $errorMsg = 'Debe completar los indicadores de logro antes de avanzar.';
+                break;
+            case 'evaluacion':
+                $isValid = $this->form->isEvaluacionComplete($unidadIndex);
+                $errorMsg = 'Debe completar el plan de evaluación (incluyendo ponderaciones) antes de avanzar.';
+                break;
+            case 'bibliografias':
+                $isValid = $this->form->isBibliografiasComplete($unidadIndex);
+                $errorMsg = 'Debe completar las referencias bibliográficas antes de avanzar.';
+                break;
+            default:
+                $isValid = true;
+        }
+
+        if (!$isValid) {
+            $this->showAlert('error', $errorMsg);
+            return;
+        }
+
+        $this->autoSaveSection();
+        $data = json_encode(['next' => $nextSection, 'index' => $unidadIndex]);
+        $this->js("window.dispatchEvent(new CustomEvent('advance-section', { detail: {$data} }))");
     }
 
     public function irAUnidad($targetIndex)

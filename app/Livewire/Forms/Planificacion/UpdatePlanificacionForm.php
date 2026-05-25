@@ -10,6 +10,7 @@ class UpdatePlanificacionForm extends Form
     public $lapso_fecha_inicio;
     public $lapso_fecha_fin;
     public $id_lapso_academico;
+    public $proposito_unidad;
 
     // Cache for performance
     protected $cachedEventos = null;
@@ -97,6 +98,7 @@ class UpdatePlanificacionForm extends Form
     {
         $rules = [
             'unidades' => 'required|array|min:1',
+            'proposito_unidad' => 'required|string|min:5',
         ];
 
         $unidadesToValidate = ($unitIndex !== null) ? [$unitIndex => $this->unidades[$unitIndex]] : $this->unidades;

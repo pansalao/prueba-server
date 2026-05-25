@@ -32,7 +32,7 @@
 <div {{ $attributes->merge(['class' => 'w-full relative']) }} 
      x-data="{ 
         open: false, 
-        search: @entangle($finalWireModel), 
+        search: @entangle($finalWireModel).live, 
         options: {{ collect($options)->map(fn($o) => is_array($o) ? ($o[$textField] ?? '') : ($o->{$textField} ?? ''))->toJson() }},
         filteredOptions: [],
         highlightedIndex: -1,
@@ -133,11 +133,11 @@
                 @click="selectOption(option)"
                 @mouseenter="highlightedIndex = index"
                 :class="{
-                    'bg-indigo-600 text-white': highlightedIndex === index,
+                    'bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-bold': highlightedIndex === index,
                     'text-gray-900 dark:text-gray-100': highlightedIndex !== index
                 }"
                 class="px-4 py-2 text-sm cursor-pointer transition-colors duration-150 border-b border-gray-100 dark:border-gray-700 last:border-0"
-                x-text="option"
+                x-text="option || '\u00A0'"
             ></div>
         </template>
     </div>

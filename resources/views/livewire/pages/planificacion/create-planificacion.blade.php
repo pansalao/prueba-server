@@ -36,9 +36,8 @@
                         </div>
 
                         {{-- Propósito de la Unidad Curricular, Malla y Lapso --}}
-                        @if($form->id_profesor_asignado)
-                            <div class="max-w-4xl mx-auto mt-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="max-w-4xl mx-auto mt-6 transition-all duration-300 {{ !$form->id_profesor_asignado ? 'opacity-50 pointer-events-none' : '' }}">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div class="p-4 bg-gray-50/80 dark:bg-gray-800/80 border border-gray-200/60 dark:border-gray-700/60 rounded-xl transition-all">
                                             <h4 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
                                                 <span class="material-icons text-sm text-indigo-500">people_outline</span> Tipo de Sección a Planificar <span class="text-red-500">*</span>
@@ -69,25 +68,20 @@
                                     @endif
                                 </div>
 
-                                @if($proposito)
-                                    <div class="mt-4 p-5 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-xl flex gap-4 items-start">
-                                        <div class="shrink-0 mt-0.5">
-                                            <span class="material-icons text-blue-500 dark:text-blue-400">flag</span>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase tracking-widest mb-1.5">Propósito de la Unidad Curricular</h4>
-                                            <p class="text-sm text-blue-900 dark:text-blue-200/80 leading-relaxed font-medium">
-                                                {{ $proposito }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-                        @endif
+                                <div class="mt-4 transition-all duration-300 {{ count($form->tipos_seccion) == 0 ? 'opacity-50 pointer-events-none' : '' }}">
+                                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                        Propósito de la Unidad Curricular
+                                    </label>
+                                    <textarea wire:model.live="form.proposito_unidad" rows="3" 
+                                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors resize-none"
+                                        placeholder="Describa el propósito de la unidad curricular para esta planificación..."></textarea>
+                                    @error('form.proposito_unidad') <span class="text-xs text-red-500 mt-1 block font-semibold">{{ $message }}</span> @enderror
+                                </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-6" x-data="{ openUnidad: @entangle('openUnidad') }">
+                <div class="space-y-6 transition-all duration-500 {{ !($form->id_profesor_asignado && count($form->tipos_seccion) > 0 && !empty($form->proposito_unidad)) ? 'opacity-50 pointer-events-none' : '' }}" x-data="{ openUnidad: @entangle('openUnidad') }">
                     <div
                         class="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-300 dark:border-gray-600 pb-6 gap-4">
                         <div>
@@ -213,18 +207,19 @@
                                     $canShowBibliografias = $isEvaluacionDone;
                                 @endphp
 
-                                <div x-data="{ openSection: 'tematica' }" class="p-8 space-y-6 flex-grow">
+                                <div x-data="{ openSection: 'tematica' }" @advance-section.window="if ($event.detail.index === {{ $index }}) { openSection = $event.detail.next }" class="p-8 space-y-6 flex-grow">
 
                                     {{-- Contenidos agrupados por tematica --}}
-                                    <div class="border-2 {{ $isTematicaDone ? 'border-green-500' : 'border-red-500' }} rounded-xl shadow-sm transition-all duration-300">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'tematica' ? '' : 'tematica'">
+                                    <div class="border-2 {{ $isTematicaDone ? 'border-green-500' : 'border-red-500' }} rounded-xl shadow-sm transition-all duration-300" :class="openSection === 'tematica' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'tematica' ? '' : 'tematica'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-blue-500">menu_book</span>
                                                 Temática General
                                             </h4>
                                             <div class="flex items-center gap-4">
+                                                @php $canAddObjetivo = $form->areObjetivosFilled($index); @endphp
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'objetivos')"
-                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors">
+                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors {{ $canAddObjetivo ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
                                                     <span class="material-icons text-[12px]">add</span>
                                                     AÑADIR TEMA
                                                 </button>
@@ -270,9 +265,13 @@
                                                         <div class="flex items-center justify-between mb-3">
                                                             <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Contenidos del Objetivo</label>
                                                             @php $selectedObjetivoId = $unidad['objetivos'][$objetivoIndex]['objetivo_id'] ?? null; @endphp
+                                                            @php 
+                                                                $canAddContenido = $form->areContenidosFilled($index, $objetivoIndex);
+                                                                $disabledContenido = empty($selectedObjetivoId);
+                                                            @endphp
                                                             <button type="button" wire:click="addItem({{ $index }}, 'contenidos', {{ $objetivoIndex }})"
-                                                                @if(empty($selectedObjetivoId)) disabled @endif
-                                                                class="inline-flex items-center gap-1 text-[10px] border border-[#767676] px-2 py-1 rounded-lg font-bold transition-colors shadow-sm uppercase {{ empty($selectedObjetivoId) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#f0f0f0] text-black hover:bg-gray-200' }}">
+                                                                @if($disabledContenido) disabled @endif
+                                                                class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors shadow-sm uppercase {{ $disabledContenido ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed' : ($canAddContenido ? 'bg-green-500 border-green-600 text-white hover:bg-green-600' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80') }}">
                                                                 <span class="material-icons text-xs">add</span> Agregar Contenido
                                                             </button>
                                                         </div>
@@ -301,7 +300,7 @@
                                                 </div>
                                             @endforeach
                                                 <div class="flex justify-end pt-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 mt-4 -mx-4 -mb-4 p-4">
-                                                    <button type="button" @click="openSection = 'estrategias'" wire:click="autoSaveSection"
+                                                    <button type="button" wire:click="validateSectionAndAdvance('tematica', 'estrategias', {{ $index }})"
                                                         class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-md hover:bg-blue-700 transition-all">
                                                         SIGUIENTE: ESTRATEGIAS <span class="material-icons text-sm">arrow_forward</span>
                                                     </button>
@@ -309,15 +308,16 @@
                                             </div>
                                         </div>
 
-                                    <div class="border-2 {{ $isEstrategiasDone ? 'border-green-500' : ($canShowEstrategias ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEstrategias ? 'opacity-50 pointer-events-none' : '' }}">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'estrategias' ? '' : 'estrategias'">
+                                    <div class="border-2 {{ $isEstrategiasDone ? 'border-green-500' : ($canShowEstrategias ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEstrategias ? 'opacity-50 pointer-events-none' : '' }}" :class="openSection === 'estrategias' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'estrategias' ? '' : 'estrategias'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-green-500">psychology</span>
                                                 Estrategias Pedagógicas
                                             </h4>
                                             <div class="flex items-center gap-4">
+                                                @php $canAddEstrategia = $form->areEstrategiasFilled($index); @endphp
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'estrategias')"
-                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-green-50 dark:hover:bg-green-900 transition-colors">
+                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors {{ $canAddEstrategia ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
                                                     <span class="material-icons text-[12px]">add</span>
                                                     AÑADIR ESTRATEGIA
                                                 </button>
@@ -351,8 +351,9 @@
                                                         <div class="space-y-2">
                                                             <div class="flex items-center justify-between">
                                                                 <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Recursos</label>
+                                                                @php $canAddRecurso = $form->areRecursosFilled($index, $estrategiaIndex); @endphp
                                                                 <button type="button" wire:click="addItem({{ $index }}, 'estrategia_recursos', {{ $estrategiaIndex }})"
-                                                                    class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
+                                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors shadow-sm uppercase {{ $canAddRecurso ? 'bg-green-500 border-green-600 text-white hover:bg-green-600' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
                                                                     <span class="material-icons text-xs">add</span> AÑADIR
                                                                 </button>
                                                             </div>
@@ -376,7 +377,7 @@
                                                 </div>
                                             @endforeach
                                                 <div class="flex justify-end pt-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 mt-4 -mx-4 -mb-4 p-4">
-                                                    <button type="button" @click="openSection = 'indicadores'" wire:click="autoSaveSection"
+                                                    <button type="button" wire:click="validateSectionAndAdvance('estrategias', 'indicadores', {{ $index }})"
                                                         class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-md hover:bg-blue-700 transition-all">
                                                         SIGUIENTE: INDICADORES <span class="material-icons text-sm">arrow_forward</span>
                                                     </button>
@@ -384,8 +385,8 @@
                                             </div>
                                         </div>
 
-                                    <div class="border-2 {{ $isIndicadoresDone ? 'border-green-500' : ($canShowIndicadores ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowIndicadores ? 'opacity-50 pointer-events-none' : '' }}">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'indicadores' ? '' : 'indicadores'">
+                                    <div class="border-2 {{ $isIndicadoresDone ? 'border-green-500' : ($canShowIndicadores ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowIndicadores ? 'opacity-50 pointer-events-none' : '' }}" :class="openSection === 'indicadores' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'indicadores' ? '' : 'indicadores'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-orange-500">assignment_turned_in</span>
                                                 Indicadores de Logros
@@ -400,7 +401,7 @@
                                             </div>
 
                                                 <div class="flex justify-end pt-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 mt-4 -mx-4 -mb-4 p-4">
-                                                    <button type="button" @click="openSection = 'evaluacion'" wire:click="autoSaveSection"
+                                                    <button type="button" wire:click="validateSectionAndAdvance('indicadores', 'evaluacion', {{ $index }})"
                                                         class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-md hover:bg-blue-700 transition-all">
                                                         SIGUIENTE: PLAN DE EVALUACIÓN <span class="material-icons text-sm">arrow_forward</span>
                                                     </button>
@@ -408,15 +409,20 @@
                                             </div>
                                         </div>
 
-                                    <div class="border-2 {{ $isEvaluacionDone ? 'border-green-500' : ($canShowEvaluacion ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEvaluacion ? 'opacity-50 pointer-events-none' : '' }}">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'evaluacion' ? '' : 'evaluacion'">
+                                    <div class="border-2 {{ $isEvaluacionDone ? 'border-green-500' : ($canShowEvaluacion ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEvaluacion ? 'opacity-50 pointer-events-none' : '' }}" :class="openSection === 'evaluacion' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'evaluacion' ? '' : 'evaluacion'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-red-500">event_available</span>
                                                 Plan de Evaluación
+                                                @php $totalPond = $form->getTotalPonderacionForUnidad($index); @endphp
+                                                <span class="ml-2 px-2 py-0.5 text-xs rounded-full font-black {{ $totalPond == 25 ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300' }}">
+                                                    Total: {{ $totalPond }}% / 25%
+                                                </span>
                                             </h4>
                                             <div class="flex items-center gap-4">
+                                                @php $canAddEvaluacion = $form->areEvaluacionesFilled($index); @endphp
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'evaluaciones')"
-                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-red-50 dark:hover:bg-red-900 transition-colors">
+                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors {{ $canAddEvaluacion ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
                                                     <span class="material-icons text-[12px]">add</span>
                                                     AÑADIR EVALUACIÓN
                                                 </button>
@@ -473,11 +479,18 @@
                                                         </div>
                                                         <div class="space-y-1">
                                                             <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase text-center block">Pond. (%)</label>
+                                                            @php
+                                                                $totalPond = $this->form->getTotalPonderacionForUnidad($index);
+                                                                $currentPond = floatval($form->unidades[$index]['evaluaciones'][$evaluacionIndex]['ponderacion'] ?? 0);
+                                                                $remainingPond = 25 - ($totalPond - $currentPond);
+                                                                $maxPond = max(0, $remainingPond);
+                                                            @endphp
                                                             <div class="flex justify-center">
-                                                                 <input type="number" step="1" min="5" max="25" onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-                                                                    x-on:input="if($el.value > 25) $el.value = 25"
-                                                                    x-on:blur="if($el.value !== '' && $el.value < 5) { $el.value = 5; $dispatch('input'); }"
+                                                                <input type="number" step="1" min="5" max="{{ $maxPond }}" onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                                                    x-on:input="if($el.value !== '' && parseInt($el.value) > {{ $maxPond }}) { $el.value = {{ $maxPond }}; $dispatch('input'); }"
+                                                                    x-on:blur="if($el.value !== '' && parseInt($el.value) < 5) { $el.value = 5; $dispatch('input'); }"
                                                                     wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.ponderacion"
+                                                                    placeholder="{{ $maxPond }}"
                                                                     class="w-20 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 p-1.5 text-gray-700 dark:text-gray-300 text-sm font-bold text-center">
                                                             </div>
                                                             @error("form.unidades.$index.evaluaciones.$evaluacionIndex.ponderacion")
@@ -488,22 +501,23 @@
                                                 </div>
                                             @endforeach
                                                 <div class="flex justify-end pt-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 mt-4 -mx-4 -mb-4 p-4">
-                                                    <button type="button" @click="openSection = 'bibliografias'" wire:click="autoSaveSection"
+                                                    <button type="button" wire:click="validateSectionAndAdvance('evaluacion', 'bibliografias', {{ $index }})"
                                                         class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-md hover:bg-blue-700 transition-all">
                                                         SIGUIENTE: BIBLIOGRAFÍAS <span class="material-icons text-sm">arrow_forward</span>
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>                                            {{-- Referencias Bibliográficas Section --}}
-                                    <div class="border-2 {{ $isBibliografiasDone ? 'border-green-500' : ($canShowBibliografias ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowBibliografias ? 'opacity-50 pointer-events-none' : '' }}">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'bibliografias' ? '' : 'bibliografias'">
+                                    <div class="border-2 {{ $isBibliografiasDone ? 'border-green-500' : ($canShowBibliografias ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowBibliografias ? 'opacity-50 pointer-events-none' : '' }}" :class="openSection === 'bibliografias' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'bibliografias' ? '' : 'bibliografias'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-purple-500">library_books</span>
                                                 Referencias Bibliográficas
                                             </h4>
                                             <div class="flex items-center gap-4">
+                                                @php $canAddBibliografia = $form->areBibliografiasFilled($index); @endphp
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'bibliografias')"
-                                                    class="inline-flex items-center gap-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors">
+                                                    class="inline-flex items-center gap-1 text-xs border px-2 py-1 rounded-lg font-bold transition-colors {{ $canAddBibliografia ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
                                                     <span class="material-icons text-[12px]">add</span>
                                                     AÑADIR BIBLIOGRAFÍA
                                                 </button>
@@ -533,9 +547,6 @@
                                                             wire:model.live="form.unidades.{{ $index }}.bibliografias.{{ $biblioIndex }}.bibliografia_id"
                                                             placeholder="Escriba o seleccione..."
                                                             class="w-full text-xs" />
-                                                        @error("form.unidades.$index.bibliografias.$biblioIndex.bibliografia_id")
-                                                            <span class="text-red-500 text-[10px] font-bold block mt-1">{{ $message }}</span>
-                                                        @enderror
                                                     </div>
                                                 </div>
                                             @endforeach

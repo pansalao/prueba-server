@@ -48,11 +48,21 @@
                                     </div>
                                 </div>
                             </div>
+
+                                <div class="mt-4 transition-all duration-300">
+                                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                                        Propósito de la Unidad Curricular
+                                    </label>
+                                    <textarea wire:model.live="form.proposito_unidad" rows="3" 
+                                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors resize-none"
+                                        placeholder="Describa el propósito de la unidad curricular para esta planificación..." @if($locked) disabled @endif></textarea>
+                                    @error('form.proposito_unidad') <span class="text-xs text-red-500 mt-1 block font-semibold">{{ $message }}</span> @enderror
+                                </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-6" x-data="{ openUnidad: @entangle('openUnidad') }">
+                <div class="space-y-6 transition-all duration-500 {{ empty($form->proposito_unidad) ? 'opacity-50 pointer-events-none' : '' }}" x-data="{ openUnidad: @entangle('openUnidad') }">
                     <div
                         class="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-300 dark:border-gray-600 pb-6 gap-4">
                         <div>
@@ -170,8 +180,8 @@
                                 <div x-data="{ openSection: 'tematica' }" class="p-8 space-y-6 flex-grow">
 
                                     {{-- Contenidos agrupados por tematica --}}
-                                    <div class="border-2 {{ $isTematicaDone ? 'border-green-500' : 'border-red-500' }} rounded-xl shadow-sm transition-all duration-300">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'tematica' ? '' : 'tematica'">
+                                    <div class="border-2 {{ $isTematicaDone ? 'border-green-500' : 'border-red-500' }} rounded-xl shadow-sm transition-all duration-300" :class="openSection === 'tematica' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'tematica' ? '' : 'tematica'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-blue-500">menu_book</span>
                                                 Temática General
@@ -274,8 +284,8 @@
                                         </div>
 
                                     {{-- Estrategias Pedagógicas Section --}}
-                                    <div class="border-2 {{ $isEstrategiasDone ? 'border-green-500' : ($canShowEstrategias ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEstrategias ? 'opacity-50 pointer-events-none' : '' }}">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'estrategias' ? '' : 'estrategias'">
+                                    <div class="border-2 {{ $isEstrategiasDone ? 'border-green-500' : ($canShowEstrategias ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEstrategias ? 'opacity-50 pointer-events-none' : '' }}" :class="openSection === 'estrategias' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'estrategias' ? '' : 'estrategias'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-green-500">psychology</span>
                                                 Estrategias Pedagógicas
@@ -354,8 +364,8 @@
                                         </div>
 
                                     {{-- Indicadores de Logros Section --}}
-                                    <div class="border-2 {{ $isIndicadoresDone ? 'border-green-500' : ($canShowIndicadores ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowIndicadores ? 'opacity-50 pointer-events-none' : '' }}">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'indicadores' ? '' : 'indicadores'">
+                                    <div class="border-2 {{ $isIndicadoresDone ? 'border-green-500' : ($canShowIndicadores ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowIndicadores ? 'opacity-50 pointer-events-none' : '' }}" :class="openSection === 'indicadores' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'indicadores' ? '' : 'indicadores'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-orange-500">assignment_turned_in</span>
                                                 Indicadores de Logros
@@ -383,8 +393,8 @@
                                         </div>
 
                                     {{-- Plan de Evaluación Section --}}
-                                    <div class="border-2 {{ $isEvaluacionDone ? 'border-green-500' : ($canShowEvaluacion ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEvaluacion ? 'opacity-50 pointer-events-none' : '' }}">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'evaluacion' ? '' : 'evaluacion'">
+                                    <div class="border-2 {{ $isEvaluacionDone ? 'border-green-500' : ($canShowEvaluacion ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowEvaluacion ? 'opacity-50 pointer-events-none' : '' }}" :class="openSection === 'evaluacion' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'evaluacion' ? '' : 'evaluacion'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-red-500">event_available</span>
                                                 Plan de Evaluación
@@ -451,11 +461,18 @@
                                                         </div>
                                                         <div class="space-y-1">
                                                             <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase text-center block">Pond. (%)</label>
+                                                            @php
+                                                                $totalPond = $this->form->getTotalPonderacionForUnidad($index);
+                                                                $currentPond = floatval($form->unidades[$index]['evaluaciones'][$evaluacionIndex]['ponderacion'] ?? 0);
+                                                                $remainingPond = 25 - ($totalPond - $currentPond);
+                                                                $maxPond = max(0, $remainingPond);
+                                                            @endphp
                                                             <div class="flex justify-center">
-                                                                 <input type="number" step="1" min="5" max="25" onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-                                                                    x-on:input="if($el.value > 25) $el.value = 25"
-                                                                    x-on:blur="if($el.value !== '' && $el.value < 5) { $el.value = 5; $dispatch('input'); }"
+                                                                <input type="number" step="1" min="5" max="{{ $maxPond }}" onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                                                    x-on:input="if($el.value !== '' && parseInt($el.value) > {{ $maxPond }}) { $el.value = {{ $maxPond }}; $dispatch('input'); }"
+                                                                    x-on:blur="if($el.value !== '' && parseInt($el.value) < 5) { $el.value = 5; $dispatch('input'); }"
                                                                     wire:model.live="form.unidades.{{ $index }}.evaluaciones.{{ $evaluacionIndex }}.ponderacion"
+                                                                    placeholder="{{ $maxPond }}"
                                                                     class="w-20 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 p-1.5 text-gray-700 dark:text-gray-300 text-sm font-bold text-center">
                                                             </div>
                                                             @error("form.unidades.$index.evaluaciones.$evaluacionIndex.ponderacion")
@@ -474,8 +491,8 @@
                                                 </div>
                                             </div>
                                         </div>                                            {{-- Referencias Bibliográficas Section --}}
-                                    <div class="border-2 {{ $isBibliografiasDone ? 'border-green-500' : ($canShowBibliografias ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowBibliografias ? 'opacity-50 pointer-events-none' : '' }}">
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" @click="openSection = openSection === 'bibliografias' ? '' : 'bibliografias'">
+                                    <div class="border-2 {{ $isBibliografiasDone ? 'border-green-500' : ($canShowBibliografias ? 'border-red-500' : 'border-gray-200 dark:border-gray-700') }} rounded-xl shadow-sm transition-all duration-300 {{ !$canShowBibliografias ? 'opacity-50 pointer-events-none' : '' }}" :class="openSection === 'bibliografias' ? 'overflow-visible' : 'overflow-hidden'">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSection = openSection === 'bibliografias' ? '' : 'bibliografias'">
                                             <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                                                 <span class="material-icons text-purple-500">library_books</span>
                                                 Referencias Bibliográficas

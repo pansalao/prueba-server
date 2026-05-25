@@ -138,10 +138,19 @@ class PlanificacionEditRepo
                 }
             }
 
-            // Actualizar estatus general de la planificación a 'En Revisión' (2) si estaba Aprobada(1), Rechazada(3) o Incompleta(4)
+            // Actualizar estatus general y proposito de la unidad
             $planificacionToUpdate = \App\Models\Planificacion::find($planificacionId);
-            if ($planificacionToUpdate && in_array($planificacionToUpdate->estatus, ['1', '3', '4'])) {
-                $planificacionToUpdate->update(['estatus' => '2']);
+            if ($planificacionToUpdate) {
+                $updates = [];
+                if (array_key_exists('estatus', $data)) {
+                    $updates['estatus'] = $data['estatus'];
+                }
+                if (array_key_exists('proposito_unidad', $data)) {
+                    $updates['proposito_unidad'] = $data['proposito_unidad'];
+                }
+                if (!empty($updates)) {
+                    $planificacionToUpdate->update($updates);
+                }
             }
 
             DB::commit();

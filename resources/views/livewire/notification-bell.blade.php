@@ -14,7 +14,7 @@
         </div>
         <div class="max-h-60 overflow-y-auto">
             @forelse($planificacionesAceptadas as $planificacion)
-                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-default">
+                <button type="button" wire:click="markAsRead({{ $planificacion->id_planificacion }})" class="w-full text-left px-4 py-3 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
                     <p class="text-xs text-gray-800 dark:text-gray-200 font-medium">
                         @if($planificacion->estatus == 1)
                             ¡Tu planificación ha sido <span class="text-green-500 font-bold uppercase">Aceptada</span>!
@@ -22,15 +22,18 @@
                             ¡Tu planificación requiere <span class="text-red-500 font-bold uppercase">Modificaciones</span>!
                         @endif
                     </p>
-                    <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-1">
-                        {{ $planificacion->ucu_nombre }} - Sec: {{ $planificacion->sec_nombre }}
-                    </p>
+                    <div class="flex justify-between items-center mt-1">
+                        <p class="text-[10px] text-gray-500 dark:text-gray-400">
+                            {{ $planificacion->ucu_nombre }} - Sec: {{ $planificacion->sec_nombre }}
+                        </p>
+                        <span class="material-icons text-[14px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" title="Marcar como leída">check_circle</span>
+                    </div>
                     @if($planificacion->estatus == 3)
                         <p class="text-[9px] text-red-400 italic mt-1">
                             Revisa los motivos en el panel de gestión.
                         </p>
                     @endif
-                </div>
+                </button>
             @empty
                 <div class="px-4 py-6 text-center text-gray-500 dark:text-gray-400 text-xs">
                     No tienes notificaciones nuevas.

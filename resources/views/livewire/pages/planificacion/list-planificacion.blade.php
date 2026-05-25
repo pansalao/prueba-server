@@ -41,7 +41,7 @@
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">U. Curricular / Sección</th>
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Docente</th>
                         @can('cambiar-estatus-planificacion')
-                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">Estatus</th>
+                            <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">Estado</th>
                         @endcan
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">Acciones</th>
                     </tr>
@@ -65,7 +65,7 @@
                                 <td class="px-4 py-4 text-gray-900 dark:text-white">
                                     {{ $planificacion->docente_nombre }} {{ $planificacion->docente_apellido }}
                                 </td>
-                                <!-- Estatus -->
+                                <!-- Estado -->
                                 @can('cambiar-estatus-planificacion')
                                 <td class="px-4 py-4 text-right">
                                     @if ($planificacion->estatus == 1)
@@ -151,7 +151,7 @@
 
                         @can('cambiar-estatus-planificacion')
                         <div class="mb-2">
-                            <span class="font-semibold text-gray-700 dark:text-gray-300">Estatus:</span>
+                            <span class="font-semibold text-gray-700 dark:text-gray-300">Estado:</span>
                             @if ($planificacion->estatus == 1)
                                 <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Aprobada</span>
                             @elseif($planificacion->estatus == 2)

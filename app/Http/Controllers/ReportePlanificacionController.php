@@ -107,9 +107,16 @@ class ReportePlanificacionController extends Controller
 
         $estudiantes = $queryEstudiantes->orderBy('per.per_apellidos')->orderBy('per.per_nombres')->get();
 
+        // Obtener sedes
+        $sedes = \Illuminate\Support\Facades\DB::table("$dbSogc.sede")
+            ->whereIn('sed_estatus', ['A', '1'])
+            ->orderBy('sed_nombre')
+            ->get();
+
         $pdf = Pdf::loadView('livewire.pages.planificacion.pdf-acuerdo-aprendizaje', [
             'planificacion' => $planificacion,
-            'estudiantes' => $estudiantes
+            'estudiantes' => $estudiantes,
+            'sedes' => $sedes
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('acuerdo_aprendizaje_' . $id . '.pdf');

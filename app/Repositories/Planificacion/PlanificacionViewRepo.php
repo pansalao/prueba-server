@@ -29,6 +29,7 @@ class PlanificacionViewRepo
             ->select(
                 'p.id_planificacion as planificacion_id',
                 'p.estatus',
+                'p.proposito_unidad',
                 'u.usu_codigo as docente_id',
                 'per.per_nombres as docente_nombre',
                 'per.per_apellidos as docente_apellido',
@@ -151,13 +152,6 @@ class PlanificacionViewRepo
                         'dev.integrantes_detalle_evaluacion as integrantes'
                     )
                     ->get()
-                    ->filter(function ($item) {
-                        // Filtrar evaluaciones vacas o con datos por defecto
-                        return !empty($item->evaluacion) && 
-                               !empty($item->tecnica) && 
-                               $item->fecha_evaluacion != '0000-00-00' &&
-                               $item->fecha_evaluacion != null;
-                    })
                     ->map(fn($item) => (array) $item)
                     ->values()
                     ->toArray();
