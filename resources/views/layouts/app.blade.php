@@ -101,7 +101,7 @@
                         {{ $slot }}
 
                         @php
-                            $formRoutes = ['*/crear', '*/update', '*/editar', 'planificaciones.update', 'profile'];
+                            $formRoutes = ['*/crear', '*/update', '*/editar', 'planificaciones.update', 'profile', 'calendario.create', 'calendario.editar'];
                             $showMandatoryNote = request()->routeIs($formRoutes);
                         @endphp
 

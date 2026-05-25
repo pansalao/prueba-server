@@ -21,17 +21,20 @@
 
                 <div class="w-full">
                     <x-input-label for="tipo" :value="__('Tipo de Evento')" />
-                    <select id="tipo" wire:model.live="form.tipo_evento" @disabled($form->is_especial) @class([
-                        'w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm',
-                        'opacity-60 cursor-not-allowed' => $form->is_especial,
-                    ])>
-                        <option value="1">Feriado Nacional</option>
-                        <option value="2">Feriado Local</option>
-                        <option value="6">Feriado Mundial</option>
-                        <option value="3">Administrativo</option>
-                        <option value="4">Académico</option>
-                        <option value="5">Administrativo/Académico</option>
-                    </select>
+                    <div class="flex items-center gap-1 w-full">
+                        <select id="tipo" wire:model.live="form.tipo_evento" @disabled($form->is_especial) @class([
+                            'flex-1 min-w-0 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm',
+                            'opacity-60 cursor-not-allowed' => $form->is_especial,
+                        ])>
+                            <option value="1">Feriado Nacional</option>
+                            <option value="2">Feriado Local</option>
+                            <option value="6">Feriado Mundial</option>
+                            <option value="3">Administrativo</option>
+                            <option value="4">Académico</option>
+                            <option value="5">Administrativo/Académico</option>
+                        </select>
+                        <span class="text-red-500 font-bold">*</span>
+                    </div>
                     <x-input-error :messages="$errors->first('form.tipo_evento')" class="mt-2" />
                 </div>
 
@@ -51,53 +54,57 @@
                             title="Seleccione un color" />
                         <x-text-input type="text" wire:model.live="form.codigo_color_evento" class="flex-1 font-mono"
                             placeholder="#000000" maxlength="7" />
+                        <span class="text-red-500 font-bold">*</span>
                     </div>
                     <x-input-error :messages="$errors->first('form.codigo_color_evento')" class="mt-2" />
                 </div>
 
                 <x-toggle-switch id="is_independiente" :label="__('¿Puede registrarse fuera de un semestre?')"
-                    model="form.is_independiente" :disabled="$deshabilitarIndependienteLaborable" />
+                    model="form.is_independiente" :disabled="$deshabilitarIndependienteLaborable" required />
 
                 <x-toggle-switch id="is_superponible" :label="__('¿Puede solaparse con otros eventos? (Superponible)')"
-                    model="form.is_superponible" :disabled="$deshabilitarSuperponible" />
+                    model="form.is_superponible" :disabled="$deshabilitarSuperponible" required />
 
                 <x-toggle-switch id="is_laborable" :label="__('¿Es Laborable?')" model="form.is_laborable"
-                    :disabled="$deshabilitarIndependienteLaborable" />
+                    :disabled="$deshabilitarIndependienteLaborable" required />
 
                 <x-toggle-switch id="is_repetible" :label="__('¿Se puede repetir?')" model="form.is_repetible"
-                    :disabled="true" />
+                    :disabled="true" required />
 
                 <x-toggle-switch id="is_rango_dias" :label="__('¿Tiene cantidad especifica días de duración?')"
-                    model="form.is_rango_dias" :disabled="$deshabilitarRangoDias" />
+                    model="form.is_rango_dias" :disabled="$deshabilitarRangoDias" required />
 
                 <div class="w-full">
                     <x-input-label for="rango_dias" :value="__('Cantidad de días que debe durar el evento')" />
                     <x-text-input id="rango_dias" type="number" min="1" max="90" class="w-full"
-                        wire:model.live="form.rango_dias" placeholder="Ej: 5" :disabled="$deshabilitarCantidadRango" />
+                        wire:model.live="form.rango_dias" placeholder="Ej: 5" :disabled="$deshabilitarCantidadRango" required />
                     <x-input-error :messages="$errors->first('form.rango_dias')" class="mt-2" />
                 </div>
 
-                <x-toggle-switch id="is_especial" :label="__('¿Es un Evento Especial?')" model="form.is_especial" />
+                <x-toggle-switch id="is_especial" :label="__('¿Es un Evento Especial?')" model="form.is_especial" required />
                 
-                <x-toggle-switch id="is_semana_evento" :label="__('¿Ocurre en semanas específicas?')" model="form.is_semana_evento" />
+                <x-toggle-switch id="is_semana_evento" :label="__('¿Ocurre en semanas específicas?')" model="form.is_semana_evento" required />
                 @if($form->is_especial)
                     <div class="w-full">
                         <x-input-label for="especial" :value="__('Seleccione el tipo de Evento Especial')" />
-                        <select id="especial" wire:model.live="form.especial_evento" @disabled(!$form->is_especial) @class([
-                            'w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm',
-                            'opacity-60 cursor-not-allowed' => !$form->is_especial,
-                        ])>
-                            <option value="">Seleccione...</option>
-                            <option value="1">Vacaciones Colectivas</option>
-                            <option value="2">Inicio del Lapso Académico</option>
-                            <option value="3">Fin del Lapso Académico</option>
-                            <option value="4">Semana Santa</option>
-                            <option value="5">Carnaval</option>
-                            <option value="7">Inicio del Lapso Introductorio</option>
-                            <option value="8">Fin del Lapso Introductorio</option>
-                            <option value="9">Inicio del Curso Intensivo</option>
-                            <option value="10">Fin del Curso Intensivo</option>
-                        </select>
+                        <div class="flex items-center gap-1 w-full">
+                            <select id="especial" wire:model.live="form.especial_evento" @disabled(!$form->is_especial) @class([
+                                'flex-1 min-w-0 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm',
+                                'opacity-60 cursor-not-allowed' => !$form->is_especial,
+                            ])>
+                                <option value="">Seleccione...</option>
+                                <option value="1">Vacaciones Colectivas</option>
+                                <option value="2">Inicio del Lapso Académico</option>
+                                <option value="3">Fin del Lapso Académico</option>
+                                <option value="4">Semana Santa</option>
+                                <option value="5">Carnaval</option>
+                                <option value="7">Inicio del Lapso Introductorio</option>
+                                <option value="8">Fin del Lapso Introductorio</option>
+                                <option value="9">Inicio del Curso Intensivo</option>
+                                <option value="10">Fin del Curso Intensivo</option>
+                            </select>
+                            <span class="text-red-500 font-bold">*</span>
+                        </div>
                         <x-input-error :messages="$errors->first('form.especial_evento')" class="mt-2" />
                     </div>
                 @endif
@@ -105,7 +112,7 @@
                     <div class="w-full">
                         <x-input-label for="cantidad_dias_evento" :value="__('Cantidad de Días de Vacaciones')" />
                         <x-text-input id="cantidad_dias_evento" type="number" min="1" max="365" class="w-full"
-                            wire:model.live="form.cantidad_dias_evento" placeholder="Ej: 15" :disabled="!$form->is_especial || $form->especial_evento != '1'" />
+                            wire:model.live="form.cantidad_dias_evento" placeholder="Ej: 15" :disabled="!$form->is_especial || $form->especial_evento != '1'" required />
                         <x-input-error :messages="$errors->first('form.cantidad_dias_evento')" class="mt-2" />
                     </div>
                 @endif
@@ -131,7 +138,7 @@
                                 <div wire:key="semana-item-{{ $index }}">
                                     <div class="flex items-center gap-2">
                                         <x-text-input type="number" min="1" max="99" class="w-full"
-                                            wire:model.live="form.semanas.{{ $index }}" placeholder="Ej: 1" />
+                                            wire:model.live="form.semanas.{{ $index }}" placeholder="Ej: 1" required />
                                         @if($form->is_repetible && count($form->semanas) > 1)
                                             <button type="button" wire:click="removerSemana({{ $index }})"
                                                 class="text-red-500 hover:text-red-700 p-2 bg-red-50 dark:bg-red-900/20 rounded-md transition-colors"

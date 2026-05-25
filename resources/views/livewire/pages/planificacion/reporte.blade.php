@@ -127,7 +127,7 @@
                                         </td>
                                         <!-- Fecha Límite -->
                                         <td class="px-4 py-4 text-center font-bold text-xs">
-                                            {{ $calendarioSeleccionado ? \Carbon\Carbon::parse($calendarioSeleccionado->dia_fin_calendario_academico)->format('d/m/Y') : 'N/D' }}
+                                            {{ isset($fechaLimite) ? \Carbon\Carbon::parse($fechaLimite)->format('d/m/Y') : 'N/D' }}
                                         </td>
                                         <!-- Fecha de Entrega -->
                                         <td class="px-4 py-4 text-center text-xs">
@@ -226,7 +226,7 @@
                                     <div>
                                         <span class="text-gray-400">Límite:</span> 
                                         <span class="font-bold text-gray-700 dark:text-gray-300">
-                                            {{ $calendarioSeleccionado ? \Carbon\Carbon::parse($calendarioSeleccionado->dia_fin_calendario_academico)->format('d/m/Y') : 'N/D' }}
+                                            {{ isset($fechaLimite) ? \Carbon\Carbon::parse($fechaLimite)->format('d/m/Y') : 'N/D' }}
                                         </span>
                                     </div>
                                     <div>

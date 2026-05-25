@@ -15,7 +15,9 @@
 
                         <!-- Tema -->
                         <div class="w-full">
-                            <x-input-label for="tema" :value="__('Tema Asociado')" class="text-gray-600 font-bold mb-1" />
+                            <label for="tema" class="block font-bold text-sm text-gray-900 dark:text-white uppercase mb-1">
+                                {{ __('Tema Asociado') }}
+                            </label>
                             <x-select id="tema" wire:model.live="form.id_tema" :options="$temas" valueField="id"
                                 textField="nombre" placeholder="Selecciona un tema" class="w-full"
                                 errorField="form.id_tema" required />
@@ -24,7 +26,9 @@
                         <!-- Selección Dinámica de Objetivos (Selects Repetibles) -->
                         <div class="w-full md:col-span-2">
                             <div class="flex items-center justify-between mb-2">
-                                <x-input-label :value="__('Objetivos Específicos')" class="text-gray-600 font-bold" />
+                                <label class="block font-bold text-sm text-gray-900 dark:text-white uppercase">
+                                    {{ __('Objetivos Específicos') }}
+                                </label>
                                 <button type="button" wire:click="addObjetivo"
                                     class="inline-flex items-center gap-1 text-[11px] bg-[#f0f0f0] border-2 border-[#767676] text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                     <span class="material-icons text-sm">add</span>
@@ -56,11 +60,10 @@
 
                         <!-- Título -->
                         <div class="w-full md:col-span-2">
-                            <x-datalist 
-                                wire:key="datalist-contenidos-{{ md5($contenidosExistentes->pluck('titulo_contenido')->join(',')) }}"
+                            <x-input 
                                 label="Título del Contenido" 
-                                :options="$contenidosExistentes" 
-                                textField="titulo_contenido"
+                                name="titulo_contenido"
+                                errorField="form.titulo_contenido"
                                 wire:model.live="form.titulo_contenido"
                                 placeholder="EJ: INVOCACIÓN DE MÉTODOS Y PASO DE PARÁMETROS"
                                 required 

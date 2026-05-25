@@ -273,8 +273,6 @@ class PlanningDataSeeder extends Seeder
         $estudiantePerms = [
             1, 2,  // Perfil, Seleccionar Rol
             13, 16,  // Planificacion: Listar, Ver Detalles
-            46, 49,  // Evento: Listar, Ver Detalles
-            50, 52,  // Calendario: Listar, Ver Detalles
         ];
 
         // Limpiar todas las relaciones existentes en rol_permiso

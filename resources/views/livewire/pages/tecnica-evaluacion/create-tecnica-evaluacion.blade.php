@@ -13,11 +13,10 @@
             <div class="flex flex-col gap-4 w-full md:flex-row">
                 <!-- Nombre -->
                 <div class="w-full">
-                    <x-datalist 
-                        wire:key="datalist-tecnicas-{{ md5($tecnicasExistentes->pluck('nombre_tecnica_evaluacion')->join(',')) }}"
+                    <x-input 
                         label="Nombre de la Técnica" 
-                        :options="$tecnicasExistentes" 
-                        textField="nombre_tecnica_evaluacion"
+                        name="nombre"
+                        errorField="form.nombre"
                         wire:model.live="form.nombre"
                         placeholder="Ej: Portafolio, Prueba escrita, Ensayo, etc."
                         required 

@@ -42,8 +42,45 @@ class ReporteController extends Controller
             }
         }
 
-        // 4. Definir la fecha límite
-        $fecha_limite = $calendarioSeleccionado ? Carbon::parse($calendarioSeleccionado->dia_fin_calendario_academico) : now();
+        // 4. Definir la fecha límite basándonos en los eventos especiales del calendario
+        $fecha_inicio_lapso = null;
+        $fecha_fin_lapso = null;
+
+        if ($calendarioSeleccionado) {
+            // Buscar Inicio del Lapso Académico (especial_evento = 2)
+            $eventoInicio = DB::table('detalle_evento as de')
+                ->join('evento as e', 'de.id_evento', '=', 'e.id_evento')
+                ->where('de.id_calendario_academico', $calendarioSeleccionado->id_calendario_academico)
+                ->where('e.especial_evento', '2')
+                ->select('de.dia_inicio_detalle_evento')
+                ->first();
+
+            // Buscar Fin del Lapso Académico (especial_evento = 3)
+            $eventoFin = DB::table('detalle_evento as de')
+                ->join('evento as e', 'de.id_evento', '=', 'e.id_evento')
+                ->where('de.id_calendario_academico', $calendarioSeleccionado->id_calendario_academico)
+                ->where('e.especial_evento', '3')
+                ->select('de.dia_inicio_detalle_evento')
+                ->first();
+
+            if ($eventoInicio) {
+                $fecha_inicio_lapso = Carbon::parse($eventoInicio->dia_inicio_detalle_evento);
+            }
+            if ($eventoFin) {
+                $fecha_fin_lapso = Carbon::parse($eventoFin->dia_inicio_detalle_evento);
+            }
+        }
+
+        // Fallbacks si no se consiguen los eventos especiales
+        if (!$fecha_inicio_lapso && $calendarioSeleccionado) {
+            $fecha_inicio_lapso = Carbon::parse($calendarioSeleccionado->dia_inicio_calendario_academico);
+        }
+        if (!$fecha_fin_lapso && $calendarioSeleccionado) {
+            $fecha_fin_lapso = Carbon::parse($calendarioSeleccionado->dia_fin_calendario_academico);
+        }
+
+        // La fecha límite para la entrega de planificaciones es el inicio del lapso académico
+        $fecha_limite = $fecha_inicio_lapso ?: now();
 
         // 5. Consultar los docentes con sus asignaciones y planificaciones asociadas
         $query = DB::table("$dbSogc.seccion_unidad_docente as sud")
@@ -150,7 +187,8 @@ class ReporteController extends Controller
             'totalPendientesSolo' => $totalPendientes,
             'totalVencidosSolo' => $totalVencidos,
             'filtroDocente' => $request->query('docente', ''),
-            'filtroPeriodo' => $request->query('periodo', '')
+            'filtroPeriodo' => $request->query('periodo', ''),
+            'fechaLimite' => $fecha_limite
         ]);
     }
 }

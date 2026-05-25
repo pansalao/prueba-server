@@ -242,14 +242,14 @@
                 </div>
             @endcan
 
-            @if(!in_array(auth()->user()->usu_cod_rol, [3, 4]) || $roleCount > 1)
+            @can('listar-permiso')
                 <!-- Permisos (DAECE) -->
                 <div>
                     <a href="{{ route('permiso/listar') }}" class="sogat-sidebar-item">
                         Permisos
                     </a>
                 </div>
-            @endif
+            @endcan
 
 
             @can('listar-planificacion')

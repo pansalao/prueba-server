@@ -221,6 +221,14 @@ class AuthServiceProvider extends ServiceProvider
             return $accesoRepository->checkPermission('Editar de Rol');
         });
 
+        // --- GATES PARA EL MÓDULO DE PERMISO ---
+        Gate::define('listar-permiso', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Listar de Permiso');
+        });
+        Gate::define('editar-permiso', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Editar de Permiso');
+        });
+
         // --- GATES PARA EL MÓDULO DE BITACORA ---
         Gate::define('listar-bitacora', function ($user) use ($accesoRepository) {
             return $accesoRepository->checkPermission('Listar de Bitacora');

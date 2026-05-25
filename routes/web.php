@@ -160,8 +160,8 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
     Route::get('calendario/editar/{id}', EditarCalendario::class)->middleware('can:cambiar-estatus-calendario')->name('calendario.editar');
 
     // Módulo de Permisos (DAECE)
-    Route::get('permiso/list', \App\Livewire\Permiso\ListPermiso::class)->name('permiso/listar');
-    Route::get('permiso/update/{permisoId}', \App\Livewire\Permiso\UpdatePermiso::class)->name('permiso/update');
+    Route::get('permiso/list', \App\Livewire\Permiso\ListPermiso::class)->middleware('can:listar-permiso')->name('permiso/listar');
+    Route::get('permiso/update/{permisoId}', \App\Livewire\Permiso\UpdatePermiso::class)->middleware('can:editar-permiso')->name('permiso/update');
 
 
     // Rutas para Bitácora

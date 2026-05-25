@@ -19,12 +19,11 @@
     $finalErrorField = $errorField ?? $finalWireModel;
 
     $inputClasses = Arr::toCssClasses([
-        'block py-1.5 px-3 pr-10 border rounded-md shadow-sm transition-all duration-200 cursor-text',
+        'mt-1 block border-gray-300 rounded-md shadow-sm transition-all duration-200 cursor-text py-1.5 px-3 pr-10',
         'w-full' => !$required,
         'flex-1' => $required,
-        'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm',
-        'border-black dark:border-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500',
-        'mt-1' => !is_null($labelValue),
+        'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 sm:text-sm',
+        'dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500',
         $extraClasses,
     ]);
 @endphp
@@ -86,31 +85,32 @@
      @click.away="open = false"
 >
     @unless (is_null($labelValue))
-        <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1 {{ $labelClasses }}">
+        <label class="block font-bold text-sm text-gray-900 dark:text-white uppercase mb-1 {{ $labelClasses }}">
             {{ $labelValue }}
         </label>
     @endunless
 
-    <div class="flex items-center gap-1 w-full relative">
-        <input 
-            type="text"
-            x-model="search"
-            @click="toggle()"
-            @keydown="onKeyDown"
-            @input="open = true"
-            placeholder="{{ $placeholder }}"
-            @disabled($disabled)
-            class="{{ $inputClasses }} {{ $attributes->get('class') }}"
-            autocomplete="off"
-        >
-        
-        <!-- Icono de dropdown que también hace toggle -->
-        <div @click="toggle()" class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-indigo-500 transition-colors">
-            <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
+    <div class="flex items-center gap-1 w-full">
+        <div class="relative flex-1 min-w-0">
+            <input 
+                type="text"
+                x-model="search"
+                @click="toggle()"
+                @keydown="onKeyDown"
+                @input="open = true"
+                placeholder="{{ $placeholder }}"
+                @disabled($disabled)
+                class="mt-1 block border-gray-300 rounded-md shadow-sm transition-all duration-200 cursor-text py-1.5 px-3 pr-10 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 sm:text-sm dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 {{ $extraClasses }} {{ $attributes->get('class') }}"
+                autocomplete="off"
+            >
+            
+            <!-- Icono de dropdown que también hace toggle -->
+            <div @click="toggle()" class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-indigo-500 transition-colors">
+                <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </div>
         </div>
-
         @if ($required)
             <span class="text-red-500 font-bold">*</span>
         @endif
@@ -143,6 +143,6 @@
     </div>
 
     @error($finalErrorField)
-        <p class="mt-1 text-[10px] font-bold text-red-600 {{ $errorClasses }}">{{ $message }}</p>
+        <span class="text-red-600 text-sm {{ $errorClasses }}">{{ $message }}</span>
     @enderror
 </div>

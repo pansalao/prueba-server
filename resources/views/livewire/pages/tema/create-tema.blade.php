@@ -16,7 +16,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <!-- Unidad Curricular -->
                         <div class="w-full">
-                            <x-input-label for="unidad" :value="__('Unidad Curricular')" class="text-gray-600 font-bold mb-1" />
+                            <label for="unidad" class="block font-bold text-sm text-gray-900 dark:text-white uppercase mb-1">
+                                {{ __('Unidad Curricular') }}
+                            </label>
                             <x-select id="unidad" wire:model.live="form.id_unidad_curricular"
                                 :options="$unidadesCurriculares" valueField="id" textField="nombre"
                                 placeholder="SELECCIONA UNA UNIDAD" class="w-full"
@@ -25,7 +27,9 @@
 
                         <!-- Corte -->
                         <div class="w-full">
-                            <x-input-label for="corte" :value="__('Corte')" class="text-gray-600 font-bold mb-1" />
+                            <label for="corte" class="block font-bold text-sm text-gray-900 dark:text-white uppercase mb-1">
+                                {{ __('Corte') }}
+                            </label>
                             <x-select id="corte" wire:model.live="form.unidad_tema" :options="$cortes" valueField="id"
                                 textField="nombre" placeholder="SELECCIONA UN CORTE" class="w-full"
                                 errorField="form.unidad_tema" required />

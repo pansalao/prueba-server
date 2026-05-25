@@ -15,11 +15,10 @@
                     <div class="flex flex-col gap-4 w-full md:flex-row">
                         <!-- Nombre -->
                         <div class="w-full">
-                            <x-datalist 
-                                wire:key="datalist-recursos-{{ md5($recursosExistentes->pluck('nombre_recurso')->join(',')) }}"
+                            <x-input 
                                 label="Nombre del Recurso" 
-                                :options="$recursosExistentes" 
-                                textField="nombre_recurso"
+                                name="nombre"
+                                errorField="form.nombre"
                                 wire:model.live="form.nombre"
                                 placeholder="Ej: Proyector, Marcadores, etc."
                                 required 

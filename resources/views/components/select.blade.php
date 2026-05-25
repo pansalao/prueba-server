@@ -37,7 +37,7 @@
 <div class="w-full">
     @unless (is_null($labelValue))
         <label for="{{ $finalWireModel ?: Str::random(8) }}"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-100 {{ $labelClasses }}">
+            class="block font-bold text-sm text-gray-900 dark:text-white uppercase mb-1 {{ $labelClasses }}">
             {{ $labelValue }}
         </label>
     @endunless
@@ -57,5 +57,4 @@
             <span class="text-red-500 font-bold">*</span>
         @endif
     </div>
-
 </div>

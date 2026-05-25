@@ -15,11 +15,10 @@
                     <div class="flex flex-col gap-4 w-full md:flex-row">
                         <!-- Nombre -->
                         <div class="w-full">
-                            <x-datalist 
-                                wire:key="datalist-estrategias-{{ md5($estrategiasExistentes->pluck('nombre_tecnica_actividad')->join(',')) }}"
+                            <x-input 
                                 label="Nombre de la Estrategia" 
-                                :options="$estrategiasExistentes" 
-                                textField="nombre_tecnica_actividad"
+                                name="nombre"
+                                errorField="form.nombre"
                                 wire:model.live="form.nombre"
                                 placeholder="Ej: Aprendizaje basado en proyectos, etc."
                                 required 
