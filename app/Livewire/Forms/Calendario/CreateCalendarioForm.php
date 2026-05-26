@@ -336,8 +336,8 @@ class CreateCalendarioForm extends Form
             if ($id && isset($eventosDb[$id])) {
                 $evento = $eventosDb[$id];
 
-                // Validar duración exacta de cada instancia si el evento tiene rango de días específico
-                if ($evento->is_cantidad_dias_evento) {
+                // Validar duración exacta de cada instancia si el evento tiene rango de días específico (excepto Vacaciones)
+                if ($evento->is_cantidad_dias_evento && $evento->especial_evento != '1') {
                     $inicio = new \DateTime($reg['inicio']);
                     $fin = new \DateTime($reg['fin']);
                     $diferencia = $inicio->diff($fin)->days + 1;

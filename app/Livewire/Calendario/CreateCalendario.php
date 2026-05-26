@@ -203,7 +203,50 @@ class CreateCalendario extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->showAlert('error', $e->validator->errors()->first());
             return;
-        }        // Se mantiene el rango completo sin dividir por fines de semana.
+        }        // Calcular duración real que se va a insertar
+        $duracionReal = 0;
+        $start = new \DateTime($inicio);
+        $end = new \DateTime($fin);
+        $duracionReal = $start->diff($end)->days + 1;
+
+        // VALIDACIÓN DE is_cantidad_dias_evento
+        if ($eventoInfo && $eventoInfo->is_cantidad_dias_evento) {
+            $cantidadRequerida = (int) $eventoInfo->cantidad_dias_evento;
+            $is_vacaciones = ($eventoInfo->especial_evento ?? '') === '1';
+
+            if ($is_vacaciones) {
+                $diasRegistrados = 0;
+                $targetYear = date('Y', strtotime($inicio));
+                
+                foreach ($this->eventosRegistrados as $reg) {
+                    if (($reg['id'] ?? null) == $eventoInfo->id_evento) {
+                        $sReg = new \DateTime($reg['inicio']);
+                        $eReg = new \DateTime($reg['fin']);
+                        
+                        $tempInterval = new \DateInterval('P1D');
+                        $periodReg = new \DatePeriod($sReg, $tempInterval, (clone $eReg)->modify('+1 day'));
+                        foreach ($periodReg as $date) {
+                            if ($date->format('Y') == $targetYear) {
+                                $diasRegistrados++;
+                            }
+                        }
+                    }
+                }
+                
+                if (($diasRegistrados + $duracionReal) > $cantidadRequerida) {
+                    $disponibles = max(0, $cantidadRequerida - $diasRegistrados);
+                    $this->showAlert('error', "No puedes registrar {$duracionReal} día(s) de Vacaciones Colectivas porque solo quedan {$disponibles} día(s) disponibles de los {$cantidadRequerida} permitidos en el año {$targetYear}.");
+                    return;
+                }
+            } else {
+                if ($duracionReal != $cantidadRequerida) {
+                    $this->showAlert('error', "El evento '{$nombre}' debe durar exactamente {$cantidadRequerida} día(s) por cada selección. Has seleccionado {$duracionReal} día(s).");
+                    return;
+                }
+            }
+        }
+
+        // Se mantiene el rango completo sin dividir por fines de semana.
         // Ejemplo: un evento que inicia viernes y termina lunes se guarda
         // como una sola entrada (inicio=viernes, fin=lunes) en lugar de dividirlo.
         $this->eventosRegistrados[] = [
@@ -643,25 +686,9 @@ class CreateCalendario extends Component
                 $start = new \DateTime($reg['inicio']);
                 $end = new \DateTime($reg['fin']);
 
-                // Determinar si es exclusivamente de fin de semana
-                $isTodoWeekend = true;
-                $tempInterval = new \DateInterval('P1D');
-                $tempPeriod = new \DatePeriod($start, $tempInterval, (clone $end)->modify('+1 day'));
-                foreach ($tempPeriod as $date) {
-                    if ((int) $date->format('N') < 6) {
-                        $isTodoWeekend = false;
-                        break;
-                    }
-                }
-
-                $ignorarFinesDeSemana = !in_array($reg['tipo'] ?? '1', ['1', '2', '6']) && !$isTodoWeekend;
-
                 $interval = new \DateInterval('P1D');
                 $period = new \DatePeriod($start, $interval, (clone $end)->modify('+1 day'));
                 foreach ($period as $date) {
-                    if ($ignorarFinesDeSemana && (int) $date->format('N') >= 6) {
-                        continue;
-                    }
                     if ($date->format('Y') == $targetYear) {
                         $diasActuales++;
                     }
