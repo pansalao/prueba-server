@@ -93,6 +93,62 @@ class UsuarioRepository
     }
 
     /**
+     * Obtiene y filtra los roles activos de un usuario que pertenecen al PNF de Informática.
+     */
+    public function getRolesInformaticoPorCedula(string $cedula)
+    {
+        $allRoles = $this->getRolesPorCedula($cedula);
+        $filteredRoles = [];
+
+        foreach ($allRoles as $role) {
+            $rolId = $role->usu_cod_rol;
+
+            // 1. Coordinador PNFINF (ID: 11) - Pertenece a Informática
+            if ($rolId == 11) {
+                $filteredRoles[] = $role;
+                continue;
+            }
+
+            // 2. Estudiante (ID: 4) - Pertenece a Informática si está inscrito en programa 4
+            if ($rolId == 4) {
+                $esEstudianteInf = DB::connection('emulacion_sogac_2')
+                    ->table('estudiante')
+                    ->where('est_cedula', $cedula)
+                    ->where('est_cod_programa', 4)
+                    ->exists();
+                if ($esEstudianteInf) {
+                    $filteredRoles[] = $role;
+                }
+                continue;
+            }
+
+            // 3. Docente (ID: 3) - Pertenece a Informática si tiene carga activa en programa 4
+            if ($rolId == 3) {
+                $esDocenteInf = DB::connection('emulacion_sogac_2')
+                    ->table('seccion_unidad_docente as sud')
+                    ->join('unidad_curricular as uc', 'sud.sud_cod_unidad', '=', 'uc.ucu_codigo')
+                    ->join('malla as m', 'uc.ucu_cod_malla', '=', 'm.mal_codigo')
+                    ->where('sud.sud_ced_docente', $cedula)
+                    ->where('m.mal_cod_programa', 4)
+                    ->where('sud.sud_estatus', 'A')
+                    ->exists();
+                if ($esDocenteInf) {
+                    $filteredRoles[] = $role;
+                }
+                continue;
+            }
+
+            // 4. Vicerrector (ID: 31) - También puede usar el sistema
+            if ($rolId == 31) {
+                $filteredRoles[] = $role;
+                continue;
+            }
+        }
+
+        return collect($filteredRoles);
+    }
+
+    /**
      * Verifica si un usuario tiene el rol 3 activo.
      */
     public function tieneRol3(string $cedula): bool

@@ -52,14 +52,14 @@ class ExternalLoginController extends Controller
                 return redirect('/');
             }
 
-            // 5. Verificar si tiene múltiples roles activos en la base de datos de emulación
-            $rolesList = \DB::connection('emulacion_sogac_2')
-                ->table('usuario as u')
-                ->join('rol as r', 'u.usu_cod_rol', '=', 'r.rol_codigo')
-                ->where('u.usu_cedula', $data['cedula'])
-                ->where('u.usu_estatus', 'A')
-                ->select('u.usu_cod_rol', 'r.rol_nombre')
-                ->get();
+            // 5. Verificar si tiene múltiples roles activos en la base de datos de emulación (Filtrados por PNF Informática)
+            $usuarioRepo = new \App\Repositories\UsuarioRepository();
+            $rolesList = $usuarioRepo->getRolesInformaticoPorCedula($data['cedula']);
+
+            if ($rolesList->isEmpty()) {
+                // Si no pertenece al PNF en Informática, no permitimos el login
+                return redirect('/');
+            }
 
             if ($rolesList->count() > 1) {
                 // Guardamos la cédula temporalmente y NO hacemos Auth aún
@@ -76,9 +76,11 @@ class ExternalLoginController extends Controller
                 return redirect()->route('seleccionar-rol');
             }
 
-            // 6. Si solo tiene un rol, buscamos ese usuario específico y hacemos login
+            // 6. Si solo tiene un rol de Informática, buscamos ese usuario específico y hacemos login
+            $singleRole = $rolesList->first();
             $user = User::on('emulacion_sogac_2')
                 ->where('usu_cedula', $data['cedula'])
+                ->where('usu_cod_rol', $singleRole->usu_cod_rol)
                 ->where('usu_estatus', 'A')
                 ->first();
 
@@ -86,6 +88,7 @@ class ExternalLoginController extends Controller
                 return redirect('/');
             }
 
+            session(['active_role' => $singleRole->usu_cod_rol]);
             Auth::login($user);
 
             // Redirigir al inicio del sistema (Dashboard)

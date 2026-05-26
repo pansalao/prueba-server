@@ -35,10 +35,10 @@ class SeleccionarRol extends Component
 
         $this->usuarioRepository = new UsuarioRepository();
 
-        // Obtener todos sus roles en emulación
-        $this->misRoles = $this->usuarioRepository->getRolesPorCedula($cedula);
+        // Obtener roles filtrados de Informática en emulación
+        $this->misRoles = $this->usuarioRepository->getRolesInformaticoPorCedula($cedula);
 
-        if (count($this->misRoles) === 0) {
+        if ($this->misRoles->isEmpty()) {
             return redirect()->route('login');
         }
 
