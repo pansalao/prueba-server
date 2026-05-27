@@ -44,7 +44,9 @@
 <body class="font-sogat antialiased">
     <div class="min-h-screen bg-gray-100 dark:bg-gray-950 py-8 px-4 sm:px-6">
         {{-- Contenedor Principal Unificado (Estilo Card de la imagen) --}}
-        <div class="max-w-[1200px] mx-auto bg-white dark:bg-gray-900 rounded-[2rem] overflow-hidden border border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300"
+        <div x-data="{ alpineSidebarOpen: false }"
+            @sidebar-state-changed.window="alpineSidebarOpen = $event.detail.isOpen"
+            class="max-w-[1200px] mx-auto bg-white dark:bg-gray-900 rounded-[2rem] overflow-hidden border border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300"
             style="box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);">
 
             <!-- Logo Header (Sintillo) -->
@@ -69,21 +71,24 @@
             </div>
 
             {{-- Alpine.js wrapper para el estado de la sidebar --}}
-            <div x-data="{ alpineSidebarOpen: false }" class="flex flex-1 relative overflow-hidden"
-                @sidebar-state-changed.window="alpineSidebarOpen = $event.detail.isOpen">
+            <div class="flex flex-1 relative overflow-hidden">
 
                 {{-- SideBar wrapper --}}
                 <div class="z-40">
                     <livewire:side-bar />
                 </div>
 
+                {{-- Backdrop para móviles --}}
+                <div x-show="alpineSidebarOpen" 
+                     x-transition:opacity
+                     @click="Livewire.dispatch('toggle-sidebar')"
+                     class="fixed inset-0 bg-black/40 z-30 lg:hidden"
+                     style="display: none;">
+                </div>
+
                 {{-- Área de Contenido Principal --}}
                 <div id="main-content-wrapper"
-                    class="flex-1 min-w-0 transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 min-h-[600px] relative"
-                    :class="{ 
-                        'ml-[234px] lg:ml-0': alpineSidebarOpen, 
-                        'ml-0': !alpineSidebarOpen 
-                    }">
+                    class="flex-1 min-w-0 transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 min-h-[600px] relative ml-0">
 
                     <livewire:notificaciones />
 

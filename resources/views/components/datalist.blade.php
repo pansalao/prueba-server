@@ -125,7 +125,7 @@
         x-transition:leave="transition ease-in duration-75"
         x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
-        class="absolute z-[9999] mt-1 w-full bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-700 rounded-md shadow-2xl max-h-60 overflow-auto"
+        class="absolute z-[9999] mt-1 w-full bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-700 rounded-md shadow-2xl max-h-40 overflow-auto"
         style="display: none;"
     >
         <template x-for="(option, index) in filteredOptions" :key="index">

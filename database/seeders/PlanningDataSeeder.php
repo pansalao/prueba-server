@@ -246,6 +246,7 @@ class PlanningDataSeeder extends Seeder
             46, 47, 48, 49, 75,  // Eventos: Listar, Crear, Editar, Ver Detalles, Cambiar Estatus
             50, 51, 52, 53, 68, 20,  // Calendario: Listar, Crear, Ver Detalles, Editar, Cambiar Estatus, Reporte de Calendario
             58, 59, 77,  // Permisos: Listar, Editar, Cambiar Estatus
+            79, 80, 81, 82, 83, 84,  // Firmas: Listar, Crear, Editar, Ver Detalles, Cambiar Estatus, Mi Firma
         ];
 
         // Coordinador (Roles 1, 5, 11, 30)
@@ -255,6 +256,7 @@ class PlanningDataSeeder extends Seeder
             7, 8, 9, 10, 65,  // Temas: Listar, Crear, Editar, Ver Detalles, Cambiar Estatus
             3, 4, 5, 6, 64,  // Contenidos: Listar, Crear, Editar, Ver Detalles, Cambiar Estatus
             13, 16, 17, 18, 19, 67,  // Planificacion: Listar, Ver Detalles, Reportes (Cumplimiento, General, Detallado), Cambiar Estatus
+            79, 80, 81, 82, 83, 84,  // Firmas: Listar, Crear, Editar, Ver Detalles, Cambiar Estatus, Mi Firma
         ];
 
         // Profesor (Rol 2)
@@ -266,6 +268,7 @@ class PlanningDataSeeder extends Seeder
             30, 31, 32, 33, 71,  // Recursos: Listar, Crear, Editar, Ver Detalles, Cambiar Estatus
             38, 39, 40, 41, 73,  // Técnica Evaluación: Listar, Crear, Editar, Ver Detalles, Cambiar Estatus
             42, 43, 44, 45, 74,  // Tipo Evaluación: Listar, Crear, Editar, Ver Detalles, Cambiar Estatus
+            84,                  // Firma: Mi Firma
         ];
 
         // Estudiante (Rol 3)

@@ -41,11 +41,11 @@
                 </div>
 
                 <div class="w-full">
-                    <x-datalist
-                        wire:key="datalist-eventos-{{ md5($eventosExistentes->pluck('nombre_evento')->join(',')) }}"
-                        label="Nombre del Evento" :options="$eventosExistentes" textField="nombre_evento"
+                    <x-input-label for="descripcion_evento" :value="__('Nombre del Evento')" />
+                    <x-text-input id="descripcion_evento" type="text"
                         wire:model.live="form.descripcion_evento" placeholder="Ej: Congreso Nacional" required
                         :disabled="$form->is_especial" />
+                    <x-input-error :messages="$errors->first('form.descripcion_evento')" class="mt-2" />
                 </div>
 
                 <div class="w-full">
