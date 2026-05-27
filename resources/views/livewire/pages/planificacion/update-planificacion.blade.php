@@ -188,10 +188,8 @@
                                             </h4>
                                             <div class="flex items-center gap-4">
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'objetivos')"
-                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors">
-                                                    <span class="material-icons text-[12px]">add</span>
-                                                    AÑADIR TEMA
-                                                </button>
+                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold whitespace-nowrap hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors">
+                                                    <span class="material-icons text-[12px]">add</span> <span class="hidden sm:inline"> <span class="hidden sm:inline">AÑADIR TEMA</span><span class="sm:hidden">AÑADIR</span> </span><span class="sm:inline hidden md:hidden lg:hidden xl:hidden 2xl:hidden">AÑADIR</span> </button>
                                                 <span class="material-icons transition-transform duration-200" :class="openSection === 'tematica' ? 'rotate-180' : ''">expand_more</span>
                                             </div>
                                         </div>
@@ -222,7 +220,7 @@
                                                                 @php $selectedTemaId = $unidad['objetivos'][$objetivoIndex]['tema_id'] ?? null; @endphp
                                                                 @if($isCoordinador)
                                                                     <button type="button" wire:click="openObjetivoModal('{{ $selectedTemaId }}')"
-                                                                        class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
+                                                                        class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold whitespace-nowrap hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                                                         <span class="material-icons text-[12px]">add</span> NUEVO
                                                                     </button>
                                                                 @endif
@@ -242,9 +240,8 @@
                                                             @php $selectedObjetivoId = $unidad['objetivos'][$objetivoIndex]['objetivo_id'] ?? null; @endphp
                                                             <button type="button" wire:click="addItem({{ $index }}, 'contenidos', {{ $objetivoIndex }})"
                                                                 @if(empty($selectedObjetivoId)) disabled @endif
-                                                                class="inline-flex items-center gap-1 text-[10px] border border-[#767676] px-2 py-1 rounded-lg font-bold transition-colors shadow-sm uppercase {{ empty($selectedObjetivoId) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#f0f0f0] text-black hover:bg-gray-200' }}">
-                                                                <span class="material-icons text-xs">add</span> Agregar Contenido
-                                                            </button>
+                                                                class="inline-flex items-center gap-1 text-[10px] border border-[#767676] px-2 py-1 rounded-lg font-bold whitespace-nowrap transition-colors shadow-sm uppercase {{ empty($selectedObjetivoId) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#f0f0f0] text-black hover:bg-gray-200' }}">
+                                                                <span class="material-icons text-xs">add</span> <span class="hidden sm:inline">AGREGAR CONTENIDO</span><span class="sm:inline hidden md:hidden lg:hidden xl:hidden 2xl:hidden">AÑADIR</span> </button>
                                                         </div>
                                                         <div class="space-y-3">
                                                             @foreach ($objetivo['contenidos'] as $contenidoIndex => $contenido)
@@ -292,10 +289,8 @@
                                             </h4>
                                             <div class="flex items-center gap-4">
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'estrategias')"
-                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-green-50 dark:hover:bg-green-900 transition-colors">
-                                                    <span class="material-icons text-[12px]">add</span>
-                                                    AÑADIR ESTRATEGIA
-                                                </button>
+                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold whitespace-nowrap hover:bg-green-50 dark:hover:bg-green-900 transition-colors">
+                                                    <span class="material-icons text-[12px]">add</span> <span class="hidden sm:inline"> <span class="hidden sm:inline">AÑADIR ESTRATEGIA</span><span class="sm:hidden">AÑADIR</span> </span><span class="sm:inline hidden md:hidden lg:hidden xl:hidden 2xl:hidden">AÑADIR</span> </button>
                                                 <span class="material-icons transition-transform duration-200" :class="openSection === 'estrategias' ? 'rotate-180' : ''">expand_more</span>
                                             </div>
                                         </div>
@@ -330,7 +325,7 @@
                                                             <div class="flex items-center justify-between">
                                                                 <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Recursos</label>
                                                                 <button type="button" wire:click="addItem({{ $index }}, 'estrategia_recursos', {{ $estrategiaIndex }})"
-                                                                    class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
+                                                                    class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold whitespace-nowrap hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                                                     <span class="material-icons text-xs">add</span> AÑADIR
                                                                 </button>
                                                             </div>
@@ -401,10 +396,8 @@
                                             </h4>
                                             <div class="flex items-center gap-4">
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'evaluaciones')"
-                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-red-50 dark:hover:bg-red-900 transition-colors">
-                                                    <span class="material-icons text-[12px]">add</span>
-                                                    AÑADIR EVALUACIÓN
-                                                </button>
+                                                    class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold whitespace-nowrap hover:bg-red-50 dark:hover:bg-red-900 transition-colors">
+                                                    <span class="material-icons text-[12px]">add</span> <span class="hidden sm:inline"> <span class="hidden sm:inline">AÑADIR EVALUACIÓN</span><span class="sm:hidden">AÑADIR</span> </span><span class="sm:inline hidden md:hidden lg:hidden xl:hidden 2xl:hidden">AÑADIR</span> </button>
                                                 <span class="material-icons transition-transform duration-200" :class="openSection === 'evaluacion' ? 'rotate-180' : ''">expand_more</span>
                                             </div>
                                         </div>
@@ -513,7 +506,7 @@
                                                         <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Referencia Bibliográfica <span class="text-red-500">*</span></label>
                                                         <div class="flex items-center gap-2">
                                                             <button type="button" wire:click="openBiblioModal"
-                                                                class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors shadow-sm uppercase">
+                                                                class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold whitespace-nowrap hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors shadow-sm uppercase">
                                                                 <span class="material-icons text-xs">add</span> NUEVA
                                                             </button>
                                                             @if (count($unidad['bibliografias']) > 1)

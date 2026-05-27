@@ -157,27 +157,31 @@
                                     </div>
                                 </div>
 
-                                <div class="flex flex-col items-end gap-2">
-                                    <div class="flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Estado</span>
-                                        @if($validPonderacion)
-                                            <span class="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-black rounded-full uppercase">Completo</span>
-                                        @else
-                                            <span class="px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-full uppercase">Pendiente</span>
-                                        @endif
-                                        
-                                        <div class="h-4 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
-
-                                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Ponderación</span>
+                                <div class="flex flex-col sm:items-end gap-2 w-full sm:w-auto mt-4 sm:mt-0">
+                                    <div class="flex flex-wrap justify-center sm:justify-end items-center gap-2 sm:gap-3 px-3 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm w-full sm:w-auto">
                                         <div class="flex items-center gap-2">
-                                            <div class="w-24 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                <div class="h-full transition-all duration-500 {{ $validPonderacion ? 'bg-green-500' : 'bg-amber-500' }}" 
-                                                     style="width: {{ ($totalPonderacion / 25) * 100 }}%"></div>
+                                            <span class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">Estado</span>
+                                            @if($validPonderacion)
+                                                <span class="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-black rounded-full uppercase">Completo</span>
+                                            @else
+                                                <span class="px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-full uppercase">Pendiente</span>
+                                            @endif
+                                        </div>
+                                        
+                                        <div class="hidden sm:block h-4 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
+
+                                        <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
+                                            <span class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">Pond.</span>
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-20 sm:w-24 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div class="h-full transition-all duration-500 {{ $validPonderacion ? 'bg-green-500' : 'bg-amber-500' }}" 
+                                                         style="width: {{ ($totalPonderacion / 25) * 100 }}%"></div>
+                                                </div>
+                                                <span class="text-xs sm:text-sm font-black {{ $validPonderacion ? 'text-green-600' : 'text-amber-600' }}">
+                                                    {{ $totalPonderacion }}%
+                                                </span>
+                                                <span class="text-[9px] sm:text-[10px] text-gray-400 font-bold">/ 25%</span>
                                             </div>
-                                            <span class="text-sm font-black {{ $validPonderacion ? 'text-green-600' : 'text-amber-600' }}">
-                                                {{ $totalPonderacion }}%
-                                            </span>
-                                            <span class="text-[10px] text-gray-400 font-bold">/ 25%</span>
                                         </div>
                                     </div>
                                     @error("form.unidades.$index.total_ponderacion_check")
@@ -219,10 +223,8 @@
                                             <div class="flex items-center gap-4">
                                                 @php $canAddObjetivo = $form->areObjetivosFilled($index); @endphp
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'objetivos')"
-                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors {{ $canAddObjetivo ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
-                                                    <span class="material-icons text-[12px]">add</span>
-                                                    AÑADIR TEMA
-                                                </button>
+                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold whitespace-nowrap transition-colors {{ $canAddObjetivo ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
+                                                    <span class="material-icons text-[12px]">add</span> <span class="hidden sm:inline"> <span class="hidden sm:inline">AÑADIR TEMA</span><span class="sm:hidden">AÑADIR</span> </span><span class="sm:inline hidden md:hidden lg:hidden xl:hidden 2xl:hidden">AÑADIR</span> </button>
                                                 <span class="material-icons transition-transform duration-200" :class="openSection === 'tematica' ? 'rotate-180' : ''">expand_more</span>
                                             </div>
                                         </div>
@@ -250,7 +252,7 @@
                                                                 @php $selectedTemaId = $unidad['objetivos'][$objetivoIndex]['tema_id'] ?? null; @endphp
                                                                 @if($isCoordinador)
                                                                     <button type="button" wire:click="openObjetivoModal('{{ $selectedTemaId }}')"
-                                                                        class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
+                                                                        class="inline-flex items-center gap-1 text-[10px] bg-[#f0f0f0] border border-[#767676] text-black px-2 py-1 rounded-lg font-bold whitespace-nowrap hover:bg-gray-200 transition-colors shadow-sm uppercase">
                                                                         <span class="material-icons text-[12px]">add</span> NUEVO
                                                                     </button>
                                                                 @endif
@@ -271,9 +273,8 @@
                                                             @endphp
                                                             <button type="button" wire:click="addItem({{ $index }}, 'contenidos', {{ $objetivoIndex }})"
                                                                 @if($disabledContenido) disabled @endif
-                                                                class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors shadow-sm uppercase {{ $disabledContenido ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed' : ($canAddContenido ? 'bg-green-500 border-green-600 text-white hover:bg-green-600' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80') }}">
-                                                                <span class="material-icons text-xs">add</span> Agregar Contenido
-                                                            </button>
+                                                                class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold whitespace-nowrap transition-colors shadow-sm uppercase {{ $disabledContenido ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed' : ($canAddContenido ? 'bg-green-500 border-green-600 text-white hover:bg-green-600' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80') }}">
+                                                                <span class="material-icons text-xs">add</span> <span class="hidden sm:inline">AGREGAR CONTENIDO</span><span class="sm:inline hidden md:hidden lg:hidden xl:hidden 2xl:hidden">AÑADIR</span> </button>
                                                         </div>
                                                         <div class="space-y-3">
                                                             @foreach ($objetivo['contenidos'] as $contenidoIndex => $contenido)
@@ -317,10 +318,8 @@
                                             <div class="flex items-center gap-4">
                                                 @php $canAddEstrategia = $form->areEstrategiasFilled($index); @endphp
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'estrategias')"
-                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors {{ $canAddEstrategia ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
-                                                    <span class="material-icons text-[12px]">add</span>
-                                                    AÑADIR ESTRATEGIA
-                                                </button>
+                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold whitespace-nowrap transition-colors {{ $canAddEstrategia ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
+                                                    <span class="material-icons text-[12px]">add</span> <span class="hidden sm:inline"> <span class="hidden sm:inline">AÑADIR ESTRATEGIA</span><span class="sm:hidden">AÑADIR</span> </span><span class="sm:inline hidden md:hidden lg:hidden xl:hidden 2xl:hidden">AÑADIR</span> </button>
                                                 <span class="material-icons transition-transform duration-200" :class="openSection === 'estrategias' ? 'rotate-180' : ''">expand_more</span>
                                             </div>
                                         </div>
@@ -353,7 +352,7 @@
                                                                 <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Recursos</label>
                                                                 @php $canAddRecurso = $form->areRecursosFilled($index, $estrategiaIndex); @endphp
                                                                 <button type="button" wire:click="addItem({{ $index }}, 'estrategia_recursos', {{ $estrategiaIndex }})"
-                                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors shadow-sm uppercase {{ $canAddRecurso ? 'bg-green-500 border-green-600 text-white hover:bg-green-600' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
+                                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold whitespace-nowrap transition-colors shadow-sm uppercase {{ $canAddRecurso ? 'bg-green-500 border-green-600 text-white hover:bg-green-600' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
                                                                     <span class="material-icons text-xs">add</span> AÑADIR
                                                                 </button>
                                                             </div>
@@ -422,10 +421,8 @@
                                             <div class="flex items-center gap-4">
                                                 @php $canAddEvaluacion = $form->areEvaluacionesFilled($index); @endphp
                                                 <button type="button" wire:click.stop="addItem({{ $index }}, 'evaluaciones')"
-                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold transition-colors {{ $canAddEvaluacion ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
-                                                    <span class="material-icons text-[12px]">add</span>
-                                                    AÑADIR EVALUACIÓN
-                                                </button>
+                                                    class="inline-flex items-center gap-1 text-[10px] border px-2 py-1 rounded-lg font-bold whitespace-nowrap transition-colors {{ $canAddEvaluacion ? 'bg-green-500 border-green-600 text-white hover:bg-green-600 shadow-sm' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
+                                                    <span class="material-icons text-[12px]">add</span> <span class="hidden sm:inline"> <span class="hidden sm:inline">AÑADIR EVALUACIÓN</span><span class="sm:hidden">AÑADIR</span> </span><span class="sm:inline hidden md:hidden lg:hidden xl:hidden 2xl:hidden">AÑADIR</span> </button>
                                                 <span class="material-icons transition-transform duration-200" :class="openSection === 'evaluacion' ? 'rotate-180' : ''">expand_more</span>
                                             </div>
                                         </div>
@@ -531,7 +528,7 @@
                                                         <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Referencia Bibliográfica <span class="text-red-500">*</span></label>
                                                         <div class="flex items-center gap-2">
                                                             <button type="button" wire:click="openBiblioModal"
-                                                                class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors shadow-sm uppercase">
+                                                                class="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg font-bold whitespace-nowrap hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors shadow-sm uppercase">
                                                                 <span class="material-icons text-xs">add</span> NUEVA
                                                             </button>
                                                             @if (count($unidad['bibliografias']) > 1)

@@ -50,18 +50,18 @@
             style="box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);">
 
             <!-- Logo Header (Sintillo) -->
-            <div class="bg-white dark:bg-gray-800 px-8 py-2 flex items-center transition-colors duration-300">
+            <div class="bg-white dark:bg-gray-800 px-4 sm:px-8 py-2 flex items-center transition-colors duration-300">
                 <div class="flex items-center w-full">
                     {{-- Botón Hamburguesa para móviles --}}
                     <button @click="Livewire.dispatch('toggle-sidebar')" aria-label="Abrir menú"
-                        class="lg:hidden p-2 mr-4 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none transition duration-150 ease-in-out">
+                        class="lg:hidden shrink-0 p-2 mr-2 sm:mr-4 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none transition duration-150 ease-in-out">
                         <svg class="h-8 w-8" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
                     <img src="{{ asset('img/logo_viejo-Photoroom.png') }}" alt="SOGAT Sintillo"
-                        class="w-full h-auto max-h-[100px] object-contain">
+                        class="flex-1 min-w-0 w-full h-auto max-h-[80px] sm:max-h-[100px] object-contain">
                 </div>
             </div>
 
@@ -82,7 +82,7 @@
                 <div x-show="alpineSidebarOpen" 
                      x-transition:opacity
                      @click="Livewire.dispatch('toggle-sidebar')"
-                     class="fixed inset-0 bg-black/40 z-30 lg:hidden"
+                     class="absolute inset-0 bg-black/40 z-30 lg:hidden"
                      style="display: none;">
                 </div>
 
