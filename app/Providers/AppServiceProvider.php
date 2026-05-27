@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
             try {
                 // Intentar conectar solo en este instante
                 DB::connection('pgsql_daece')->getPdo();
-                return DB::connection('pgsql_daece');
+                return DB::connection('emulacion_sogac_2');
             } catch (Exception $e) {
                 Log::warning('Fallo la conexión a pgsql_daece (Conexión diferida). Usando emulacion_sogac_2. Error: ' . $e->getMessage());
                 return DB::connection('emulacion_sogac_2');

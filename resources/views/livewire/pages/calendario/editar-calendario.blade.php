@@ -125,7 +125,7 @@
                     <h4
                         class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
                         <span class="material-icons text-blue-500">calendar_today</span>
-                        Configuración del Período
+                        Configuración del Calendario
                     </h4>
                     <span class="material-icons transition-transform duration-200"
                         :class="openSection === 'fechas' ? 'rotate-180' : ''">expand_more</span>
@@ -139,25 +139,27 @@
                             <x-text-input id="dia_inicio_calendario_academico" type="date"
                                 wire:model.live="form.dia_inicio_calendario_academico"
                                 class="w-full mt-1 date-input-dark" required />
-                            <x-input-error :messages="$errors->first('form.dia_inicio_calendario_academico')" class="mt-2" />
+                            <x-input-error :messages="$errors->first('form.dia_inicio_calendario_academico')"
+                                class="mt-2" />
                         </div>
                         <div class="w-full">
                             <x-input-label for="dia_fin_calendario_academico" :value="__('Fin del Período')" />
                             <x-text-input id="dia_fin_calendario_academico" type="date"
                                 wire:model.live="form.dia_fin_calendario_academico" class="w-full mt-1 date-input-dark"
                                 required />
-                            <x-input-error :messages="$errors->first('form.dia_fin_calendario_academico')" class="mt-2" />
+                            <x-input-error :messages="$errors->first('form.dia_fin_calendario_academico')"
+                                class="mt-2" />
                         </div>
                         <div class="w-full">
-                            <x-input-label for="semana_lapso_uno_calendario_academico" :value="__('Cantidad de Semanas (Lapso 1)')" />
+                            <x-input-label for="semana_lapso_uno_calendario_academico" :value="__('Cantidad de Semanas del Lapso 1')" />
                             <x-text-input id="semana_lapso_uno_calendario_academico" type="number" min="1" max="99"
-                                wire:model.live="form.semana_lapso_uno_calendario_academico"
-                                class="w-full mt-1" placeholder="Ej: 18" required />
+                                wire:model.live="form.semana_lapso_uno_calendario_academico" class="w-full mt-1"
+                                placeholder="Ej: 18" required />
                             <x-input-error :messages="$errors->first('form.semana_lapso_uno_calendario_academico')"
                                 class="mt-2" />
                         </div>
                         <div class="w-full">
-                            <x-input-label for="semana_lapso_dos_calendario_academico" :value="__('Cantidad de Semanas (Lapso 2)')" />
+                            <x-input-label for="semana_lapso_dos_calendario_academico" :value="__('Cantidad de Semanas del Lapso 2')" />
                             <x-text-input id="semana_lapso_dos_calendario_academico" type="number" min="1" max="99"
                                 wire:model.live="form.semana_lapso_dos_calendario_academico" class="w-full mt-1"
                                 placeholder="Ej: 18" required />
@@ -165,27 +167,32 @@
                                 class="mt-2" />
                         </div>
                         <div class="w-full">
-                            <x-input-label for="semana_lapso_uno_introductorio_calendario_academico" :value="__('Semanas (Lapso 1 Introductorio)')" />
-                            <x-text-input id="semana_lapso_uno_introductorio_calendario_academico" type="number" min="0" max="99"
-                                wire:model.live="form.semana_lapso_uno_introductorio_calendario_academico"
+                            <x-input-label for="semana_lapso_uno_introductorio_calendario_academico"
+                                :value="__('Semanas del Lapso Introductorio 1')" />
+                            <x-text-input id="semana_lapso_uno_introductorio_calendario_academico" type="number" min="0"
+                                max="99" wire:model.live="form.semana_lapso_uno_introductorio_calendario_academico"
                                 class="w-full mt-1" placeholder="Ej: 18" required />
-                            <x-input-error :messages="$errors->first('form.semana_lapso_uno_introductorio_calendario_academico')"
+                            <x-input-error
+                                :messages="$errors->first('form.semana_lapso_uno_introductorio_calendario_academico')"
                                 class="mt-2" />
                         </div>
                         <div class="w-full">
-                            <x-input-label for="semana_lapso_dos_introductorio_calendario_academico" :value="__('Semanas (Lapso 2 Introductorio)')" />
-                            <x-text-input id="semana_lapso_dos_introductorio_calendario_academico" type="number" min="0" max="99"
-                                wire:model.live="form.semana_lapso_dos_introductorio_calendario_academico"
+                            <x-input-label for="semana_lapso_dos_introductorio_calendario_academico"
+                                :value="__('Semanas del Lapso Introductorio 2')" />
+                            <x-text-input id="semana_lapso_dos_introductorio_calendario_academico" type="number" min="0"
+                                max="99" wire:model.live="form.semana_lapso_dos_introductorio_calendario_academico"
                                 class="w-full mt-1" placeholder="Ej: 18" required />
-                            <x-input-error :messages="$errors->first('form.semana_lapso_dos_introductorio_calendario_academico')"
+                            <x-input-error
+                                :messages="$errors->first('form.semana_lapso_dos_introductorio_calendario_academico')"
                                 class="mt-2" />
                         </div>
                         <div class="w-full">
-                            <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Semanas (Intensivo)')" />
-                            <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" min="0" max="99"
-                                wire:model.live="form.semana_intensibo_introductorio_calendario_academico" class="w-full mt-1"
-                                placeholder="Ej: 18" required />
-                            <x-input-error :messages="$errors->first('form.semana_intensibo_introductorio_calendario_academico')"
+                            <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Semanas del curso Intensivo')" />
+                            <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" min="0"
+                                max="99" wire:model.live="form.semana_intensibo_introductorio_calendario_academico"
+                                class="w-full mt-1" placeholder="Ej: 18" required />
+                            <x-input-error
+                                :messages="$errors->first('form.semana_intensibo_introductorio_calendario_academico')"
                                 class="mt-2" />
                         </div>
                     </div>
@@ -213,11 +220,11 @@
                     </div>
                 </div>
                 <div x-show="openSection === 'eventos'" x-collapse class="p-4 space-y-6 relative">
-                    
+
                     {{-- Botón de búsqueda de eventos (ubicado en el contenido) --}}
                     <div class="absolute top-4 right-4 z-10" x-show="inicio && fin">
-                        <button type="button" @click="showListModal = true" 
-                            class="flex items-center justify-center gap-2 px-4 h-10 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-600 dark:hover:text-white rounded-full transition-colors shadow-sm text-sm font-medium" 
+                        <button type="button" @click="showListModal = true"
+                            class="flex items-center justify-center gap-2 px-4 h-10 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-600 dark:hover:text-white rounded-full transition-colors shadow-sm text-sm font-medium"
                             title="Ver Eventos Asignados">
                             <span class="material-icons text-[18px]">search</span>
                             <span>Buscar un evento asignado a este calendario</span>
@@ -260,6 +267,7 @@
                                       nuevoIsRangoDias: @entangle('form.nuevoIsRangoDias'),
                                       nuevoRangoDias: @entangle('form.nuevoRangoDias'),
                                       nuevoIsIndependiente: @entangle('form.nuevoIsIndependiente'),
+                                      nuevoIsSuperponible: @entangle('form.nuevoIsSuperponible'),
 
 
                                     formatDate(dateStr) {
@@ -340,7 +348,11 @@
                                                 clickDay: (e, self) => {
                                                     if (this._clickLock) return;
                                                     this._clickLock = true;
-                                                    setTimeout(() => { this._clickLock = false; }, 200);
+                                                    document.querySelectorAll('.sogat-datepicker-container').forEach(c => c.style.pointerEvents = 'none');
+                                                    setTimeout(() => { 
+                                                        this._clickLock = false; 
+                                                        document.querySelectorAll('.sogat-datepicker-container').forEach(c => c.style.pointerEvents = '');
+                                                    }, 1000);
                                                     let btn = e.target.closest('.vanilla-calendar-day__btn');
                                                     let clickedDate = btn ? btn.dataset.calendarDay : null;
                                                     if (!clickedDate) return;
@@ -395,14 +407,19 @@
                                         this.$watch('inicio', (val) => { if(val && fin) this.setupCalendar(); });
                                         this.$watch('fin', (val) => { if(val && inicio) this.setupCalendar(); });
                                         this.$watch('nuevoTipo', (val) => {
-                                            if (val == '1' || val == '2') {
+                                            if (val == '1' || val == '2' || val == '6') {
                                                 this.nuevoLaborable = false;
                                                 this.nuevoRepetible = false;
                                                 this.nuevoIsRangoDias = false;
                                                 this.nuevoRangoDias = '';
                                                 this.nuevoIsIndependiente = true;
+                                                this.nuevoIsSuperponible = true;
                                             } else {
+                                                this.nuevoLaborable = false;
                                                 this.nuevoRepetible = true;
+                                                this.nuevoIsRangoDias = false;
+                                                this.nuevoRangoDias = '';
+                                                this.nuevoIsIndependiente = false;
                                             }
                                         });
                                         this.$watch('mapaEventosAlpine', () => {
@@ -833,7 +850,8 @@
                                              this.nuevoLaborable, 
                                              this.nuevoRepetible,
                                              this.nuevoIsRangoDias,
-                                             this.nuevoRangoDias
+                                             this.nuevoRangoDias,
+                                             this.nuevoIsSuperponible
                                          ).then(success => {
                                              this._clickLock = false;
                                              if (success) {
@@ -856,7 +874,7 @@
                                          }
                                          this.selectedEventStart = ''; this.selectedEventEnd = ''; this.eventoNombre = '';
                                          this.eventoSeleccionado = ''; this.clickCount = 0;
-                                         this.nuevoColorHex = ''; this.nuevoTipo = '1'; this.nuevoLaborable = false; this.nuevoRepetible = false; this.nuevoIsRangoDias = false; this.nuevoRangoDias = ''; this.nuevoIsIndependiente = true;
+                                         this.nuevoColorHex = ''; this.nuevoTipo = '1'; this.nuevoLaborable = false; this.nuevoRepetible = false; this.nuevoIsRangoDias = false; this.nuevoRangoDias = ''; this.nuevoIsIndependiente = true; this.nuevoIsSuperponible = true;
                                      },
                                      eliminarEventoDesdeTooltip(ev) {
                                         let index = this.eventosAlpine.findIndex(e => e.id === ev.id && e.inicio === ev.inicio && e.fin === ev.fin);
@@ -953,36 +971,51 @@
                             </template>
 
                             @if ($this->vacacionesContador)
-                            <div class="flex justify-center mb-6 -mt-4">
-                                @if ($this->vacacionesContador['faltantes'] > 0)
-                                <div class="px-4 py-1.5 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-full text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center">
-                                    <span>
-                                        Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados {{ $this->vacacionesContador['total_assignados'] }} de {{ $this->vacacionesContador['requeridos'] }} días
-                                        @if ($this->vacacionesContador['asignados_otros'] > 0)
-                                        <span class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }} días en otros períodos)</span>
-                                        @endif
-                                    </span>
+                                <div class="flex justify-center mb-6 -mt-4">
+                                    @if ($this->vacacionesContador['faltantes'] > 0)
+                                        <div
+                                            class="px-4 py-1.5 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-full text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center">
+                                            <span>
+                                                Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados
+                                                {{ $this->vacacionesContador['total_assignados'] }} de
+                                                {{ $this->vacacionesContador['requeridos'] }} días
+                                                @if ($this->vacacionesContador['asignados_otros'] > 0)
+                                                    <span
+                                                        class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }}
+                                                        días en otros períodos)</span>
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @elseif ($this->vacacionesContador['excedidos'] > 0)
+                                        <div
+                                            class="px-4 py-1.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-full text-red-600 dark:text-red-400 text-xs font-bold flex items-center">
+                                            <span>
+                                                Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados
+                                                {{ $this->vacacionesContador['total_assignados'] }} de
+                                                {{ $this->vacacionesContador['requeridos'] }} días
+                                                @if ($this->vacacionesContador['asignados_otros'] > 0)
+                                                    <span
+                                                        class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }}
+                                                        días en otros períodos)</span>
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @else
+                                        <div
+                                            class="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-full text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center">
+                                            <span>
+                                                Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados
+                                                {{ $this->vacacionesContador['total_assignados'] }} de
+                                                {{ $this->vacacionesContador['requeridos'] }} días
+                                                @if ($this->vacacionesContador['asignados_otros'] > 0)
+                                                    <span
+                                                        class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }}
+                                                        días en otros períodos)</span>
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @endif
                                 </div>
-                                @elseif ($this->vacacionesContador['excedidos'] > 0)
-                                <div class="px-4 py-1.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-full text-red-600 dark:text-red-400 text-xs font-bold flex items-center">
-                                    <span>
-                                        Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados {{ $this->vacacionesContador['total_assignados'] }} de {{ $this->vacacionesContador['requeridos'] }} días
-                                        @if ($this->vacacionesContador['asignados_otros'] > 0)
-                                        <span class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }} días en otros períodos)</span>
-                                        @endif
-                                    </span>
-                                </div>
-                                @else
-                                <div class="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-full text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center">
-                                    <span>
-                                        Vacaciones Colectivas {{ $this->vacacionesContador['anio'] }}: Asignados {{ $this->vacacionesContador['total_assignados'] }} de {{ $this->vacacionesContador['requeridos'] }} días
-                                        @if ($this->vacacionesContador['asignados_otros'] > 0)
-                                        <span class="text-[10px] opacity-80">({{ $this->vacacionesContador['asignados_otros'] }} días en otros períodos)</span>
-                                        @endif
-                                    </span>
-                                </div>
-                                @endif
-                            </div>
                             @endif
 
 

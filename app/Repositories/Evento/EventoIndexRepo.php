@@ -47,7 +47,7 @@ class EventoIndexRepo
             ->where('estatus', 1)
             ->select('id_evento', 'nombre_evento', 'tipo_evento', 
                      'is_laborable_evento', 'is_repetible_evento', 
-                     'is_rango_dias_evento', 'rango_dias_evento', 
+                     'is_cantidad_dias_evento', 'cantidad_dias_evento', 
                      'codigo_color_evento')
             ->get();
     }

@@ -210,8 +210,8 @@ class CalendarioCreateRepo
             'tipo_evento' => $data['tipo'],
             'is_laborable_evento' => $data['is_laborable'],
             'is_repetible_evento' => $data['is_repetible'],
-            'is_rango_dias_evento' => $data['is_rango_dias'],
-            'rango_dias_evento' => $data['rango_dias'],
+            'is_cantidad_dias_evento' => $data['is_rango_dias'],
+            'cantidad_dias_evento' => $data['rango_dias'],
             'estatus' => '1',
         ];
 
@@ -222,6 +222,11 @@ class CalendarioCreateRepo
         }
         if (in_array('is_independiente_evento', $columns)) {
             $insert['is_independiente_evento'] = $data['is_independiente'] ?? false;
+        }
+
+        // Guardar is_superponible de forma dinámica según la columna que exista en la BD
+        if (in_array('is_superponible_evento', $columns)) {
+            $insert['is_superponible_evento'] = $data['is_superponible'] ?? true;
         }
 
         return DB::table('evento')->insertGetId($insert);

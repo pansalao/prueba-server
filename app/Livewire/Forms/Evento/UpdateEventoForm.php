@@ -35,8 +35,8 @@ class UpdateEventoForm extends Form
         $this->codigo_color_evento = $evento->codigo_color_evento ?? '';
         $this->is_laborable = (bool) $evento->is_laborable_evento;
         $this->is_repetible = (bool) $evento->is_repetible_evento;
-        $this->is_rango_dias = (bool) $evento->is_rango_dias_evento;
-        $this->rango_dias = $evento->rango_dias_evento;
+        $this->is_rango_dias = (bool) ($evento->is_cantidad_dias_evento ?? false);
+        $this->rango_dias = $evento->cantidad_dias_evento;
         $this->is_independiente = (bool) ($evento->is_independiente ?? $evento->is_independiente_evento ?? false);
         $this->is_superponible = (bool) ($evento->is_superponible_evento ?? false);
         $this->is_semana_evento = (bool) ($evento->is_semana_evento ?? false);
@@ -80,7 +80,9 @@ class UpdateEventoForm extends Form
                 'boolean',
                 function ($attribute, $value, $fail) {
                     if (in_array($this->tipo_evento, ['1', '2', '6']) && !$value) {
-                        $fail('Para los feriados, el evento debe ser obligatoriamente superponible.');
+                        if (!($this->is_especial && in_array($this->especial_evento, ['4', '5']))) {
+                            $fail('Para los feriados, el evento debe ser obligatoriamente superponible.');
+                        }
                     }
                 }
             ],
@@ -190,8 +192,10 @@ class UpdateEventoForm extends Form
                     if ($this->is_especial) {
                         if (in_array($this->especial_evento, ['2', '3', '7', '8', '9', '10']) && !$value) {
                             $fail('Para este evento especial, debe tener obligatoriamente cantidad específica de días.');
-                        } elseif (in_array($this->especial_evento, ['1', '4', '5']) && $value) {
+                        } elseif ($this->especial_evento == '1' && $value) {
                             $fail('Para este evento especial, no debe tener cantidad específica de días.');
+                        } elseif (in_array($this->especial_evento, ['4', '5']) && !$value) {
+                            $fail('Para Semana Santa y Carnaval, debe tener obligatoriamente cantidad específica de días.');
                         }
                     }
                 }
@@ -206,8 +210,10 @@ class UpdateEventoForm extends Form
                     if ($this->is_especial) {
                         if (in_array($this->especial_evento, ['2', '3', '7', '8', '9', '10']) && $value != 1) {
                             $fail('Para este evento especial, la cantidad de días debe ser obligatoriamente 1.');
-                        } elseif (in_array($this->especial_evento, ['1', '4', '5']) && !empty($value)) {
+                        } elseif ($this->especial_evento == '1' && !empty($value)) {
                             $fail('Para este evento especial, no se debe definir cantidad de días.');
+                        } elseif (in_array($this->especial_evento, ['4', '5']) && $value != 2) {
+                            $fail('Para Semana Santa y Carnaval, la cantidad de días debe ser obligatoriamente 2.');
                         }
                     }
                 }
@@ -223,6 +229,11 @@ class UpdateEventoForm extends Form
                     }
                     if (!$this->is_repetible && count($value) > 1) {
                         $fail('Si el evento no es repetible, solo puede seleccionar una (1) semana.');
+                    }
+                    
+                    $semanasNoVacias = array_filter($value, fn($v) => $v !== null && $v !== '');
+                    if (count($semanasNoVacias) > 4) {
+                        $fail('Un evento puede tener máximo 4 semanas asignadas.');
                     }
                     
                     $semanasValidas = array_filter($value, function($val) {

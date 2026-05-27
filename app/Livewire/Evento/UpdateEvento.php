@@ -85,18 +85,20 @@ class UpdateEvento extends Component
                 $this->form->is_laborable = false;
                 $this->form->is_repetible = false;
                 $this->form->tipo_evento = '6';
-                $this->form->is_rango_dias = false;
-                $this->form->rango_dias = '';
+                $this->form->is_rango_dias = true;
+                $this->form->rango_dias = '2';
                 $this->form->is_independiente = true;
-                $this->form->cantidad_dias_evento = 0;
+                $this->form->is_superponible = true;
+                $this->form->cantidad_dias_evento = 2;
             } elseif ($this->form->especial_evento == '5') { // Carnaval
                 $this->form->is_laborable = false;
                 $this->form->is_repetible = false;
                 $this->form->tipo_evento = '6';
-                $this->form->is_rango_dias = false;
-                $this->form->rango_dias = '';
+                $this->form->is_rango_dias = true;
+                $this->form->rango_dias = '2';
                 $this->form->is_independiente = true;
-                $this->form->cantidad_dias_evento = 0;
+                $this->form->is_superponible = true;
+                $this->form->cantidad_dias_evento = 2;
             } else {
                 $this->form->cantidad_dias_evento = 0;
             }
@@ -208,6 +210,10 @@ class UpdateEvento extends Component
     public function agregarSemana()
     {
         if ($this->form->is_repetible) {
+            $semanasValidas = array_filter($this->form->semanas ?? [], fn($v) => $v !== null && $v !== '');
+            if (count($semanasValidas) >= 4) {
+                return;
+            }
             $this->form->semanas[] = '';
         }
     }

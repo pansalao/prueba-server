@@ -14,11 +14,11 @@
                 @php
                     $deshabilitarIndependienteLaborable = $form->is_especial
                         || in_array($form->tipo_evento, ['1', '2', '6'], true);
-                    $deshabilitarSuperponible = in_array($form->tipo_evento, ['1', '2', '6'], true)
+                    $deshabilitarSuperponible = (in_array($form->tipo_evento, ['1', '2', '6'], true) && !($form->is_especial && in_array($form->especial_evento, ['4', '5'])))
                         || ($form->is_especial && $form->especial_evento == '1');
-                    $deshabilitarRangoDias = $form->is_especial;
-                    $deshabilitarCantidadRango = $form->is_especial || !$form->is_rango_dias;
+                    $deshabilitarIsCantidadDias = $form->is_especial;
                     $deshabilitarSemanaEvento = in_array($form->tipo_evento, ['1', '2', '6'], true);
+                    $deshabilitarInputDias = $form->is_especial && in_array($form->especial_evento, ['2', '3', '4', '5', '7', '8', '9', '10']);
                 @endphp
 
                 <div class="w-full">
@@ -61,27 +61,27 @@
                     <x-input-error :messages="$errors->first('form.codigo_color_evento')" class="mt-2" />
                 </div>
 
-                <x-toggle-switch id="is_independiente" :label="__('¿Puede registrarse fuera de un semestre?')"
-                    model="form.is_independiente" :disabled="$deshabilitarIndependienteLaborable" required />
-
-                <x-toggle-switch id="is_superponible" :label="__('¿Puede asignarse en la misma fecha que días de vacaciones?')"
-                    model="form.is_superponible" :disabled="$deshabilitarSuperponible" required />
-
                 <x-toggle-switch id="is_laborable" :label="__('¿Es Laborable?')" model="form.is_laborable"
                     :disabled="$deshabilitarIndependienteLaborable" required />
 
                 <x-toggle-switch id="is_repetible" :label="__('¿Se puede repetir?')" model="form.is_repetible"
                     :disabled="true" required />
 
-                <x-toggle-switch id="is_rango_dias" :label="__('¿Tiene cantidad especifica días de duración?')"
-                    model="form.is_rango_dias" :disabled="$deshabilitarRangoDias" required />
+                <x-toggle-switch id="is_independiente" :label="__('¿Puede registrarse fuera de un semestre?')"
+                    model="form.is_independiente" :disabled="$deshabilitarIndependienteLaborable" required />
 
-                @if($form->is_rango_dias)
+                <x-toggle-switch id="is_superponible" :label="__('¿Puede asignarse en la misma fecha que días de vacaciones?')"
+                    model="form.is_superponible" :disabled="$deshabilitarSuperponible" required />
+
+                <x-toggle-switch id="is_cantidad_dias_evento" :label="__('¿Tiene una duración de días específica?')"
+                    model="form.is_cantidad_dias_evento" :disabled="$deshabilitarIsCantidadDias" required />
+
+                @if($form->is_cantidad_dias_evento)
                 <div class="w-full">
-                    <x-input-label for="rango_dias" :value="__('Cantidad de días que debe durar el evento')" />
-                    <x-text-input id="rango_dias" type="number" min="1" max="90" class="w-full"
-                        wire:model.live="form.rango_dias" placeholder="Ej: 5" :disabled="$deshabilitarCantidadRango" required />
-                    <x-input-error :messages="$errors->first('form.rango_dias')" class="mt-2" />
+                    <x-input-label for="cantidad_dias_evento" :value="__('Cantidad de días que debe durar el evento')" />
+                    <x-text-input id="cantidad_dias_evento" type="number" min="1" max="365" class="w-full"
+                        wire:model.live="form.cantidad_dias_evento" placeholder="Ej: 5" :disabled="$deshabilitarInputDias" required />
+                    <x-input-error :messages="$errors->first('form.cantidad_dias_evento')" class="mt-2" />
                 </div>
                 @endif
 
@@ -112,14 +112,6 @@
                         <x-input-error :messages="$errors->first('form.especial_evento')" class="mt-2" />
                     </div>
                 @endif
-                @if($form->is_especial && $form->especial_evento == '1')
-                    <div class="w-full">
-                        <x-input-label for="cantidad_dias_evento" :value="__('Cantidad de Días de Vacaciones')" />
-                        <x-text-input id="cantidad_dias_evento" type="number" min="1" max="365" class="w-full"
-                            wire:model.live="form.cantidad_dias_evento" placeholder="Ej: 15" :disabled="!$form->is_especial || $form->especial_evento != '1'" required />
-                        <x-input-error :messages="$errors->first('form.cantidad_dias_evento')" class="mt-2" />
-                    </div>
-                @endif
 
                 @if($form->is_semana_evento)
                     <div class="w-full mt-4 col-span-1 md:col-span-2 lg:col-span-3">
@@ -127,12 +119,13 @@
                             <x-input-label :value="__('Semanas en las que debe suceder el evento *')" />
                             @if($form->is_repetible)
                                 <button type="button" wire:click="agregarSemana"
-                                    class="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1">
+                                    @disabled(count(array_filter($form->semanas, fn($v) => $v !== null && $v !== '')) >= 4)
+                                    class="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 4v16m8-8H4"></path>
                                     </svg>
-                                    Agregar Semana
+                                    Agregar Semana (máx. 4)
                                 </button>
                             @endif
                         </div>

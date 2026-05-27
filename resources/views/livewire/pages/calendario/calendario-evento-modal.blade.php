@@ -65,6 +65,7 @@ $wireKey = $wireKey ?? 'datalist-calendario';
             @php
             $deshabilitarIndependienteLaborable = in_array($form->nuevoTipo, ['1', '2', '6'], true);
             $deshabilitarCantidadRango = !$form->nuevoIsRangoDias;
+            $deshabilitarSuperponible = in_array($form->nuevoTipo, ['1', '2', '6'], true);
             @endphp
 
             {{-- Cuadrícula Principal de 3 Columnas (3x3) --}}
@@ -108,43 +109,47 @@ $wireKey = $wireKey ?? 'datalist-calendario';
                 </div>
 
                 {{-- FILA 2 --}}
-                {{-- Columna 1: ¿Puede registrarse fuera de un semestre? --}}
+                {{-- Columna 1: ¿Es Laborable? --}}
+                <div>
+                    <x-toggle-switch id="{{ $wireKey }}_laborable_switch" :label="__('¿Es Laborable?')"
+                        model="form.nuevoLaborable" :disabled="$deshabilitarIndependienteLaborable" />
+                </div>
+
+                {{-- Columna 2: ¿Se puede repetir? --}}
+                <div>
+                    <x-toggle-switch id="{{ $wireKey }}_repetible_switch" :label="__('¿Se puede repetir?')"
+                        model="form.nuevoRepetible" :disabled="true" />
+                </div>
+
+                {{-- Columna 3: ¿Puede registrarse fuera de un semestre? --}}
                 <div>
                     <x-toggle-switch id="{{ $wireKey }}_is_independiente_switch" :label="__('¿Puede registrarse fuera de un semestre?')"
                         model="form.nuevoIsIndependiente" :disabled="$deshabilitarIndependienteLaborable" />
                     <x-input-error :messages="$errors->get('form.nuevoIsIndependiente')" class="mt-2" />
                 </div>
 
-                {{-- Columna 2: ¿Es Laborable? --}}
-                <div>
-                    <x-toggle-switch id="{{ $wireKey }}_laborable_switch" :label="__('¿Es Laborable?')"
-                        model="form.nuevoLaborable" :disabled="$deshabilitarIndependienteLaborable" />
-                </div>
-
-                {{-- Columna 3: ¿Se puede repetir? --}}
-                <div>
-                    <x-toggle-switch id="{{ $wireKey }}_repetible_switch" :label="__('¿Se puede repetir?')"
-                        model="form.nuevoRepetible" :disabled="true" />
-                </div>
-
                 {{-- FILA 3 --}}
-                {{-- Columna 1: ¿Tiene cantidad específica de días de duración? --}}
+                {{-- Columna 1: ¿Puede asignarse en la misma fecha que días de vacaciones? --}}
                 <div>
-                    <x-toggle-switch id="{{ $wireKey }}_is_rango_dias_switch" :label="__('¿Tiene cantidad específica de días de duración?')"
+                    <x-toggle-switch id="{{ $wireKey }}_is_superponible_switch" :label="__('¿Puede asignarse en la misma fecha que días de vacaciones?')"
+                        model="form.nuevoIsSuperponible" :disabled="$deshabilitarSuperponible" />
+                    <x-input-error :messages="$errors->get('form.nuevoIsSuperponible')" class="mt-2" />
+                </div>
+
+                {{-- Columna 2: ¿Tiene cantidad específica de días de duración? (último switch) --}}
+                <div>
+                    <x-toggle-switch id="{{ $wireKey }}_is_rango_dias_switch" :label="__('¿Tiene una duración de días específica?')"
                         model="form.nuevoIsRangoDias" />
                 </div>
 
-                {{-- Columna 2: Cantidad de Días --}}
-                <div class="w-full">
+                {{-- Columna 3: Cantidad de Días (oculto dinámicamente con x-show) --}}
+                <div class="w-full" x-show="nuevoIsRangoDias" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{{ __('Cantidad de días que debe durar el evento') }}</label>
                     <x-text-input id="{{ $wireKey }}_rango_dias_input" type="number"
                         class="w-full block" wire:model.live="form.nuevoRangoDias"
-                        placeholder="{{ __('EJ: 5') }}" min="1" max="90" :disabled="$deshabilitarCantidadRango" />
+                        placeholder="{{ __('EJ: 5') }}" min="1" max="365" :disabled="$deshabilitarCantidadRango" />
                     <x-input-error :messages="$errors->get('form.nuevoRangoDias')" class="mt-2" />
                 </div>
-
-                {{-- Columna 3: Div vacío para mantener la simetría --}}
-                <div class="hidden lg:block"></div>
 
             </div>
         </div>

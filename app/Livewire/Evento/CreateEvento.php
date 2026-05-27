@@ -43,32 +43,28 @@ class CreateEvento extends Component
                 $this->form->is_laborable = true;
                 $this->form->is_repetible = true;
                 $this->form->tipo_evento = '4';
-                $this->form->is_rango_dias = true;
-                $this->form->rango_dias = '1';
+                $this->form->is_cantidad_dias_evento = true;
                 $this->form->is_independiente = true;
-                $this->form->cantidad_dias_evento = 0;
+                $this->form->cantidad_dias_evento = 1;
             } elseif (in_array($this->form->especial_evento, ['7', '8'])) {
                 $this->form->is_laborable = true;
                 $this->form->is_repetible = true;
                 $this->form->tipo_evento = '4';
-                $this->form->is_rango_dias = true;
-                $this->form->rango_dias = '1';
+                $this->form->is_cantidad_dias_evento = true;
                 $this->form->is_independiente = true;
-                $this->form->cantidad_dias_evento = 0;
+                $this->form->cantidad_dias_evento = 1;
             } elseif (in_array($this->form->especial_evento, ['9', '10'])) {
                 $this->form->is_laborable = true;
                 $this->form->is_repetible = false;
                 $this->form->tipo_evento = '4';
-                $this->form->is_rango_dias = true;
-                $this->form->rango_dias = '1';
+                $this->form->is_cantidad_dias_evento = true;
                 $this->form->is_independiente = true;
-                $this->form->cantidad_dias_evento = 0;
+                $this->form->cantidad_dias_evento = 1;
             } elseif ($this->form->especial_evento == '1') {
                 $this->form->is_laborable = false;
                 $this->form->is_repetible = true;
                 $this->form->tipo_evento = '5';
-                $this->form->is_rango_dias = false;
-                $this->form->rango_dias = '';
+                $this->form->is_cantidad_dias_evento = true;
                 $this->form->is_independiente = true;
                 $this->form->is_superponible = false;
                 $this->form->cantidad_dias_evento = 60;
@@ -76,18 +72,18 @@ class CreateEvento extends Component
                 $this->form->is_laborable = false;
                 $this->form->is_repetible = false;
                 $this->form->tipo_evento = '6';
-                $this->form->is_rango_dias = false;
-                $this->form->rango_dias = '';
+                $this->form->is_cantidad_dias_evento = true;
                 $this->form->is_independiente = true;
-                $this->form->cantidad_dias_evento = 0;
+                $this->form->is_superponible = true;
+                $this->form->cantidad_dias_evento = 2;
             } elseif ($this->form->especial_evento == '5') { // Carnaval
                 $this->form->is_laborable = false;
                 $this->form->is_repetible = false;
                 $this->form->tipo_evento = '6';
-                $this->form->is_rango_dias = false;
-                $this->form->rango_dias = '';
+                $this->form->is_cantidad_dias_evento = true;
                 $this->form->is_independiente = true;
-                $this->form->cantidad_dias_evento = 0;
+                $this->form->is_superponible = true;
+                $this->form->cantidad_dias_evento = 2;
             } else {
                 $this->form->cantidad_dias_evento = 0;
             }
@@ -128,10 +124,14 @@ class CreateEvento extends Component
                 if (in_array($this->form->tipo_evento, ['1', '2', '6'])) {
                     $this->form->is_laborable = false;
                     $this->form->is_repetible = false;
+                    $this->form->is_cantidad_dias_evento = false;
+                    $this->form->cantidad_dias_evento = 0;
                 } else {
                     // Para tipos 3, 4 y 5
                     $this->form->is_laborable = false;
                     $this->form->is_repetible = true;
+                    $this->form->is_cantidad_dias_evento = false;
+                    $this->form->cantidad_dias_evento = 0;
                 }
             }
         }
@@ -161,13 +161,12 @@ class CreateEvento extends Component
                 $this->form->is_repetible = true;
                 $this->form->is_superponible = false;
             }
-            $this->form->is_rango_dias = false;
-            $this->form->rango_dias = '';
+            $this->form->is_cantidad_dias_evento = false;
         }
-        // Limpiar rango de días si el switch se apaga
-        if ($propertyName === 'form.is_rango_dias' && !$this->form->is_rango_dias) {
-            $this->form->rango_dias = '';
-            $this->resetErrorBag('form.rango_dias');
+        // Limpiar cantidad_dias_evento si el switch se apaga
+        if ($propertyName === 'form.is_cantidad_dias_evento' && !$this->form->is_cantidad_dias_evento) {
+            $this->form->cantidad_dias_evento = 0;
+            $this->resetErrorBag('form.cantidad_dias_evento');
         }
 
         // 2. FINALMENTE VALIDAMOS EL CAMPO
@@ -202,6 +201,10 @@ class CreateEvento extends Component
     public function agregarSemana()
     {
         if ($this->form->is_repetible) {
+            $semanasValidas = array_filter($this->form->semanas ?? [], fn($v) => $v !== null && $v !== '');
+            if (count($semanasValidas) >= 4) {
+                return;
+            }
             $this->form->semanas[] = '';
         }
     }

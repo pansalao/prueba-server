@@ -17,7 +17,7 @@ class Evento extends Model
     protected $casts = [
         'is_laborable_evento' => 'boolean',
         'is_repetible_evento' => 'boolean',
-        'is_rango_dias_evento' => 'boolean',
+        'is_cantidad_dias_evento' => 'boolean',
         'is_independiente' => 'boolean',
         'is_independiente_evento' => 'boolean',
         'is_superponible_evento' => 'boolean',

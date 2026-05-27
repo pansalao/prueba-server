@@ -14,7 +14,7 @@
                 @php
                     $deshabilitarIndependienteLaborable = $form->is_especial
                         || in_array($form->tipo_evento, ['1', '2', '6'], true);
-                    $deshabilitarSuperponible = in_array($form->tipo_evento, ['1', '2', '6'], true)
+                    $deshabilitarSuperponible = (in_array($form->tipo_evento, ['1', '2', '6'], true) && !($form->is_especial && in_array($form->especial_evento, ['4', '5'])))
                         || ($form->is_especial && $form->especial_evento == '1');
                     $deshabilitarRangoDias = $form->is_especial;
                     $deshabilitarCantidadRango = $form->is_especial || !$form->is_rango_dias;
@@ -61,16 +61,16 @@
                     <x-input-error :messages="$errors->first('form.codigo_color_evento')" class="mt-2" />
                 </div>
 
-                <x-toggle-switch id="is_independiente_edit" :label="__('¿Puede registrarse fuera de un semestre?')"
-                    model="form.is_independiente" :disabled="$deshabilitarIndependienteLaborable" required />
-
-                <x-toggle-switch id="is_superponible_edit" :label="__('¿Puede asignarse en la misma fecha que días de vacaciones?')" model="form.is_superponible" :disabled="$deshabilitarSuperponible" required />
-
                 <x-toggle-switch id="is_laborable_edit" :label="__('¿Es Laborable?')" model="form.is_laborable"
                     :disabled="$deshabilitarIndependienteLaborable" required />
 
                 <x-toggle-switch id="is_repetible_edit" :label="__('¿Se puede repetir?')" model="form.is_repetible"
                     :disabled="true" required />
+
+                <x-toggle-switch id="is_independiente_edit" :label="__('¿Puede registrarse fuera de un semestre?')"
+                    model="form.is_independiente" :disabled="$deshabilitarIndependienteLaborable" required />
+
+                <x-toggle-switch id="is_superponible_edit" :label="__('¿Puede asignarse en la misma fecha que días de vacaciones?')" model="form.is_superponible" :disabled="$deshabilitarSuperponible" required />
 
                 <x-toggle-switch id="is_rango_dias_edit" :label="__('¿Tiene cantidad especifica días de duración?')"
                     model="form.is_rango_dias" :disabled="$deshabilitarRangoDias" required />
@@ -129,12 +129,13 @@
                             <x-input-label :value="__('Semanas en las que debe suceder el evento *')" />
                             @if($form->is_repetible && !$form->is_especial)
                                 <button type="button" wire:click="agregarSemana"
-                                    class="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1">
+                                    @disabled(count(array_filter($form->semanas, fn($v) => $v !== null && $v !== '')) >= 4)
+                                    class="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 4v16m8-8H4"></path>
                                     </svg>
-                                    Agregar Semana
+                                    Agregar Semana (máx. 4)
                                 </button>
                             @endif
                         </div>

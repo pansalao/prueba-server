@@ -203,7 +203,82 @@ class CreateCalendario extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->showAlert('error', $e->validator->errors()->first());
             return;
-        }        // Se mantiene el rango completo sin dividir por fines de semana.
+        }        // Calcular duración real que se va a insertar
+        $duracionReal = 0;
+        $start = new \DateTime($inicio);
+        $end = new \DateTime($fin);
+        
+        $isTodoWeekend = true;
+        $tempInterval = new \DateInterval('P1D');
+        $tempPeriod = new \DatePeriod($start, $tempInterval, (clone $end)->modify('+1 day'));
+        foreach ($tempPeriod as $date) {
+            if ((int) $date->format('N') < 6) {
+                $isTodoWeekend = false;
+                break;
+            }
+        }
+        
+        $ignorarFinesDeSemana = !in_array($tipo, ['1', '2', '6']) && !$isTodoWeekend;
+
+        $period = new \DatePeriod($start, $tempInterval, (clone $end)->modify('+1 day'));
+        foreach ($period as $date) {
+            if ($ignorarFinesDeSemana && (int) $date->format('N') >= 6) {
+                continue;
+            }
+            $duracionReal++;
+        }
+
+        // VALIDACIÓN DE is_cantidad_dias_evento
+        if ($eventoInfo && $eventoInfo->is_cantidad_dias_evento) {
+            $cantidadRequerida = (int) $eventoInfo->cantidad_dias_evento;
+            $is_vacaciones = ($eventoInfo->especial_evento ?? '') === '1';
+
+            if ($is_vacaciones) {
+                $diasRegistrados = 0;
+                $targetYear = date('Y', strtotime($inicio));
+                
+                foreach ($this->eventosRegistrados as $reg) {
+                    if (($reg['id'] ?? null) == $eventoInfo->id_evento) {
+                        $sReg = new \DateTime($reg['inicio']);
+                        $eReg = new \DateTime($reg['fin']);
+                        
+                        $isTodoWeekendReg = true;
+                        $tempInterval = new \DateInterval('P1D');
+                        $tempPeriod = new \DatePeriod($sReg, $tempInterval, (clone $eReg)->modify('+1 day'));
+                        foreach ($tempPeriod as $date) {
+                            if ((int) $date->format('N') < 6) {
+                                $isTodoWeekendReg = false;
+                                break;
+                            }
+                        }
+                        $ignorarFinesDeSemanaReg = !in_array($reg['tipo'] ?? '1', ['1', '2', '6']) && !$isTodoWeekendReg;
+
+                        $periodReg = new \DatePeriod($sReg, $tempInterval, (clone $eReg)->modify('+1 day'));
+                        foreach ($periodReg as $date) {
+                            if ($ignorarFinesDeSemanaReg && (int) $date->format('N') >= 6) {
+                                continue;
+                            }
+                            if ($date->format('Y') == $targetYear) {
+                                $diasRegistrados++;
+                            }
+                        }
+                    }
+                }
+                
+                if (($diasRegistrados + $duracionReal) > $cantidadRequerida) {
+                    $disponibles = max(0, $cantidadRequerida - $diasRegistrados);
+                    $this->showAlert('error', "No puedes registrar {$duracionReal} día(s) de Vacaciones Colectivas porque solo quedan {$disponibles} día(s) disponibles de los {$cantidadRequerida} permitidos en el año {$targetYear}.");
+                    return;
+                }
+            } else {
+                if ($duracionReal != $cantidadRequerida) {
+                    $this->showAlert('error', "El evento '{$nombre}' debe durar exactamente {$cantidadRequerida} día(s) por cada selección. Has seleccionado {$duracionReal} día(s).");
+                    return;
+                }
+            }
+        }
+
+        // Se mantiene el rango completo sin dividir por fines de semana.
         // Ejemplo: un evento que inicia viernes y termina lunes se guarda
         // como una sola entrada (inicio=viernes, fin=lunes) en lugar de dividirlo.
         $this->eventosRegistrados[] = [
@@ -213,8 +288,8 @@ class CreateCalendario extends Component
             'nombre_evento' => (string) $nombre,
             'tipo' => (string) $tipo,
             'color' => (string) $color,
-            'is_rango_dias_evento' => $eventoInfo ? (bool) $eventoInfo->is_rango_dias_evento : false,
-            'rango_dias_evento' => $eventoInfo ? $eventoInfo->rango_dias_evento : null,
+            'is_cantidad_dias_evento' => $eventoInfo ? (bool) $eventoInfo->is_cantidad_dias_evento : false,
+            'cantidad_dias_evento' => $eventoInfo ? $eventoInfo->cantidad_dias_evento : null,
             'especial_evento' => $eventoInfo ? (string) $eventoInfo->especial_evento : null,
             'is_superponible_evento' => $eventoInfo ? (bool) $eventoInfo->is_superponible_evento : false,
         ];
@@ -300,8 +375,8 @@ class CreateCalendario extends Component
                 'nombre_evento' => (string) $template->nombre_evento,
                 'tipo' => (string) $template->tipo_evento,
                 'color' => (string) $colorFin,
-                'is_rango_dias_evento' => (bool) $template->is_rango_dias_evento,
-                'rango_dias_evento' => $template->rango_dias_evento,
+                'is_cantidad_dias_evento' => (bool) $template->is_cantidad_dias_evento,
+                'cantidad_dias_evento' => $template->cantidad_dias_evento,
                 'especial_evento' => $templateKey,
             ];
         };
@@ -421,7 +496,7 @@ class CreateCalendario extends Component
         $this->guardarBorrador();
     }
 
-    public function crearYAgregarEvento($inicio, $fin, $nombre, $tipo, $codigo_color_evento, $is_laborable, $is_repetible, $is_rango_dias, $rango_dias)
+    public function crearYAgregarEvento($inicio, $fin, $nombre, $tipo, $codigo_color_evento, $is_laborable, $is_repetible, $is_rango_dias, $rango_dias, $is_superponible = true)
     {
         // Validar usando el objeto Form
         try {
@@ -476,6 +551,7 @@ class CreateCalendario extends Component
                 'is_rango_dias' => $is_rango_dias,
                 'rango_dias' => $rango_dias,
                 'is_independiente' => $this->form->nuevoIsIndependiente,
+                'is_superponible' => $is_superponible,
             ]);
 
             $colorHex = $codigo_color_evento ?: '#808080';
@@ -591,29 +667,42 @@ class CreateCalendario extends Component
             $targetYear = date('Y');
         }
 
-        // Obtener IDs de eventos asignados EN EL AÑO SELECCIONADO del calendario actual
+        // Obtener IDs y CONTEOS de eventos asignados EN TODO EL CALENDARIO ACTUAL
+        $conteosAsignadosTotal = [];
         $idsAsignadosEsteAnio = [];
         foreach ($this->eventosRegistrados as $ev) {
-            $evStart = $ev['inicio'] ?? null;
-            if ($evStart) {
-                $evYear = date('Y', strtotime($evStart));
-                if ((int) $evYear === (int) $targetYear) {
-                    $idsAsignadosEsteAnio[] = $ev['id'] ?? null;
+            $idEv = $ev['id'] ?? null;
+            if ($idEv) {
+                $conteosAsignadosTotal[$idEv] = ($conteosAsignadosTotal[$idEv] ?? 0) + 1;
+                
+                $evStart = $ev['inicio'] ?? null;
+                if ($evStart) {
+                    $evYear = date('Y', strtotime($evStart));
+                    if ((int) $evYear === (int) $targetYear) {
+                        $idsAsignadosEsteAnio[] = $idEv;
+                    }
                 }
             }
         }
         $idsAsignadosEsteAnio = array_filter(array_unique($idsAsignadosEsteAnio));
 
-        return $biblioteca->filter(function ($evento) use ($idsAsignadosEsteAnio) {
-            // Si es un evento especial de tipo 2 (Inicio) o 3 (Fin) y ya está asignado en este año, no lo mostramos
+        return $biblioteca->filter(function ($evento) use ($idsAsignadosEsteAnio, $conteosAsignadosTotal) {
             $especial = $evento->especial_evento ?? null;
-            if (in_array($especial, ['2', '3']) && in_array($evento->id_evento, $idsAsignadosEsteAnio)) {
-                return false;
+            $id = $evento->id_evento;
+
+            // Lapsos Académicos (2, 3) e Introductorios (7, 8) -> Hasta 2 veces en el calendario general
+            if (in_array($especial, ['2', '3', '7', '8'])) {
+                return ($conteosAsignadosTotal[$id] ?? 0) < 2;
+            }
+
+            // Curso Intensivo (9, 10) -> Hasta 1 vez en el calendario general
+            if (in_array($especial, ['9', '10'])) {
+                return ($conteosAsignadosTotal[$id] ?? 0) < 1;
             }
 
             // Si el evento es repetible, siempre aparece.
             // Si NO es repetible, solo aparece si NO ha sido asignado aún en este año.
-            return $evento->is_repetible_evento || !in_array($evento->id_evento, $idsAsignadosEsteAnio);
+            return $evento->is_repetible_evento || !in_array($id, $idsAsignadosEsteAnio);
         })->values();
     }
 
@@ -642,7 +731,6 @@ class CreateCalendario extends Component
                 $start = new \DateTime($reg['inicio']);
                 $end = new \DateTime($reg['fin']);
 
-                // Determinar si es exclusivamente de fin de semana
                 $isTodoWeekend = true;
                 $tempInterval = new \DateInterval('P1D');
                 $tempPeriod = new \DatePeriod($start, $tempInterval, (clone $end)->modify('+1 day'));
@@ -652,7 +740,6 @@ class CreateCalendario extends Component
                         break;
                     }
                 }
-
                 $ignorarFinesDeSemana = !in_array($reg['tipo'] ?? '1', ['1', '2', '6']) && !$isTodoWeekend;
 
                 $interval = new \DateInterval('P1D');

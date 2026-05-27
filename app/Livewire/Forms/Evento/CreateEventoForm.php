@@ -13,8 +13,7 @@ class CreateEventoForm extends Form
     public $is_especial = false;
     public $is_laborable = false;
     public $is_repetible = false;
-    public $is_rango_dias = false;
-    public $rango_dias = '';
+    public $is_cantidad_dias_evento = false;
     public $is_independiente = true;
     public $is_superponible = true;
     public $is_semana_evento = false;
@@ -27,15 +26,46 @@ class CreateEventoForm extends Form
             'cantidad_dias_evento' => [
                 'nullable',
                 function ($attribute, $value, $fail) {
-                    if ($this->is_especial && $this->especial_evento == '1') {
-                        if (empty($value) && $value !== '0' && $value !== 0) {
-                            $fail('La cantidad de días de vacaciones es obligatoria.');
-                        } elseif (!is_numeric($value) || $value < 1 || $value > 365) {
-                            $fail('La cantidad de días de vacaciones debe ser un número entero entre 1 y 365.');
+                    if ($this->is_cantidad_dias_evento) {
+                        if ($this->is_especial && in_array($this->especial_evento, ['2', '3', '7', '8', '9', '10'])) {
+                            if ($value != 1) {
+                                $fail('La cantidad de días debe ser obligatoriamente 1 para este evento especial.');
+                            }
+                        } elseif ($this->is_especial && in_array($this->especial_evento, ['4', '5'])) {
+                            if ($value != 2) {
+                                $fail('Para Semana Santa y Carnaval, la cantidad de días debe ser obligatoriamente 2.');
+                            }
+                        } else {
+                            if (empty($value) && $value !== '0' && $value !== 0) {
+                                $fail('La cantidad de días es obligatoria.');
+                            } elseif (!is_numeric($value) || $value < 1 || $value > 365) {
+                                $fail('La cantidad de días debe ser un número entero entre 1 y 365.');
+                            }
                         }
                     } else {
                         if ($value !== null && $value !== '' && $value !== 0 && $value !== '0') {
-                            $fail('No se permite asignar una cantidad de días de vacaciones para este tipo de evento.');
+                            $fail('No se permite asignar una cantidad de días si la opción no está habilitada.');
+                        }
+                    }
+                }
+            ],
+            'is_cantidad_dias_evento' => [
+                'required',
+                'boolean',
+                function ($attribute, $value, $fail) {
+                    if ($this->is_especial) {
+                        if ($this->especial_evento == '1') {
+                            if (!$value) {
+                                $fail('Para las vacaciones, debe habilitarse la cantidad de días obligatoriamente.');
+                            }
+                        } elseif (in_array($this->especial_evento, ['2', '3', '7', '8', '9', '10'])) {
+                            if (!$value) {
+                                $fail('Este evento especial requiere cantidad de días obligatoriamente (1 día).');
+                            }
+                        } elseif (in_array($this->especial_evento, ['4', '5'])) {
+                            if (!$value) {
+                                $fail('Para Semana Santa y Carnaval, debe habilitarse la cantidad de días obligatoriamente.');
+                            }
                         }
                     }
                 }
@@ -57,7 +87,9 @@ class CreateEventoForm extends Form
                 'boolean',
                 function ($attribute, $value, $fail) {
                     if (in_array($this->tipo_evento, ['1', '2', '6']) && !$value) {
-                        $fail('Para los feriados, el evento debe ser obligatoriamente superponible.');
+                        if (!($this->is_especial && in_array($this->especial_evento, ['4', '5']))) {
+                            $fail('Para los feriados, el evento debe ser obligatoriamente superponible.');
+                        }
                     }
                 }
             ],
@@ -159,35 +191,7 @@ class CreateEventoForm extends Form
                     }
                 }
             ],
-            'is_rango_dias' => [
-                'required',
-                'boolean',
-                function ($attribute, $value, $fail) {
-                    if ($this->is_especial) {
-                        if (in_array($this->especial_evento, ['2', '3', '7', '8', '9', '10']) && !$value) {
-                            $fail('Para este evento especial, debe tener obligatoriamente cantidad específica de días.');
-                        } elseif (in_array($this->especial_evento, ['1', '4', '5']) && $value) {
-                            $fail('Para este evento especial, no debe tener cantidad específica de días.');
-                        }
-                    }
-                }
-            ],
-            'rango_dias' => [
-                'required_if:is_rango_dias,true',
-                'nullable',
-                'integer',
-                'min:1',
-                'max:90',
-                function ($attribute, $value, $fail) {
-                    if ($this->is_especial) {
-                        if (in_array($this->especial_evento, ['2', '3', '7', '8', '9', '10']) && $value != 1) {
-                            $fail('Para este evento especial, la cantidad de días debe ser obligatoriamente 1.');
-                        } elseif (in_array($this->especial_evento, ['1', '4', '5']) && !empty($value)) {
-                            $fail('Para este evento especial, no se debe definir cantidad de días.');
-                        }
-                    }
-                }
-            ],
+
             'semanas' => [
                 'required_if:is_semana_evento,true',
                 'array',
@@ -199,6 +203,11 @@ class CreateEventoForm extends Form
                     }
                     if (!$this->is_repetible && count($value) > 1) {
                         $fail('Si el evento no es repetible, solo puede seleccionar una (1) semana.');
+                    }
+                    
+                    $semanasNoVacias = array_filter($value, fn($v) => $v !== null && $v !== '');
+                    if (count($semanasNoVacias) > 4) {
+                        $fail('Un evento puede tener máximo 4 semanas asignadas.');
                     }
                     
                     // Filtrar valores vacíos
@@ -240,12 +249,7 @@ class CreateEventoForm extends Form
             'is_laborable.boolean' => 'El valor de laborable debe ser booleano.',
             'is_repetible.boolean' => 'El valor de repetible debe ser booleano.',
             'is_superponible.boolean' => 'El valor de superponible debe ser booleano.',
-            'is_rango_dias.boolean' => 'El valor de rango de días debe ser booleano.',
-            'rango_dias.required_if' => 'La cantidad de días es obligatoria.',
-            'rango_dias.integer' => 'La cantidad de días debe ser un número entero.',
-            'rango_dias.min' => 'La cantidad de días debe ser al menos 1.',
-            'rango_dias.max' => 'La cantidad de días no debe superar los 90 días.',
-            'rango_dias.max' => 'La cantidad de días no debe superar los 90 días.',
+            'is_cantidad_dias_evento.boolean' => 'El valor de cantidad de días debe ser booleano.',
             'semanas.required_if' => 'Debe seleccionar al menos una semana cuando el evento está asociado a semanas específicas.',
             'semanas.array' => 'Formato inválido de semanas.',
         ];

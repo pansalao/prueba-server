@@ -109,12 +109,12 @@
                             </div>
                         </div>
 
-                        {{-- Rango de Días --}}
-                        @if($evento->is_rango_dias_evento)
+                        {{-- Cantidad de Días --}}
+                        @if($evento->is_cantidad_dias_evento)
                             <div>
                                 <x-input-label value="Cantidad de días de duración:" />
                                 <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
-                                    {{ $evento->rango_dias_evento }} días
+                                    {{ $evento->cantidad_dias_evento }} días
                                 </p>
                             </div>
                         @endif
