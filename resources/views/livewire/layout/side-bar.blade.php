@@ -5,9 +5,8 @@
     <!-- Logo y encabezado -->
     <!-- Logo y encabezado - Solo visible en móviles -->
     <div class="px-4 mb-4 flex items-center justify-between lg:hidden">
-        <div class="flex items-center space-x-2">
-            <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
-            <span class="text-lg font-bold text-gray-800 dark:text-gray-200">Panel</span>
+        <div class="flex items-center w-full mt-4">
+            <img src="{{ asset('img/logo_new.png') }}" alt="SOGAT Logo" class="block h-12 w-auto object-contain" />
         </div>
         {{-- Botón de cerrar, solo visible en móviles --}}
         <button wire:click="toggle"
