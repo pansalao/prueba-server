@@ -278,9 +278,18 @@ class UpdateEventoForm extends Form
             'rango_dias.integer' => 'La cantidad de días debe ser un número entero.',
             'rango_dias.min' => 'La cantidad de días debe ser al menos 1.',
             'rango_dias.max' => 'La cantidad de días no debe superar los 90 días.',
-            'rango_dias.max' => 'La cantidad de días no debe superar los 90 días.',
             'semanas.required_if' => 'Debe seleccionar al menos una semana cuando el evento está asociado a semanas específicas.',
             'semanas.array' => 'Formato inválido de semanas.',
+            'is_independiente.required' => 'El campo independiente es obligatorio.',
+            'is_independiente.boolean' => 'El campo independiente debe ser un valor booleano.',
+            'is_superponible.required' => 'El campo superponible es obligatorio.',
+            'is_semana_evento.required' => 'El campo semana es obligatorio.',
+            'is_semana_evento.boolean' => 'El campo semana debe ser un valor booleano.',
+            'is_especial.required' => 'El campo especial es obligatorio.',
+            'is_especial.boolean' => 'El campo especial debe ser un valor booleano.',
+            'is_laborable.required' => 'El campo laborable es obligatorio.',
+            'is_repetible.required' => 'El campo repetible es obligatorio.',
+            'is_rango_dias.required' => 'El campo rango de días es obligatorio.',
         ];
     }
 }

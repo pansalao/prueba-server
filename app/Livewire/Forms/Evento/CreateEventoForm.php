@@ -252,6 +252,16 @@ class CreateEventoForm extends Form
             'is_cantidad_dias_evento.boolean' => 'El valor de cantidad de días debe ser booleano.',
             'semanas.required_if' => 'Debe seleccionar al menos una semana cuando el evento está asociado a semanas específicas.',
             'semanas.array' => 'Formato inválido de semanas.',
+            'is_cantidad_dias_evento.required' => 'El campo cantidad de días es obligatorio.',
+            'is_independiente.required' => 'El campo independiente es obligatorio.',
+            'is_independiente.boolean' => 'El campo independiente debe ser un valor booleano.',
+            'is_superponible.required' => 'El campo superponible es obligatorio.',
+            'is_semana_evento.required' => 'El campo semana es obligatorio.',
+            'is_semana_evento.boolean' => 'El campo semana debe ser un valor booleano.',
+            'is_especial.required' => 'El campo especial es obligatorio.',
+            'is_especial.boolean' => 'El campo especial debe ser un valor booleano.',
+            'is_laborable.required' => 'El campo laborable es obligatorio.',
+            'is_repetible.required' => 'El campo repetible es obligatorio.',
         ];
     }
 }
