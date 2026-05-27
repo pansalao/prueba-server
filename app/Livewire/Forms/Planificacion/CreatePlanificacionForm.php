@@ -215,6 +215,12 @@ class CreatePlanificacionForm extends Form
                     function ($attribute, $value, $fail) {
                         if (!$this->id_profesor_asignado) return;
 
+                        // Validar que no sea fin de semana
+                        $dayOfWeek = \Carbon\Carbon::parse($value)->dayOfWeek;
+                        if ($dayOfWeek === 0 || $dayOfWeek === 6) {
+                            $fail("La fecha de evaluación no puede caer en fin de semana (sábado o domingo).");
+                        }
+
                         if (!$this->cachedLapso) {
                             $this->cachedLapso = \Illuminate\Support\Facades\DB::connection('emulacion_sogac_2')
                                 ->table('seccion_unidad_docente as sud')

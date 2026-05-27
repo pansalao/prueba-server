@@ -146,6 +146,12 @@ class UpdatePlanificacionForm extends Form
                     'required',
                     'date',
                     function ($attribute, $value, $fail) {
+                        // Validar que no sea fin de semana
+                        $dayOfWeek = \Carbon\Carbon::parse($value)->dayOfWeek;
+                        if ($dayOfWeek === 0 || $dayOfWeek === 6) {
+                            $fail("La fecha de evaluación no puede caer en fin de semana (sábado o domingo).");
+                        }
+
                         if ($this->lapso_fecha_inicio && $this->lapso_fecha_fin) {
                             if ($value < $this->lapso_fecha_inicio || $value > $this->lapso_fecha_fin) {
                                 $fail("La fecha debe estar dentro del lapso ({$this->lapso_fecha_inicio} al {$this->lapso_fecha_fin}).");
