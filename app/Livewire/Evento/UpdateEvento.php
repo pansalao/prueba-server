@@ -108,8 +108,8 @@ class UpdateEvento extends Component
                 '3' => 'Fin del Lapso Académico',
                 '4' => 'Semana Santa',
                 '5' => 'Carnaval',
-                '7' => 'Inicio del Lapso Introductorio',
-                '8' => 'Fin del Lapso Introductorio',
+                '7' => 'Inicio del Lapso Académico Trayecto Inicial',
+                '8' => 'Fin del Lapso Académico Trayecto Inicial',
                 '9' => 'Inicio del Curso Intensivo',
                 '10' => 'Fin del Curso Intensivo',
             ];

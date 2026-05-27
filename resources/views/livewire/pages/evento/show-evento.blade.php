@@ -53,8 +53,8 @@
                                 @elseif($evento->especial_evento == 3) Fin del Lapso Académico
                                 @elseif($evento->especial_evento == 4) Semana Santa
                                 @elseif($evento->especial_evento == 5) Carnaval
-                                @elseif($evento->especial_evento == 7) Inicio del Lapso Introductorio
-                                @elseif($evento->especial_evento == 8) Fin del Lapso Introductorio
+                                @elseif($evento->especial_evento == 7) Inicio del Lapso Académico Trayecto Inicial
+                                @elseif($evento->especial_evento == 8) Fin del Lapso Académico Trayecto Inicial
                                 @elseif($evento->especial_evento == 9) Inicio del Curso Intensivo
                                 @elseif($evento->especial_evento == 10) Fin del Curso Intensivo
                                 @else Ninguno @endif

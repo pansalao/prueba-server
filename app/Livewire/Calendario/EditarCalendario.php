@@ -153,14 +153,14 @@ class EditarCalendario extends Component
                 return;
             }
 
-            // Verificar si hay un lapso introductorio o intensivo más reciente que el académico
+            // Verificar si hay un lapso de trayecto inicial o intensivo más reciente que el académico
             $otrosLapsos = collect($this->eventosRegistrados)
                 ->filter(fn($ev) => in_array($ev['especial_evento'] ?? '', ['7', '9']))
                 ->sortByDesc('inicio');
             $otroLapsoActual = $otrosLapsos->firstWhere('inicio', '<=', $inicio);
 
             if ($otroLapsoActual && $otroLapsoActual['inicio'] >= $lapsoActual['inicio']) {
-                $this->showAlert('error', 'Este evento tiene semanas específicas y solo puede registrarse durante un Lapso Académico regular (no introductorio ni intensivo).');
+                $this->showAlert('error', 'Este evento tiene semanas específicas y solo puede registrarse durante un Lapso Académico regular (no de Trayecto Inicial ni intensivo).');
                 return;
             }
 
@@ -432,7 +432,7 @@ class EditarCalendario extends Component
             $generarFin($inicioEv, $semanas, '3');
         }
 
-        // Introductorio (7 -> 8)
+        // Lapso Académico Trayecto Inicial (7 -> 8)
         $iniciosIntro = collect($this->eventosRegistrados)
             ->filter(fn($ev) => ($ev['especial_evento'] ?? '') === '7')
             ->sortBy('inicio')

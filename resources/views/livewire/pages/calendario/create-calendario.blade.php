@@ -167,7 +167,7 @@
                                 class="mt-2" />
                         </div>
                         <div class="w-full">
-                            <x-input-label for="semana_lapso_uno_introductorio_calendario_academico" :value="__('Semanas del Lapso Introductorio 1')" />
+                            <x-input-label for="semana_lapso_uno_introductorio_calendario_academico" :value="__('Semanas del Lapso Académico Trayecto Inicial 1')" />
                             <x-text-input id="semana_lapso_uno_introductorio_calendario_academico" type="number" min="0"
                                 max="99" wire:model.live="form.semana_lapso_uno_introductorio_calendario_academico"
                                 class="w-full mt-1" placeholder="Ej: 18" required />
@@ -176,7 +176,7 @@
                                 class="mt-2" />
                         </div>
                         <div class="w-full">
-                            <x-input-label for="semana_lapso_dos_introductorio_calendario_academico" :value="__('Semanas del Lapso Introductorio 2')" />
+                            <x-input-label for="semana_lapso_dos_introductorio_calendario_academico" :value="__('Semanas del Lapso Académico Trayecto Inicial 2')" />
                             <x-text-input id="semana_lapso_dos_introductorio_calendario_academico" type="number" min="0"
                                 max="99" wire:model.live="form.semana_lapso_dos_introductorio_calendario_academico"
                                 class="w-full mt-1" placeholder="Ej: 18" required />
@@ -614,7 +614,7 @@
                                                         }
                                                     }
                                                     
-                                                    // Determinar si esta semana pertenece a un lapso introductorio
+                                                    // Determinar si esta semana pertenece a un lapso de trayecto inicial
                                                     let activeIntroIndex = -1;
                                                     let activeIntroInicio = null;
                                                     let activeIntroFin = null;
