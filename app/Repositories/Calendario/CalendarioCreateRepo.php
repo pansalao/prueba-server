@@ -42,6 +42,14 @@ class CalendarioCreateRepo
             ->exists();
     }
 
+    public function contarCalendariosActivos(): int
+    {
+        \App\Models\CalendarioAcademico::inactivarVencidos();
+        return DB::table('calendario_academico')
+            ->where('estatus', '!=', '3')
+            ->count();
+    }
+
     /**
      * Crea un calendario académico junto con todos sus eventos en una transacción.
      */

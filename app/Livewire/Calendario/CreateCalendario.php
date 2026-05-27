@@ -23,6 +23,8 @@ class CreateCalendario extends Component
 
     public $id_calendario_borrador = null;
     public $selectedYearTemporal = null;
+    public $esProsecucion = false;
+    public $minFechaInicio = null;
 
     public function boot()
     {
@@ -72,6 +74,14 @@ class CreateCalendario extends Component
     {
         $this->currentYear = date('Y');
 
+        if (!$id) {
+            $repo = new \App\Repositories\Calendario\CalendarioCreateRepo();
+            if ($repo->contarCalendariosActivos() >= 2) {
+                session()->flash('error', 'Solo se pueden tener máximo dos calendarios activos a la vez. Inactive uno para crear otro.');
+                return redirect()->route('calendario.list');
+            }
+        }
+
         if ($id) {
             $this->id_calendario_borrador = $id;
             $calendario = $this->calendarioRepository->obtenerPorId($id);
@@ -98,8 +108,53 @@ class CreateCalendario extends Component
                 $this->actualizarMapaEventos();
             }
         } else {
-            $this->form->dia_inicio_calendario_academico = date('Y-01-01');
-            $this->form->dia_fin_calendario_academico = date('Y-12-31');
+            // Verificar si hay prosecución (último calendario)
+            $ultimoCalendario = \App\Models\CalendarioAcademico::where('estatus', '!=', '4')
+                ->orderBy('id_calendario_academico', 'desc')
+                ->first();
+
+            if ($ultimoCalendario) {
+                $this->esProsecucion = true;
+                
+                // Cargar eventos del calendario anterior como heredados
+                $eventosAnteriores = $this->calendarioRepository->obtenerEventosDetalle($ultimoCalendario->id_calendario_academico);
+                
+                $maxFechaFin = null;
+                foreach ($eventosAnteriores as $ev) {
+                    $this->eventosRegistrados[] = [
+                        'id' => $ev->id,
+                        'inicio' => $ev->inicio,
+                        'fin' => $ev->fin,
+                        'nombre' => $ev->nombre,
+                        'tipo' => $ev->tipo,
+                        'color' => $ev->color,
+                        'especial_evento' => isset($ev->especial_evento) ? (string) $ev->especial_evento : null,
+                        'is_superponible_evento' => (bool) ($ev->is_superponible_evento ?? false),
+                        'is_heredado' => true,
+                    ];
+                    
+                    if (!$maxFechaFin || $ev->fin > $maxFechaFin) {
+                        $maxFechaFin = $ev->fin;
+                    }
+                }
+                
+                $this->actualizarMapaEventos();
+                
+                // Forzar fecha de inicio a partir del último día con evento
+                if ($maxFechaFin) {
+                    $nuevaFechaInicio = date('Y-m-d', strtotime($maxFechaFin . ' + 1 day'));
+                    $this->minFechaInicio = $nuevaFechaInicio;
+                    $this->form->dia_inicio_calendario_academico = $nuevaFechaInicio;
+                    // Sugerir fecha fin 1 año después
+                    $this->form->dia_fin_calendario_academico = date('Y-m-d', strtotime($nuevaFechaInicio . ' + 1 year - 1 day'));
+                } else {
+                    $this->form->dia_inicio_calendario_academico = date('Y-01-01');
+                    $this->form->dia_fin_calendario_academico = date('Y-12-31');
+                }
+            } else {
+                $this->form->dia_inicio_calendario_academico = date('Y-01-01');
+                $this->form->dia_fin_calendario_academico = date('Y-12-31');
+            }
         }
 
         // Cargar la biblioteca de eventos (templates)

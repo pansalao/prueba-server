@@ -283,7 +283,28 @@ class CreateCalendarioForm extends Form
         $eventosObligatorios = \App\Models\Evento::where('estatus', '1')
             ->get();
 
-        $idsRegistrados = collect($eventosRegistrados)->pluck('id')->all();
+        $inicioCalendario = $this->dia_inicio_calendario_academico;
+        $eventosParaValidar = [];
+        
+        foreach ($eventosRegistrados as $ev) {
+            $esHeredado = false;
+            if (isset($ev['is_heredado']) && $ev['is_heredado']) {
+                $esHeredado = true;
+            } else if ($inicioCalendario && isset($ev['fin']) && $ev['fin'] < $inicioCalendario) {
+                $esHeredado = true;
+            }
+            
+            // Excepción: las vacaciones (especial_evento == '1') SÍ cuentan para validación aunque sean heredadas
+            if ($esHeredado && isset($ev['especial_evento']) && (string)$ev['especial_evento'] === '1') {
+                $esHeredado = false;
+            }
+            
+            if (!$esHeredado) {
+                $eventosParaValidar[] = $ev;
+            }
+        }
+
+        $idsRegistrados = collect($eventosParaValidar)->pluck('id')->all();
 
         foreach ($eventosObligatorios as $obligatorio) {
             // 2.1 Validar que el evento esté registrado
@@ -305,7 +326,7 @@ class CreateCalendarioForm extends Form
         $fines_intensi = [];
         $visitados = [];
 
-        foreach ($eventosRegistrados as $reg) {
+        foreach ($eventosParaValidar as $reg) {
             $id = $reg['id'] ?? null;
             if ($id && isset($eventosDb[$id])) {
                 $evento = $eventosDb[$id];
@@ -339,7 +360,7 @@ class CreateCalendarioForm extends Form
         sort($inicios_intensi);
         sort($fines_intensi);
 
-        foreach ($eventosRegistrados as $reg) {
+        foreach ($eventosParaValidar as $reg) {
             $id = $reg['id'] ?? null;
             if ($id && isset($eventosDb[$id])) {
                 $evento = $eventosDb[$id];
@@ -529,7 +550,7 @@ class CreateCalendarioForm extends Form
 
             // Validar cantidad de semanas asignadas
             $incluirVacaciones = $periodo['nombre'] !== 'Curso Intensivo';
-            $semanasReales = \App\Support\CalendarioLapsoSemanas::contarSemanas($periodo['inicio'], $periodo['fin'], $eventosRegistrados, $incluirVacaciones);
+            $semanasReales = \App\Support\CalendarioLapsoSemanas::contarSemanas($periodo['inicio'], $periodo['fin'], $eventosParaValidar, $incluirVacaciones);
             if ($semanasReales != $periodo['semanas_configuradas']) {
                 $msg = "Las fechas asignadas para '{$periodo['nombre']}' abarcan {$semanasReales} semanas, pero se estipularon {$periodo['semanas_configuradas']}.";
                 $this->addError('eventosRegistrados', $msg);
@@ -567,7 +588,7 @@ class CreateCalendarioForm extends Form
         $eventoVacaciones = $repo->obtenerEventoVacacionesActivo();
         if ($eventoVacaciones) {
             $diasPorAnio = [];
-            foreach ($eventosRegistrados as $reg) {
+            foreach ($eventosParaValidar as $reg) {
                 if (($reg['id'] ?? null) == $eventoVacaciones->id_evento) {
                     $start = new \DateTime($reg['inicio']);
                     $end = new \DateTime($reg['fin']);

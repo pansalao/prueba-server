@@ -132,13 +132,23 @@
                 </div>
                 <div x-show="openSection === 'fechas'" x-collapse class="p-4 space-y-6">
 
+                    @if($esProsecucion)
+                        <div class="mb-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300">
+                            <div class="flex items-center gap-2">
+                                <span class="material-icons">info</span>
+                                <p class="text-sm"><strong>Prosecución:</strong> Este calendario se inicia a partir del día siguiente del último evento del calendario anterior. Los eventos pasados han sido precargados como referencia y no pueden eliminarse.</p>
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- Selección de Fechas y Lapsos --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-6">
                         <div class="w-full">
                             <x-input-label for="dia_inicio_calendario_academico" :value="__('Inicio del Período')" />
                             <x-text-input id="dia_inicio_calendario_academico" type="date"
                                 wire:model.live="form.dia_inicio_calendario_academico"
-                                class="w-full mt-1 date-input-dark" required />
+                                class="w-full mt-1 date-input-dark" 
+                                min="{{ $minFechaInicio }}" required />
                             <x-input-error :messages="$errors->first('form.dia_inicio_calendario_academico')"
                                 class="mt-2" />
                         </div>
@@ -896,10 +906,12 @@
                                                                     x-text="ev.fin"></span></span></template>
                                                     </div>
                                                 </div>
-                                                <button type="button" @click="eliminarEventoDesdeTooltip(ev)"
-                                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors">
-                                                    <span class="material-icons text-sm">delete</span>
-                                                </button>
+                                                <template x-if="!ev.is_heredado">
+                                                    <button type="button" @click="eliminarEventoDesdeTooltip(ev)"
+                                                        class="flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors">
+                                                        <span class="material-icons text-sm">delete</span>
+                                                    </button>
+                                                </template>
                                             </div>
                                         </template>
                                     </div>
