@@ -77,9 +77,13 @@
                                                             <td class="px-4 py-2 whitespace-nowrap text-sm">
                                                                 @if($est['es_vocero'])
                                                                     <div class="flex flex-col">
-                                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200 w-max">
-                                                                            Vocero Principal
-                                                                        </span>
+                                                                        @if($est['tipo_vocero'] == 1)
+                                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200 w-max">Vocero Principal</span>
+                                                                        @elseif($est['tipo_vocero'] == 2)
+                                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 border border-blue-200 w-max">Vocero Secundario</span>
+                                                                        @elseif($est['tipo_vocero'] == 3)
+                                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800 border border-orange-200 w-max">Vocero Terciario</span>
+                                                                        @endif
                                                                         <span class="text-[10px] text-gray-400 mt-1" title="Fecha de asignación">
                                                                             <span class="material-icons text-[10px] align-middle">calendar_today</span>
                                                                             {{ $est['fecha_asignacion'] }}
@@ -88,14 +92,23 @@
                                                                 @else
                                                                     <span class="text-gray-500 text-xs">Estudiante</span>
                                                                 @endif
-                                                            </td>
+                                                                </td>
                                                             <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                                                                 @if(!$est['es_vocero'])
-                                                                    <button wire:click="asignarVocero('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }})" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors">
-                                                                        Asignar Vocero
-                                                                    </button>
+                                                                    <div x-data="{ open: false }" class="relative inline-block text-left">
+                                                                        <button @click="open = !open" @click.away="open = false" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors flex items-center">
+                                                                            Asignar <span class="material-icons text-sm ml-1">arrow_drop_down</span>
+                                                                        </button>
+                                                                        <div x-show="open" style="display: none;" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
+                                                                            <div class="py-1" role="menu" aria-orientation="vertical">
+                                                                                <button wire:click="asignarVocero('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 1)" wire:confirm="¿Estás seguro de asignar a este estudiante como Vocero Principal? Si ya hay uno asignado, será reemplazado automáticamente." class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Principal</button>
+                                                                                <button wire:click="asignarVocero('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 2)" wire:confirm="¿Estás seguro de asignar a este estudiante como Vocero Secundario? Si ya hay uno asignado, será reemplazado automáticamente." class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Secundario</button>
+                                                                                <button wire:click="asignarVocero('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 3)" wire:confirm="¿Estás seguro de asignar a este estudiante como Vocero Terciario? Si ya hay uno asignado, será reemplazado automáticamente." class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Terciario</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 @else
-                                                                    <button wire:click="quitarVocero({{ $seccion['sec_codigo'] }})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors" title="Quitar rol de vocero">
+                                                                    <button wire:click="quitarVocero({{ $seccion['sec_codigo'] }}, {{ $est['tipo_vocero'] }})" wire:confirm="¿Estás seguro de revocar el cargo de vocero a este estudiante?" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors" title="Quitar rol de vocero">
                                                                         Revocar
                                                                     </button>
                                                                 @endif

@@ -17,7 +17,8 @@ class Vocero extends Model
         'id_seccion',
         'id_pnf',
         'id_coordinador',
-        'estatus'
+        'estatus',
+        'tipo_vocero'
     ];
 
     /**

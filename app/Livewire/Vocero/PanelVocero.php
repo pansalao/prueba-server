@@ -88,7 +88,7 @@ class PanelVocero extends Component
 
         // Agrupar estudiantes por sección
         $agrupados = [];
-        $vocerosData = Vocero::where('estatus', 'A')->get(['id_seccion', 'id_estudiante', 'updated_at'])->keyBy('id_seccion');
+        $vocerosData = Vocero::where('estatus', 'A')->get(['id_seccion', 'id_estudiante', 'tipo_vocero', 'updated_at'])->groupBy('id_seccion');
 
         foreach ($estudiantes as $est) {
             if (!isset($agrupados[$est->sec_codigo])) {
@@ -104,14 +104,19 @@ class PanelVocero extends Component
             // Evitar duplicados si hay varias UCs
             $existe = collect($agrupados[$est->sec_codigo]['estudiantes'])->contains('per_cedula', $est->per_cedula);
             if (!$existe) {
-                $esVocero = isset($vocerosData[$est->sec_codigo]) && $vocerosData[$est->sec_codigo]->id_estudiante == $est->per_cedula;
-                $fechaAsignacion = $esVocero ? $vocerosData[$est->sec_codigo]->updated_at->format('d/m/Y h:i A') : null;
+                // Verificar si este estudiante es algún tipo de vocero en esta sección
+                $voceroRecord = isset($vocerosData[$est->sec_codigo]) ? $vocerosData[$est->sec_codigo]->firstWhere('id_estudiante', $est->per_cedula) : null;
+                
+                $esVocero = $voceroRecord !== null;
+                $tipoVocero = $esVocero ? $voceroRecord->tipo_vocero : null; // 1, 2 o 3
+                $fechaAsignacion = $esVocero ? $voceroRecord->updated_at->format('d/m/Y h:i A') : null;
 
                 $agrupados[$est->sec_codigo]['estudiantes'][] = [
                     'per_cedula' => $est->per_cedula,
                     'per_nombres' => $est->per_nombres,
                     'per_apellidos' => $est->per_apellidos,
                     'es_vocero' => $esVocero,
+                    'tipo_vocero' => $tipoVocero,
                     'fecha_asignacion' => $fechaAsignacion
                 ];
             }
@@ -180,12 +185,12 @@ class PanelVocero extends Component
         $this->voceroInfo = $info;
     }
 
-    public function asignarVocero($cedula, $idSeccion)
+    public function asignarVocero($cedula, $idSeccion, $tipo)
     {
         $pnfCoordinador = 4; // O obtener el PNF real
 
-        // Revisar si ya hay un registro de vocero para esta sección
-        $vocero = Vocero::where('id_seccion', $idSeccion)->first();
+        // Revisar si ya hay un registro de este TIPO de vocero para esta sección activo o inactivo
+        $vocero = Vocero::where('id_seccion', $idSeccion)->where('tipo_vocero', $tipo)->first();
         if ($vocero) {
             // Actualizar registro existente (reactivar y actualizar fecha por Eloquent automáticamente)
             $vocero->id_estudiante = $cedula;
@@ -201,7 +206,8 @@ class PanelVocero extends Component
                 'id_seccion' => $idSeccion,
                 'id_pnf' => $pnfCoordinador,
                 'id_coordinador' => Auth::id(),
-                'estatus' => 'A'
+                'estatus' => 'A',
+                'tipo_vocero' => $tipo
             ]);
         }
 
@@ -209,9 +215,9 @@ class PanelVocero extends Component
         session()->flash('message', 'Vocero asignado exitosamente.');
     }
 
-    public function quitarVocero($idSeccion)
+    public function quitarVocero($idSeccion, $tipo)
     {
-        $vocero = Vocero::where('id_seccion', $idSeccion)->first();
+        $vocero = Vocero::where('id_seccion', $idSeccion)->where('tipo_vocero', $tipo)->first();
         if ($vocero) {
             $vocero->estatus = 'I';
             $vocero->save();
