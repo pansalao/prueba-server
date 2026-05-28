@@ -58,7 +58,7 @@
                                             @can('ver-evaluacion')
                                                 <a href="{{ route('tecnica-evaluacion/show', $evaluacion->id_tecnica_evaluacion) }}"
                                                     wire:navigate
-                                                    class="flex items-center gap-1 bg-blue-50 text-blue-600 text-xs font-medium px-2.5 py-0.5 rounded hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800">
+                                                    class="flex items-center gap-1 bg-blue-600 text-white text-xs font-medium px-2.5 py-1 rounded-md hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-sm transition-colors">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
                                                         class="w-4 h-4">
                                                         <path
@@ -71,7 +71,7 @@
                                             @can('editar-evaluacion')
                                                 <a href="{{ route('tecnica-evaluacion/update', $evaluacion->id_tecnica_evaluacion) }}"
                                                     wire:navigate
-                                                    class="flex items-center gap-1 bg-yellow-600 text-white text-xs font-medium px-2.5 py-0.5 rounded hover:bg-yellow-700 dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
+                                                    class="flex items-center gap-1 bg-amber-500 text-white text-xs font-medium px-2.5 py-1 rounded-md hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-600 shadow-sm transition-colors">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
                                                         class="w-4 h-4">
                                                         <path
@@ -86,7 +86,7 @@
                                                 @if ($evaluacion->estatus == 1)
                                                     <!-- Inactivar -->
                                                     <button wire:click="confirmarInhabilitar({{ $evaluacion->id_tecnica_evaluacion }})"
-                                                        class="flex items-center gap-1 bg-red-50 text-red-600 dark:bg-red-900 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                                                        class="flex items-center gap-1 bg-red-600 text-white text-xs font-medium px-2.5 py-1 rounded-md hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 shadow-sm transition-colors">
                                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd"
                                                                 d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
@@ -97,7 +97,7 @@
                                                 @else
                                                     <!-- Activar -->
                                                     <button wire:click="confirmarRestaurar({{ $evaluacion->id_tecnica_evaluacion }})"
-                                                        class="flex items-center gap-1 bg-green-50 text-green-600 dark:bg-green-900 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-800 text-xs font-medium px-2.5 py-0.5 rounded text-left">
+                                                        class="flex items-center gap-1 bg-green-600 text-white text-xs font-medium px-2.5 py-1 rounded-md hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 shadow-sm transition-colors text-left">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                                 d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />

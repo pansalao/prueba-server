@@ -90,7 +90,7 @@
                                     <td class="px-4 py-4 text-right">
                                         @can('ver-bitacora')
                                             <a href="{{ route('bitacora/show', $log->id_bitacora) }}" wire:navigate
-                                                class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-xs font-medium px-2.5 py-0.5 rounded hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800">
+                                                class="inline-flex items-center gap-1 bg-blue-600 text-white text-xs font-medium px-2.5 py-1 rounded-md hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-sm transition-colors">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
                                                     class="w-4 h-4">
                                                     <path
