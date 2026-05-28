@@ -117,7 +117,7 @@ class EditarCalendario extends Component
         $this->actualizarMapaEventos();
     }
 
-    public function agregarEvento($inicio, $fin, $id_evento, $nombre = null, $tipo = null, $color = null, $confirmadoIntensivo = false)
+    public function agregarEvento($inicio, $fin, $id_evento, $nombre = null, $tipo = null, $color = null, $confirmadoIntensivo = false, $confirmadoIncorporacion = false, $confirmadoDuracion = false)
     {
         $eventoInfo = \App\Models\Evento::find($id_evento);
 
@@ -161,6 +161,38 @@ class EditarCalendario extends Component
                     'cancelText' => 'Cancelar',
                     'okText' => 'Continuar',
                     'onOkEvent' => 'confirmar-agregar-evento-intensivo'
+                ]);
+                return;
+            }
+        }
+
+        // VALIDAR SI ES INCORPORACIÓN FUERA DE FECHA (EVENTO 11)
+        if (!$confirmadoIncorporacion && $especial === '11') {
+            $esDespuesVacaciones = false;
+            $fechaInicioEvento = \Carbon\Carbon::parse($inicio);
+            
+            foreach ($this->eventosRegistrados as $evReg) {
+                if (($evReg['especial_evento'] ?? '') === '1') {
+                    $fechaFinVacaciones = \Carbon\Carbon::parse($evReg['fin']);
+                    $diffDays = $fechaFinVacaciones->diffInDays($fechaInicioEvento, false);
+                    
+                    // Si el inicio es de 1 a 3 días después de las vacaciones (para cubrir fines de semana)
+                    if ($diffDays >= 1 && $diffDays <= 3 && $fechaInicioEvento->gt($fechaFinVacaciones)) {
+                        $esDespuesVacaciones = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!$esDespuesVacaciones) {
+                $this->tempEventoAgregar = func_get_args();
+                $this->dispatch('show-alert', [
+                    'type' => 'warning',
+                    'message' => 'El evento "Incorporación después del Receso Vacacional" solo debería registrarse inmediatamente después de unas Vacaciones Colectivas. ¿Está seguro de registrarlo en esta fecha?',
+                    'showCancelButton' => true,
+                    'cancelText' => 'Cancelar',
+                    'okText' => 'Continuar',
+                    'onOkEvent' => 'confirmar-agregar-evento-incorporacion'
                 ]);
                 return;
             }
@@ -360,8 +392,24 @@ class EditarCalendario extends Component
                 }
             } else {
                 if ($duracionReal != $cantidadRequerida) {
-                    $this->showAlert('error', "El evento '{$nombre}' debe durar exactamente {$cantidadRequerida} día(s) por cada selección. Has seleccionado {$duracionReal} día(s).");
-                    return;
+                    // Si el evento requiere exactamente 1 día, error bloqueante (rojo)
+                    if ($cantidadRequerida == 1) {
+                        $this->showAlert('error', "El evento '{$nombre}' debe durar exactamente {$cantidadRequerida} día(s) por cada selección. Has seleccionado {$duracionReal} día(s).");
+                        return;
+                    }
+                    // Para eventos de más de 1 día, alerta amarilla con confirmación
+                    if (!$confirmadoDuracion) {
+                        $this->tempEventoAgregar = func_get_args();
+                        $this->dispatch('show-alert', [
+                            'type' => 'warning',
+                            'message' => "El evento '{$nombre}' debería durar exactamente {$cantidadRequerida} día(s) por cada selección, pero has seleccionado {$duracionReal} día(s). ¿Desea continuar de todas formas?",
+                            'showCancelButton' => true,
+                            'cancelText' => 'Cancelar',
+                            'okText' => 'Continuar',
+                            'onOkEvent' => 'confirmar-agregar-evento-duracion'
+                        ]);
+                        return;
+                    }
                 }
             }
         }
@@ -986,7 +1034,38 @@ class EditarCalendario extends Component
     {
         if ($this->tempEventoAgregar) {
             $args = $this->tempEventoAgregar;
+            while (count($args) < 7) {
+                $args[] = false;
+            }
             $args[6] = true; // $confirmadoIntensivo
+            $this->agregarEvento(...$args);
+            $this->tempEventoAgregar = null;
+        }
+    }
+
+    #[\Livewire\Attributes\On('confirmar-agregar-evento-incorporacion')]
+    public function confirmarAgregarEventoIncorporacion()
+    {
+        if ($this->tempEventoAgregar) {
+            $args = $this->tempEventoAgregar;
+            while (count($args) < 8) {
+                $args[] = false;
+            }
+            $args[7] = true; // $confirmadoIncorporacion
+            $this->agregarEvento(...$args);
+            $this->tempEventoAgregar = null;
+        }
+    }
+
+    #[\Livewire\Attributes\On('confirmar-agregar-evento-duracion')]
+    public function confirmarAgregarEventoDuracion()
+    {
+        if ($this->tempEventoAgregar) {
+            $args = $this->tempEventoAgregar;
+            while (count($args) < 9) {
+                $args[] = false;
+            }
+            $args[8] = true; // $confirmadoDuracion
             $this->agregarEvento(...$args);
             $this->tempEventoAgregar = null;
         }
