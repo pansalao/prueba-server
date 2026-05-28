@@ -144,6 +144,10 @@ class PlanificacionEditRepo
                 $updates = [];
                 if (array_key_exists('estatus', $data)) {
                     $updates['estatus'] = $data['estatus'];
+                    // Si se está reactivando a pendiente (2), limpiar motivo de rechazo del vocero
+                    if ($data['estatus'] == '2' || $data['estatus'] == 2) {
+                        $updates['motivo_rechazo_vocero'] = null;
+                    }
                 }
                 if (array_key_exists('proposito_unidad', $data)) {
                     $updates['proposito_unidad'] = $data['proposito_unidad'];

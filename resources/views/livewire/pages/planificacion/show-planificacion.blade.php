@@ -56,6 +56,7 @@
                             @if (($planificacion->estatus ?? 0) == 1) bg-green-100 text-green-800
                             @elseif(($planificacion->estatus ?? 0) == 2) bg-yellow-100 text-yellow-800
                             @elseif(($planificacion->estatus ?? 0) == 3) bg-red-100 text-red-800
+                            @elseif(($planificacion->estatus ?? 0) == 5) bg-purple-100 text-purple-800
                             @else bg-gray-100 text-gray-800 @endif">
                             {{ $estatusTexto ?? 'Desconocido' }}
                         </span>
@@ -248,12 +249,8 @@
                                             </div>
                                         @endif
 
-                                        {{-- Area de Motivo de Rechazo (Solo Coordinador) --}}
-<<<<<<< HEAD
+                                        {{-- Area de Motivo de Rechazo (Coordinador o Vocero) --}}
                                         @if ($mostrarBotonRechazarPlanificacion && Gate::allows('cambiar-estatus-planificacion'))
-=======
-                                        @if ($mostrarBotonRechazarPlanificacion && (Gate::allows('editar-planificacion') || Gate::allows('aprobacion-vocero-planificacion')))
->>>>>>> 9724ceca76f4b4a24edf6aa3bb514ad5b954f980
                                             <div class="mt-4 border-t pt-4 dark:border-gray-600">
                                                 {{-- Caso 1: La unidad no está rechazada y no se ha pulsado 'Rechazar' --}}
                                                 @if (($unidad->estatus ?? 0) != 3 && empty($mostrarMotivoRechazoCorte[$unidad->detalle_id]))
@@ -308,11 +305,7 @@
                                                         {{ $unidad->ultimo_motivo_rechazo }}
                                                     </p>
                                                 </div>
-<<<<<<< HEAD
-                                                @if (Gate::allows('cambiar-estatus-planificacion'))
-=======
-                                                @if (Gate::allows('editar-planificacion') || Gate::allows('aprobacion-vocero-planificacion'))
->>>>>>> 9724ceca76f4b4a24edf6aa3bb514ad5b954f980
+                                                @if (Gate::allows('cambiar-estatus-planificacion') || Gate::allows('aprobacion-vocero-planificacion'))
                                                     <div class="flex justify-end mt-2">
                                                         <button wire:click="eliminarMotivoRechazo({{ $unidad->detalle_id }})"
                                                             class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
@@ -335,6 +328,77 @@
                     </div>
 
 
+
+                    {{-- Mostrar motivo de rechazo del vocero cuando estatus=3 y hay motivo --}}
+                    @if (($planificacion->estatus ?? 0) == 3 && !empty($planificacion->motivo_rechazo_vocero))
+                        <div class="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="material-icons text-red-600 dark:text-red-400 text-sm">gavel</span>
+                                <h4 class="text-sm font-bold text-red-800 dark:text-red-300 uppercase tracking-wide">
+                                    Rechazado por el Vocero
+                                </h4>
+                            </div>
+                            <p class="text-sm text-red-700 dark:text-red-400 ml-7">
+                                {{ $planificacion->motivo_rechazo_vocero }}
+                            </p>
+                        </div>
+                    @endif
+
+                    {{-- SECCIÓN DE APROBACIÓN DEL VOCERO (Solo cuando estatus=5 y el usuario es vocero de la sección) --}}
+                    @if (($planificacion->estatus ?? 0) == 5 && $esVoceroDePlanificacion)
+                        <div class="mt-10 p-6 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-2xl">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                                    <span class="material-icons">how_to_vote</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
+                                        Aprobación del Vocero
+                                    </h3>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        La planificación ha sido aprobada por el coordinador. Como vocero de la sección, debes aprobar o rechazar esta planificación.
+                                    </p>
+                                </div>
+                            </div>
+
+                            @if(!$mostrarFormularioRechazoVocero)
+                                <div class="flex flex-wrap gap-3 justify-end">
+                                    <button wire:click="voceroMostrarFormularioRechazo"
+                                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-red-700 transition-all hover:-translate-y-0.5">
+                                        <span class="material-icons text-sm">close</span>
+                                        RECHAZAR PLANIFICACIÓN
+                                    </button>
+                                    <button wire:click="voceroAprobarPlanificacion"
+                                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-green-700 transition-all hover:-translate-y-0.5">
+                                        <span class="material-icons text-sm">check</span>
+                                        APROBAR PLANIFICACIÓN
+                                    </button>
+                                </div>
+                            @else
+                                <div class="space-y-3">
+                                    <x-input-label for="motivo_rechazo_vocero" :value="__('Motivo de Rechazo (mín. 10 caracteres)')" />
+                                    <textarea wire:model="motivoRechazoVocero"
+                                        id="motivo_rechazo_vocero" rows="3"
+                                        class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                                        placeholder="Describa el motivo por el cual rechaza la planificación..."></textarea>
+                                    @error('motivoRechazoVocero')
+                                        <span class="text-red-600 text-xs">{{ $message }}</span>
+                                    @enderror
+                                    <div class="flex justify-end gap-2">
+                                        <button wire:click="voceroOcultarFormularioRechazo"
+                                            class="inline-flex items-center gap-1 text-xs bg-[#f0f0f0] border border-[#767676] text-black px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition-colors shadow-sm uppercase">
+                                            Cancelar
+                                        </button>
+                                        <button wire:click="voceroRechazarPlanificacion"
+                                            class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold shadow-lg hover:bg-red-700 transition-all">
+                                            <span class="material-icons text-sm">close</span>
+                                            CONFIRMAR RECHAZO
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
 
                     {{-- Sección de Carga de Contrato de Estudiantes (Solo para Planificación Aprobada y para el Docente) --}}
                     @if (($planificacion->estatus ?? 0) == 1)

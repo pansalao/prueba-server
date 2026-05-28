@@ -47,6 +47,8 @@ class PlanificacionViewRepo
                 'pr.pro_nombre as nombre_pnf',
                 'tr.tra_nombre as trayecto_unidad_curricular',
                 'sem.sem_nombre as duracion_unidad_curricular',
+                's.sec_codigo as seccion_id',
+                'p.motivo_rechazo_vocero',
                 'p.archivo_contrato'
             )
             ->where('p.id_planificacion', $planificacionId)

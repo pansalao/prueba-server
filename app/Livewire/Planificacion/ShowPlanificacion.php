@@ -22,6 +22,11 @@ class ShowPlanificacion extends Component
     public $contratoEstudiantes;
     public $contratoPath;
 
+    // Propiedades para aprobación de vocero
+    public $esVoceroDePlanificacion = false;
+    public $motivoRechazoVocero = '';
+    public $mostrarFormularioRechazoVocero = false;
+
     use WithFileUploads;
 
     protected $planificacionIndexRepo;
@@ -59,6 +64,9 @@ class ShowPlanificacion extends Component
         // Cargar el path del contrato si existe
         $this->contratoPath = $this->planificacion->archivo_contrato ?? null;
 
+        // Verificar si el usuario actual es vocero de esta planificación
+        $this->esVoceroDePlanificacion = $this->planificacionIndexRepo->usuarioEsVoceroDePlanificacion($this->planificacionId);
+
         // Registrar visualización en la bitácora
         $planificacionModel = Planificacion::find($this->planificacionId);
         if ($planificacionModel) {
@@ -91,13 +99,92 @@ class ShowPlanificacion extends Component
         }
     }
 
+    /**
+     * Aprobación final por parte del vocero.
+     */
+    public function voceroAprobarPlanificacion()
+    {
+        if (!Gate::allows('aprobacion-vocero-planificacion') && !$this->esVoceroDePlanificacion) {
+            session()->flash('error', 'No tienes permisos para aprobar esta planificación como vocero.');
+            return;
+        }
+
+        if (($this->planificacion->estatus ?? 0) != 5) {
+            session()->flash('error', 'La planificación no está en estado pendiente de aprobación del vocero.');
+            return;
+        }
+
+        $success = $this->planificacionIndexRepo->aprobarPlanificacionVocero($this->planificacionId);
+
+        if ($success) {
+            session()->flash('message', 'Has aprobado la planificación como vocero. La planificación ha sido aprobada completamente.');
+            $this->mount($this->planificacion->planificacion_id);
+            $this->dispatch('planificacionAprobada');
+        } else {
+            session()->flash('error', 'No se pudo completar la aprobación. Intente de nuevo.');
+        }
+    }
+
+    /**
+     * Muestra el formulario de rechazo del vocero.
+     */
+    public function voceroMostrarFormularioRechazo()
+    {
+        $this->mostrarFormularioRechazoVocero = true;
+        $this->motivoRechazoVocero = '';
+    }
+
+    /**
+     * Cancela el formulario de rechazo del vocero.
+     */
+    public function voceroOcultarFormularioRechazo()
+    {
+        $this->mostrarFormularioRechazoVocero = false;
+        $this->motivoRechazoVocero = '';
+    }
+
+    /**
+     * Rechazo por parte del vocero.
+     */
+    public function voceroRechazarPlanificacion()
+    {
+        if (!Gate::allows('aprobacion-vocero-planificacion') && !$this->esVoceroDePlanificacion) {
+            session()->flash('error', 'No tienes permisos para rechazar esta planificación como vocero.');
+            return;
+        }
+
+        if (($this->planificacion->estatus ?? 0) != 5) {
+            session()->flash('error', 'La planificación no está en estado pendiente de aprobación del vocero.');
+            return;
+        }
+
+        $motivo = trim($this->motivoRechazoVocero);
+
+        if (mb_strlen($motivo) < 10) {
+            $this->addError('motivoRechazoVocero', 'El motivo de rechazo debe tener al menos 10 caracteres.');
+            return;
+        }
+
+        $success = $this->planificacionIndexRepo->rechazarPlanificacionVocero($this->planificacionId, $motivo);
+
+        if ($success) {
+            session()->flash('message', 'Has rechazado la planificación como vocero.');
+            $this->mostrarFormularioRechazoVocero = false;
+            $this->motivoRechazoVocero = '';
+            $this->mount($this->planificacion->planificacion_id);
+            $this->dispatch('planificacionRechazada');
+        } else {
+            session()->flash('error', 'No se pudo completar el rechazo. Intente de nuevo.');
+        }
+    }
+
 
 
 
 
     public function eliminarMotivoRechazo($detalleId)
     {
-        if (!Gate::allows('cambiar-estatus-planificacion') && !Gate::allows('aprobacion-vocero-planificacion')) {
+        if (!Gate::allows('cambiar-estatus-planificacion')) {
             session()->flash('error', 'No tienes permisos para eliminar motivos de rechazo.');
             return;
         }
@@ -110,7 +197,7 @@ class ShowPlanificacion extends Component
 
     public function mostrarTextareaMotivo($detalleId)
     {
-        if (!Gate::allows('cambiar-estatus-planificacion') && !Gate::allows('aprobacion-vocero-planificacion')) {
+        if (!Gate::allows('cambiar-estatus-planificacion')) {
             session()->flash('error', 'No tienes permisos para rechazar planificaciones.');
             return;
         }
@@ -126,7 +213,7 @@ class ShowPlanificacion extends Component
 
     public function confirmarRechazoCorte($detalleId)
     {
-        if (!Gate::allows('cambiar-estatus-planificacion') && !Gate::allows('aprobacion-vocero-planificacion')) {
+        if (!Gate::allows('cambiar-estatus-planificacion')) {
             session()->flash('error', 'No tienes permisos para rechazar planificaciones.');
             return;
         }
@@ -164,7 +251,7 @@ class ShowPlanificacion extends Component
 
     public function aprobarCorte($detalleId)
     {
-        if (!Gate::allows('cambiar-estatus-planificacion') && !Gate::allows('aprobacion-vocero-planificacion')) {
+        if (!Gate::allows('cambiar-estatus-planificacion')) {
             session()->flash('error', 'No tienes permisos para aprobar planificaciones.');
             return;
         }
@@ -181,7 +268,7 @@ class ShowPlanificacion extends Component
 
     public function render()
     {
-        $mostrarBotonRechazarPlanificacion = ($this->planificacion->estatus ?? null) != 1;
+        $mostrarBotonRechazarPlanificacion = ($this->planificacion->estatus ?? null) != 1 && ($this->planificacion->estatus ?? null) != 5;
         $estatusTexto = $this->mapEstatusToText($this->planificacion->estatus ?? null);
         foreach ($this->planificacion->unidades as $key => $unidad) {
             $this->planificacion->unidades[$key]->estatus_texto = $this->mapEstatusToText($unidad->estatus);
@@ -202,6 +289,10 @@ class ShowPlanificacion extends Component
                 return 'Pendiente';
             case 3:
                 return 'Rechazado';
+            case 4:
+                return 'Incompleta';
+            case 5:
+                return 'Aprobado por Coordinador';
             default:
                 return 'Desconocido';
         }

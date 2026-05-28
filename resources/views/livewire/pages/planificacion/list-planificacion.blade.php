@@ -40,9 +40,9 @@
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">PNF / Trayecto</th>
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">U. Curricular / Sección</th>
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Docente</th>
-                        @can('cambiar-estatus-planificacion')
+                        @if(Gate::allows('cambiar-estatus-planificacion') || Gate::allows('aprobacion-vocero-planificacion'))
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">Estado</th>
-                        @endcan
+                        @endif
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -66,7 +66,7 @@
                                     {{ $planificacion->docente_nombre }} {{ $planificacion->docente_apellido }}
                                 </td>
                                 <!-- Estado -->
-                                @can('cambiar-estatus-planificacion')
+                                @if(Gate::allows('cambiar-estatus-planificacion') || Gate::allows('aprobacion-vocero-planificacion'))
                                 <td class="px-4 py-4 text-right">
                                     @if ($planificacion->estatus == 1)
                                         <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Aprobada</span>
@@ -76,11 +76,13 @@
                                         <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">Rechazada</span>
                                     @elseif($planificacion->estatus == 4)
                                         <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-amber-900 dark:text-amber-300">Incompleta</span>
+                                    @elseif($planificacion->estatus == 5)
+                                        <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-purple-900 dark:text-purple-300">Aprob. Coordinador</span>
                                     @else
                                         <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-900 dark:text-gray-300">Desconocido</span>
                                     @endif
                                 </td>
-                                @endcan
+                                @endif
                                 <!-- Acciones -->
                                 <td class="px-4 py-4">
                                     <div class="flex items-center justify-end space-x-4">
@@ -112,7 +114,7 @@
                         @endforeach
                     @else
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <td colspan="{{ auth()->user()->can('cambiar-estatus-planificacion') ? 5 : 4 }}" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="{{ auth()->user()->can('cambiar-estatus-planificacion') || auth()->user()->can('aprobacion-vocero-planificacion') ? 5 : 4 }}" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                 No hay planificaciones registradas.
                             </td>
                         </tr>
@@ -149,7 +151,7 @@
                             </span>
                         </div>
 
-                        @can('cambiar-estatus-planificacion')
+                        @if(Gate::allows('cambiar-estatus-planificacion') || Gate::allows('aprobacion-vocero-planificacion'))
                         <div class="mb-2">
                             <span class="font-semibold text-gray-700 dark:text-gray-300">Estado:</span>
                             @if ($planificacion->estatus == 1)
@@ -160,11 +162,13 @@
                                 <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">Rechazada</span>
                             @elseif($planificacion->estatus == 4)
                                 <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-amber-900 dark:text-amber-300">Incompleta</span>
+                            @elseif($planificacion->estatus == 5)
+                                <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-purple-900 dark:text-purple-300">Aprob. Coordinador</span>
                             @else
                                 <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-900 dark:text-gray-300">Desconocido</span>
                             @endif
                         </div>
-                        @endcan
+                        @endif
 
                         <div class="flex justify-end space-x-4 mt-3">
                             <a href="{{ route('planificacion/show', $planificacion->planificacion_id) }}"

@@ -232,6 +232,7 @@ class PlanningDataSeeder extends Seeder
             ['id_permiso' => 82, 'nombre_permiso' => 'Ver Detalles de Firma', 'estatus' => '3'],
             ['id_permiso' => 83, 'nombre_permiso' => 'Cambiar Estatus de Firma', 'estatus' => '1'],
             ['id_permiso' => 84, 'nombre_permiso' => 'Mi Firma de Firma', 'estatus' => '1'],
+            ['id_permiso' => 85, 'nombre_permiso' => 'Aprobacion Vocero de Planificacion', 'estatus' => '1'],
         ];
 
         foreach ($permisos as $p) {
@@ -278,6 +279,17 @@ class PlanningDataSeeder extends Seeder
             13, 16,  // Planificacion: Listar, Ver Detalles
         ];
 
+        // --- VOCERO: Buscar ID del rol VOCERO en BD externa y asignar permiso ---
+        $voceroPermisos = [85];
+        try {
+            $voceroRolId = DB::connection('emulacion_sogac_2')
+                ->table('rol')
+                ->where('rol_nombre', 'VOCERO')
+                ->value('rol_codigo');
+        } catch (\Exception $e) {
+            $voceroRolId = null;
+        }
+
         // Limpiar todas las relaciones existentes en rol_permiso
         DB::table('rol_permiso')->delete();
 
@@ -298,5 +310,16 @@ class PlanningDataSeeder extends Seeder
         $insertMapping($coordinadorRoles, $coordinadorPerms);
         $insertMapping($profesorRoles, $profesorPerms);
         $insertMapping($estudianteRoles, $estudiantePerms);
+
+        // Asignar permiso de aprobación vocero al rol VOCERO (si se encontró)
+        if ($voceroRolId) {
+            foreach ($voceroPermisos as $permId) {
+                DB::table('rol_permiso')->insert([
+                    'id_rol' => $voceroRolId,
+                    'id_permiso' => $permId,
+                    'estatus' => '1',
+                ]);
+            }
+        }
     }
 }

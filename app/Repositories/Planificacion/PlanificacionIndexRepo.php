@@ -68,7 +68,8 @@ class PlanificacionIndexRepo
     }
 
     /**
-     * Aprueba una planificación y todos sus cortes asociados.
+     * Aprueba una planificación (usado por el coordinador).
+     * Establece estatus=5 (Aprobado por Coordinador - Pendiente de Vocero).
      */
     public function aprobarPlanificacion(int $planificacionId): bool
     {
@@ -76,7 +77,7 @@ class PlanificacionIndexRepo
         try {
             $planificacion = \App\Models\Planificacion::find($planificacionId);
             if ($planificacion) {
-                $planificacion->update(['estatus' => 1]);
+                $planificacion->update(['estatus' => 5]);
             }
 
             // Actualizar todas las unidades asociadas a la planificación
@@ -164,6 +165,136 @@ class PlanificacionIndexRepo
         }
     }
 
+    /**
+     * Aprueba la planificación por parte del vocero.
+     * Cambia estatus de 5 (Aprobado Coordinador) a 1 (Aprobado Final).
+     */
+    public function aprobarPlanificacionVocero(int $planificacionId): bool
+    {
+        $planificacion = \App\Models\Planificacion::find($planificacionId);
+        if (!$planificacion || $planificacion->estatus != 5) {
+            return false;
+        }
+
+        DB::beginTransaction();
+        try {
+            $planificacion->update(['estatus' => 1]);
+
+            // Enviar correo de aprobación final
+            try {
+                $dbSogc = config('database.connections.emulacion_sogac_2.database');
+                $profesor = DB::table("$dbSogc.usuario as u")
+                    ->join("$dbSogc.seccion_unidad_docente as sud", 'u.usu_cedula', '=', 'sud.sud_ced_docente')
+                    ->join("$dbSogc.persona as p", 'u.usu_cedula', '=', 'p.per_cedula')
+                    ->where('sud.sud_codigo', $planificacion->id_profesor_asignado)
+                    ->select('u.usu_nombre', 'p.per_email', 'p.per_nombres', 'p.per_apellidos')
+                    ->first();
+
+                $planificacionDetalles = DB::table('planificacion as p')
+                    ->join("$dbSogc.seccion_unidad_docente as sud", 'p.id_profesor_asignado', '=', 'sud.sud_codigo')
+                    ->join("$dbSogc.unidad_curricular as uc", 'sud.sud_cod_unidad', '=', 'uc.ucu_codigo')
+                    ->join("$dbSogc.seccion as s", 'sud.sud_cod_seccion', '=', 's.sec_codigo')
+                    ->where('p.id_planificacion', $planificacionId)
+                    ->select('uc.ucu_nombre as nombre_unidad_curricular', 's.sec_nombre as nombre_seccion')
+                    ->first();
+
+                if ($profesor && !empty($profesor->per_email)) {
+                    Mail::to($profesor->per_email)->send(new PlanificacionAceptada($profesor, $planificacionDetalles));
+                }
+            } catch (\Exception $e) {
+                Log::error("Error al enviar correo de aprobación final por vocero: " . $e->getMessage());
+            }
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Error al aprobar planificación por vocero: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Rechaza la planificación por parte del vocero.
+     * Cambia estatus de 5 a 3 (Rechazado).
+     */
+    public function rechazarPlanificacionVocero(int $planificacionId, string $motivo): bool
+    {
+        $planificacion = \App\Models\Planificacion::find($planificacionId);
+        if (!$planificacion || $planificacion->estatus != 5) {
+            return false;
+        }
+
+        DB::beginTransaction();
+        try {
+            $planificacion->update([
+                'estatus' => 3,
+                'motivo_rechazo_vocero' => $motivo,
+            ]);
+
+            // Enviar correo de rechazo
+            try {
+                $dbSogc = config('database.connections.emulacion_sogac_2.database');
+                $profesor = DB::table("$dbSogc.usuario as u")
+                    ->join("$dbSogc.seccion_unidad_docente as sud", 'u.usu_cedula', '=', 'sud.sud_ced_docente')
+                    ->join("$dbSogc.persona as p", 'u.usu_cedula', '=', 'p.per_cedula')
+                    ->where('sud.sud_codigo', $planificacion->id_profesor_asignado)
+                    ->select('u.usu_nombre', 'p.per_email', 'p.per_nombres', 'p.per_apellidos')
+                    ->first();
+
+                $planificacionDetalles = DB::table('planificacion as p')
+                    ->join("$dbSogc.seccion_unidad_docente as sud", 'p.id_profesor_asignado', '=', 'sud.sud_codigo')
+                    ->join("$dbSogc.unidad_curricular as uc", 'sud.sud_cod_unidad', '=', 'uc.ucu_codigo')
+                    ->join("$dbSogc.seccion as s", 'sud.sud_cod_seccion', '=', 's.sec_codigo')
+                    ->where('p.id_planificacion', $planificacionId)
+                    ->select('uc.ucu_nombre as nombre_unidad_curricular', 's.sec_nombre as nombre_seccion')
+                    ->first();
+
+                $motivosFormat = [['numero' => 'General', 'motivo' => $motivo]];
+
+                if ($profesor && !empty($profesor->per_email)) {
+                    Mail::to($profesor->per_email)->send(new PlanificacionRechazada($profesor, $planificacionDetalles, $motivosFormat));
+                }
+            } catch (\Exception $e) {
+                Log::error("Error al enviar correo de rechazo por vocero: " . $e->getMessage());
+            }
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Error al rechazar planificación por vocero: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Verifica si el usuario autenticado es vocero (Principal o Secundario) activo
+     * de la sección a la que pertenece la planificación.
+     */
+    public function usuarioEsVoceroDePlanificacion(int $planificacionId): bool
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if (!$user) return false;
+
+        // Obtener la sección de la planificación
+        $dbSogc = config('database.connections.emulacion_sogac_2.database');
+        $planificacion = DB::table('planificacion as p')
+            ->join("$dbSogc.seccion_unidad_docente as sud", 'p.id_profesor_asignado', '=', 'sud.sud_codigo')
+            ->where('p.id_planificacion', $planificacionId)
+            ->select('sud.sud_cod_seccion as sec_codigo')
+            ->first();
+
+        if (!$planificacion) return false;
+
+        // Verificar si el usuario es un vocero activo (Principal=1 o Secundario=2) de esa sección
+        return \App\Models\Vocero::where('id_estudiante', $user->usu_cedula)
+            ->where('id_seccion', $planificacion->sec_codigo)
+            ->whereIn('tipo_vocero', [1, 2])
+            ->where('estatus', 1)
+            ->exists();
+    }
+
     public function eliminarMotivoRechazoPorCorte($detalleId)
     {
         try {
@@ -212,9 +343,10 @@ class PlanificacionIndexRepo
                 if ($todosAprobados) {
                     $planificacion = \App\Models\Planificacion::find($planificacionId);
                     if ($planificacion) {
-                        $planificacion->update(['estatus' => 1]);
+                        // El coordinador aprobó todas las unidades -> pasa a estatus 5 (pendiente vocero)
+                        $planificacion->update(['estatus' => 5]);
 
-                        // Enviar correo electrónico al profesor
+                        // Enviar correo electrónico al profesor notificando que el coordinador aprobó
                         try {
                             $dbSogc = config('database.connections.emulacion_sogac_2.database');
                             $profesor = DB::table("$dbSogc.usuario as u")
@@ -237,7 +369,7 @@ class PlanificacionIndexRepo
                                 Mail::to($profesor->per_email)->send(new PlanificacionAceptada($profesor, $planificacionDetalles));
                             }
                         } catch (\Exception $e) {
-                            Log::error("Error al enviar correo de planificación aceptada: " . $e->getMessage());
+                            Log::error("Error al enviar correo de planificación aceptada por coordinador: " . $e->getMessage());
                         }
                     }
                 }
