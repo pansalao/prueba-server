@@ -15,6 +15,9 @@ class PanelVocero extends Component
     public $secciones = [];
     public $voceroInfo = null;
 
+    public $tempAsignarVocero = [];
+    public $tempQuitarVocero = [];
+
     // Propiedad para la búsqueda de estudiantes
     public $search = '';
     
@@ -27,19 +30,25 @@ class PanelVocero extends Component
     {
         $user = Auth::user();
         
-        // Verificar si tiene el permiso (Coordinador u otro rol autorizado)
-        if ($user->can('listar-voceros') || $user->can('listar-vocero') || $user->can('modulo-voceros') || $user->can('modulo-vocero') || in_array($user->usu_cod_rol, [1, 5, 11]) || in_array(session('active_role'), [1, 5, 11])) {
+        $activeRole = session('active_role', $user->usu_cod_rol);
+
+        // Verificar si tiene el rol de Coordinador (rol 5)
+        if ($activeRole == 5) {
             $this->isCoordinador = true;
             $this->cargarSecciones();
-        } else {
-            // Verificar si es vocero
-            $vocero = Vocero::where('id_estudiante', $user->usu_cedula)->first();
+        } elseif ($activeRole == 3) {
+            // Verificar si tiene rol de Estudiante (rol 3) y es vocero activo
+            $vocero = Vocero::where('id_estudiante', $user->usu_cedula)
+                            ->where('estatus', 'A')
+                            ->first();
             if ($vocero) {
                 $this->isVocero = true;
                 $this->cargarInfoVocero($vocero);
             } else {
                 abort(403, 'No tienes permisos para acceder a este módulo.');
             }
+        } else {
+            abort(403, 'No tienes permisos para acceder a este módulo.');
         }
     }
 
@@ -185,6 +194,31 @@ class PanelVocero extends Component
         $this->voceroInfo = $info;
     }
 
+    public function confirmarAsignar($cedula, $idSeccion, $tipo)
+    {
+        $this->tempAsignarVocero = [$cedula, $idSeccion, $tipo];
+        $tipoStr = $tipo == 1 ? 'Principal' : ($tipo == 2 ? 'Secundario' : 'Terciario');
+        
+        $this->dispatch('show-alert', [
+            'type' => 'success',
+            'title' => 'AVISO DE ASIGNACIÓN',
+            'message' => "¿Estás seguro de asignar a este estudiante como Vocero {$tipoStr}? Si ya hay uno asignado, será reemplazado automáticamente.",
+            'showCancelButton' => true,
+            'cancelText' => 'Cancelar',
+            'okText' => 'Asignar',
+            'onOkEvent' => 'ejecutar-asignar-vocero'
+        ]);
+    }
+
+    #[\Livewire\Attributes\On('ejecutar-asignar-vocero')]
+    public function ejecutarAsignarVocero()
+    {
+        if (!empty($this->tempAsignarVocero)) {
+            $this->asignarVocero(...$this->tempAsignarVocero);
+            $this->tempAsignarVocero = [];
+        }
+    }
+
     public function asignarVocero($cedula, $idSeccion, $tipo)
     {
         $pnfCoordinador = 4; // O obtener el PNF real
@@ -212,7 +246,35 @@ class PanelVocero extends Component
         }
 
         $this->cargarSecciones();
-        session()->flash('message', 'Vocero asignado exitosamente.');
+        $this->dispatch('show-alert', [
+            'type' => 'success',
+            'title' => '¡ASIGNACIÓN EXITOSA!',
+            'message' => 'El rol de vocero ha sido asignado correctamente.',
+            'countdown' => 3
+        ]);
+    }
+
+    public function confirmarQuitar($idSeccion, $tipo)
+    {
+        $this->tempQuitarVocero = [$idSeccion, $tipo];
+        $this->dispatch('show-alert', [
+            'type' => 'success',
+            'title' => 'AVISO DE REVOCACIÓN',
+            'message' => '¿Estás seguro de revocar el cargo de vocero a este estudiante?',
+            'showCancelButton' => true,
+            'cancelText' => 'Cancelar',
+            'okText' => 'Revocar',
+            'onOkEvent' => 'ejecutar-quitar-vocero'
+        ]);
+    }
+
+    #[\Livewire\Attributes\On('ejecutar-quitar-vocero')]
+    public function ejecutarQuitarVocero()
+    {
+        if (!empty($this->tempQuitarVocero)) {
+            $this->quitarVocero(...$this->tempQuitarVocero);
+            $this->tempQuitarVocero = [];
+        }
     }
 
     public function quitarVocero($idSeccion, $tipo)
@@ -222,7 +284,12 @@ class PanelVocero extends Component
             $vocero->estatus = 'I';
             $vocero->save();
             $this->cargarSecciones();
-            session()->flash('message', 'Rol de vocero revocado y desactivado exitosamente.');
+            $this->dispatch('show-alert', [
+                'type' => 'success',
+                'title' => '¡REVOCACIÓN EXITOSA!',
+                'message' => 'El rol de vocero ha sido revocado y desactivado exitosamente.',
+                'countdown' => 3
+            ]);
         }
     }
 
