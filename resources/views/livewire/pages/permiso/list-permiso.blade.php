@@ -37,7 +37,7 @@
                                     <td class="px-4 py-4">
                                         <div class="flex items-center justify-end space-x-3">
                                             <a href="{{ route('permiso/update', $permiso->rol_codigo) }}" wire:navigate
-                                                class="flex items-center gap-1 bg-yellow-600 text-white text-xs font-medium px-2.5 py-0.5 rounded hover:bg-yellow-700 dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
+                                                class="flex items-center gap-1 bg-amber-500 text-white text-xs font-medium px-2.5 py-1 rounded-md hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-600 shadow-sm transition-colors">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
                                                     class="w-4 h-4">
                                                     <path

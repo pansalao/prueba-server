@@ -41,9 +41,7 @@ class UpdatePlanificacion extends Component
     public Collection $tecnica;
     public Collection $bibliografiasMaestras;
     public Collection $tecnicasActividad;
-    public array $temasPorUnidad = [];
-    public Collection $todosLosContenidos;
-    public Collection $todosLosObjetivos;
+    // Removed public collections for temas, contenidos, objetivos to avoid dehydration issues
 
     public $id_unidad_curricular;
     public $lapso_fecha_inicio;
@@ -115,7 +113,8 @@ class UpdatePlanificacion extends Component
         $malla = $this->planificacionCreateRepo->getMallaByAsignacion($planificacion['id_detalle_profesor_asignado'] ?? null);
         $this->nombre_malla = $malla ? $malla->mal_nombre : 'No especificada';
 
-        $this->loadContenidosUnidad();
+        // Optional: Load anything needed for initial setup
+        $contenidosData = $this->loadContenidosUnidad();
 
         $unidades = [];
         $firstPendiente = 0;
@@ -129,9 +128,9 @@ class UpdatePlanificacion extends Component
 
             $objetivosDict = [];
             foreach ($corte['contenidos'] as $cont) {
-                $objId = $cont['id_objetivo'] ?? null;
-                $temaId = $cont['tema_id'] ?? null;
-                $contId = $cont['contenido_id'] ?? null;
+                $objId = isset($cont['id_objetivo']) ? (string) $cont['id_objetivo'] : null;
+                $temaId = isset($cont['tema_id']) ? (string) $cont['tema_id'] : null;
+                $contId = isset($cont['contenido_id']) ? (string) $cont['contenido_id'] : null;
 
                 // Solo procesar si tenemos datos mínimos válidos
                 if (!$objId || !$temaId) continue;
@@ -178,11 +177,11 @@ class UpdatePlanificacion extends Component
 
             $evaluaciones = collect($corte['evaluaciones'])
                 ->map(fn($eval) => [
-                    'evaluacion_id' => $eval['evaluacion'],
-                    'tecnica_id' => $eval['tecnica'],
+                    'evaluacion_id' => (string) $eval['evaluacion'],
+                    'tecnica_id' => (string) $eval['tecnica'],
                     'ponderacion' => (int) $eval['ponderacion'],
-                    'fecha_evaluacion' => $eval['fecha_evaluacion'],
-                    'forma_participacion' => $eval['forma_participacion'],
+                    'fecha_evaluacion' => (string) $eval['fecha_evaluacion'],
+                    'forma_participacion' => (string) $eval['forma_participacion'],
                     'integrantes' => $eval['integrantes'] ?? null,
                 ])
                 ->toArray();
@@ -248,12 +247,15 @@ class UpdatePlanificacion extends Component
     protected function loadContenidosUnidad()
     {
         $todosLosTemas = $this->planificacionCreateRepo->select_temas_por_unidad($this->id_unidad_curricular);
-        $this->temasPorUnidad = [];
+        $temasPorUnidadLocal = [];
         foreach (range(1, 4) as $num) {
-            $this->temasPorUnidad[$num] = $todosLosTemas->where('unidad_tema', (string) $num)->values();
+            $temasPorUnidadLocal[$num] = $todosLosTemas->where('unidad_tema', (string) $num)->values();
         }
-        $this->todosLosContenidos = $this->planificacionCreateRepo->select_contenidos($this->id_unidad_curricular);
-        $this->todosLosObjetivos = $this->planificacionCreateRepo->select_objetivos($this->id_unidad_curricular);
+        return [
+            'temasPorUnidad' => $temasPorUnidadLocal,
+            'todosLosContenidos' => $this->planificacionCreateRepo->select_contenidos($this->id_unidad_curricular),
+            'todosLosObjetivos' => $this->planificacionCreateRepo->select_objetivos($this->id_unidad_curricular)
+        ];
     }
 
     public function addItem($unidadIndex, $arrayName, $parentIndex = null)
@@ -627,8 +629,13 @@ class UpdatePlanificacion extends Component
 
     public function render()
     {
+        $contenidosData = $this->loadContenidosUnidad();
+
         return view('livewire.pages.planificacion.update-planificacion', [
-            'timeSlots' => collect(range(8, 18))->map(fn($h) => sprintf('%02d:00', $h))
+            'timeSlots' => collect(range(8, 18))->map(fn($h) => sprintf('%02d:00', $h)),
+            'temasPorUnidad' => $contenidosData['temasPorUnidad'],
+            'todosLosContenidos' => $contenidosData['todosLosContenidos'],
+            'todosLosObjetivos' => $contenidosData['todosLosObjetivos']
         ]);
     }
 }
