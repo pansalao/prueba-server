@@ -280,7 +280,9 @@
                             <li><a href="{{ route('planificacion/crear') }}" class="sogat-sidebar-link">Crear Planificación</a></li>
                         @endcan
                         <li><a href="{{ route('planificacion/listar') }}" class="sogat-sidebar-link">Gestionar Planificaciones</a></li>
-                        <li><a href="{{ route('planificacion.historial') }}" class="sogat-sidebar-link">Historial de Planificaciones</a></li>
+                        @if(session('active_role', auth()->user()->usu_cod_rol) == 2)
+                            <li><a href="{{ route('planificacion.historial') }}" class="sogat-sidebar-link">Historial de Planificaciones</a></li>
+                        @endif
                         @if(in_array(auth()->user()->usu_cod_rol, [1, 5, 11]))
                             <li><a href="{{ route('planificacion.reporte.cumplimiento') }}" class="sogat-sidebar-link">Estadísticas de Entrega</a></li>
                         @endif
