@@ -8,7 +8,7 @@ $wireKey = $wireKey ?? 'datalist-calendario';
     <div @click.away="closeModal()" x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0 scale-90"
         x-transition:enter-end="opacity-100 scale-100"
-        class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-gray-700">
+        class="bg-white dark:bg-gray-800 p-5 sm:p-8 rounded-3xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-gray-700 max-h-[90vh] overflow-y-auto">
         <h3
             class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6 uppercase tracking-widest text-center">
             {{ __('Registrar Evento') }}</h3>
@@ -51,7 +51,7 @@ $wireKey = $wireKey ?? 'datalist-calendario';
     <div @click.away="closeModal()" x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0 scale-90"
         x-transition:enter-end="opacity-100 scale-100"
-        class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-3xl border border-gray-200 dark:border-gray-700">
+        class="bg-white dark:bg-gray-800 p-5 sm:p-8 rounded-3xl shadow-2xl w-full max-w-3xl border border-gray-200 dark:border-gray-700 max-h-[90vh] overflow-y-auto">
         <h3
             class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 uppercase tracking-widest text-center">
             {{ __('Nuevo Evento Detectado') }}
@@ -74,36 +74,43 @@ $wireKey = $wireKey ?? 'datalist-calendario';
                 {{-- FILA 1 --}}
                 {{-- Columna 1: Tipo de Evento --}}
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{{ __('Tipo de Evento') }}</label>
-                    <select x-model="nuevoTipo" wire:model.live="form.nuevoTipo"
-                        class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400">
-                        <option value="1">{{ __('FERIADOS NACIONALES') }}</option>
-                        <option value="2">{{ __('FERIADOS LOCALES') }}</option>
-                        <option value="6">{{ __('FERIADO MUNDIAL') }}</option>
-                        <option value="3">{{ __('ADMINISTRATIVO') }}</option>
-                        <option value="4">{{ __('ACADÉMICO') }}</option>
-                        <option value="5">{{ __('ADMINISTRATIVO/ACADÉMICO') }}</option>
-                    </select>
+                    <label class="block uppercase font-bold text-sm text-gray-900 dark:text-white mb-1">{{ __('Tipo de Evento') }}</label>
+                    <div class="flex items-center gap-1 w-full">
+                        <select x-model="nuevoTipo" wire:model.live="form.nuevoTipo"
+                            class="flex-1 min-w-0 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm text-sm">
+                            <option value="1">Feriado Nacional</option>
+                            <option value="2">Feriado Local</option>
+                            <option value="6">Feriado Mundial</option>
+                            <option value="3">Administrativo</option>
+                            <option value="4">Académico</option>
+                            <option value="5">Administrativo/Académico</option>
+                        </select>
+                        <span class="text-red-500 font-bold">*</span>
+                    </div>
                 </div>
 
                 {{-- Columna 2: Nombre del Evento --}}
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{{ __('Nombre del Evento') }}</label>
-                    <div class="w-full bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-700 dark:text-gray-300 font-semibold shadow-sm">
-                        <span x-text="eventoNombre ? eventoNombre.toUpperCase() : '{{ __('EJ: CONGRESO NACIONAL') }}'"></span>
+                    <label class="block uppercase font-bold text-sm text-gray-900 dark:text-white mb-1">{{ __('Nombre del Evento') }}</label>
+                    <div class="flex items-center gap-1 mt-1">
+                        <div class="flex-1 border border-black dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm px-3 py-2 text-sm font-semibold bg-white">
+                            <span x-text="eventoNombre ? eventoNombre.toUpperCase() : '{{ __('EJ: CONGRESO NACIONAL') }}'"></span>
+                        </div>
+                        <span class="text-red-500 font-bold">*</span>
                     </div>
                 </div>
 
                 {{-- Columna 3: Selección de Color con input nativo --}}
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{{ __('Color del Evento *') }}</label>
+                    <label class="block uppercase font-bold text-sm text-gray-900 dark:text-white mb-1">{{ __('Color del Evento') }}</label>
                     <div class="flex items-center gap-3">
                         <input type="color" x-model="nuevoColorHex" wire:model.live="form.nuevoColorHex"
-                            class="w-14 h-14 rounded-xl border border-gray-300 dark:border-gray-600 cursor-pointer bg-transparent p-1"
+                            class="w-12 h-10 rounded-md border border-gray-300 dark:border-gray-700 cursor-pointer shadow-sm bg-white dark:bg-gray-900 p-1"
                             title="{{ __('Seleccione un color') }}">
                         <input type="text" x-model="nuevoColorHex" wire:model.live="form.nuevoColorHex"
-                            class="flex-1 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-3 text-sm text-gray-900 dark:text-white font-mono uppercase focus:ring-2 focus:ring-gray-400"
-                            placeholder="#FFFFFF" maxlength="7" pattern="#[0-9A-Fa-f]{6}">
+                            class="flex-1 border-black dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm text-sm font-mono"
+                            placeholder="#000000" maxlength="7" pattern="#[0-9A-Fa-f]{6}">
+                        <span class="text-red-500 font-bold">*</span>
                     </div>
                     <x-input-error :messages="$errors->first('form.nuevoColorHex')" class="mt-2" />
                 </div>
@@ -112,19 +119,19 @@ $wireKey = $wireKey ?? 'datalist-calendario';
                 {{-- Columna 1: ¿Es Laborable? --}}
                 <div>
                     <x-toggle-switch id="{{ $wireKey }}_laborable_switch" :label="__('¿Es Laborable?')"
-                        model="form.nuevoLaborable" :disabled="$deshabilitarIndependienteLaborable" />
+                        model="form.nuevoLaborable" :disabled="$deshabilitarIndependienteLaborable" required />
                 </div>
 
                 {{-- Columna 2: ¿Se puede repetir? --}}
                 <div>
                     <x-toggle-switch id="{{ $wireKey }}_repetible_switch" :label="__('¿Se puede repetir?')"
-                        model="form.nuevoRepetible" :disabled="true" />
+                        model="form.nuevoRepetible" :disabled="true" required />
                 </div>
 
                 {{-- Columna 3: ¿Puede registrarse fuera de un semestre? --}}
                 <div>
                     <x-toggle-switch id="{{ $wireKey }}_is_independiente_switch" :label="__('¿Puede registrarse fuera de un semestre?')"
-                        model="form.nuevoIsIndependiente" :disabled="$deshabilitarIndependienteLaborable" />
+                        model="form.nuevoIsIndependiente" :disabled="$deshabilitarIndependienteLaborable" required />
                     <x-input-error :messages="$errors->get('form.nuevoIsIndependiente')" class="mt-2" />
                 </div>
 
@@ -132,22 +139,25 @@ $wireKey = $wireKey ?? 'datalist-calendario';
                 {{-- Columna 1: ¿Puede asignarse en la misma fecha que días de vacaciones? --}}
                 <div>
                     <x-toggle-switch id="{{ $wireKey }}_is_superponible_switch" :label="__('¿Puede asignarse en la misma fecha que días de vacaciones?')"
-                        model="form.nuevoIsSuperponible" :disabled="$deshabilitarSuperponible" />
+                        model="form.nuevoIsSuperponible" :disabled="$deshabilitarSuperponible" required />
                     <x-input-error :messages="$errors->get('form.nuevoIsSuperponible')" class="mt-2" />
                 </div>
 
                 {{-- Columna 2: ¿Tiene cantidad específica de días de duración? (último switch) --}}
                 <div>
                     <x-toggle-switch id="{{ $wireKey }}_is_rango_dias_switch" :label="__('¿Tiene una duración de días específica?')"
-                        model="form.nuevoIsRangoDias" />
+                        model="form.nuevoIsRangoDias" required />
                 </div>
 
                 {{-- Columna 3: Cantidad de Días (oculto dinámicamente con x-show) --}}
                 <div class="w-full" x-show="nuevoIsRangoDias" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{{ __('Cantidad de días que debe durar el evento') }}</label>
-                    <x-text-input id="{{ $wireKey }}_rango_dias_input" type="number"
-                        class="w-full block" wire:model.live="form.nuevoRangoDias"
-                        placeholder="{{ __('EJ: 5') }}" min="1" max="365" :disabled="$deshabilitarCantidadRango" />
+                    <label class="block uppercase font-bold text-sm text-gray-900 dark:text-white mb-1">{{ __('Cantidad de días que debe durar el evento') }}</label>
+                    <div class="flex items-center gap-1 mt-1">
+                        <x-text-input id="{{ $wireKey }}_rango_dias_input" type="number"
+                            class="flex-1 min-w-0 block" wire:model.live="form.nuevoRangoDias"
+                            placeholder="{{ __('EJ: 5') }}" min="1" max="365" :disabled="$deshabilitarCantidadRango" />
+                        <span class="text-red-500 font-bold">*</span>
+                    </div>
                     <x-input-error :messages="$errors->get('form.nuevoRangoDias')" class="mt-2" />
                 </div>
 

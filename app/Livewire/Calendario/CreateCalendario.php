@@ -115,10 +115,10 @@ class CreateCalendario extends Component
 
             if ($ultimoCalendario) {
                 $this->esProsecucion = true;
-                
+
                 // Cargar eventos del calendario anterior como heredados
                 $eventosAnteriores = $this->calendarioRepository->obtenerEventosDetalle($ultimoCalendario->id_calendario_academico);
-                
+
                 $maxFechaFin = null;
                 foreach ($eventosAnteriores as $ev) {
                     $this->eventosRegistrados[] = [
@@ -132,21 +132,23 @@ class CreateCalendario extends Component
                         'is_superponible_evento' => (bool) ($ev->is_superponible_evento ?? false),
                         'is_heredado' => true,
                     ];
-                    
+
                     if (!$maxFechaFin || $ev->fin > $maxFechaFin) {
                         $maxFechaFin = $ev->fin;
                     }
                 }
-                
+
                 $this->actualizarMapaEventos();
-                
-                // Forzar fecha de inicio a partir del último día con evento
+
+                // Forzar fecha de inicio visual (minFechaInicio) a partir del último día con evento
                 if ($maxFechaFin) {
                     $nuevaFechaInicio = date('Y-m-d', strtotime($maxFechaFin . ' + 1 day'));
                     $this->minFechaInicio = $nuevaFechaInicio;
-                    $this->form->dia_inicio_calendario_academico = $nuevaFechaInicio;
+                    // El inicio del periodo por defecto es el primer día del año en que terminó el calendario anterior
+                    $anioNuevo = date('Y', strtotime($maxFechaFin));
+                    $this->form->dia_inicio_calendario_academico = $anioNuevo . '-01-01';
                     // Sugerir fecha fin 1 año después
-                    $this->form->dia_fin_calendario_academico = date('Y-m-d', strtotime($nuevaFechaInicio . ' + 1 year - 1 day'));
+                    $this->form->dia_fin_calendario_academico = $anioNuevo . '-12-31';
                 } else {
                     $this->form->dia_inicio_calendario_academico = date('Y-01-01');
                     $this->form->dia_fin_calendario_academico = date('Y-12-31');
@@ -262,7 +264,7 @@ class CreateCalendario extends Component
         $duracionReal = 0;
         $start = new \DateTime($inicio);
         $end = new \DateTime($fin);
-        
+
         $isTodoWeekend = true;
         $tempInterval = new \DateInterval('P1D');
         $tempPeriod = new \DatePeriod($start, $tempInterval, (clone $end)->modify('+1 day'));
@@ -272,7 +274,7 @@ class CreateCalendario extends Component
                 break;
             }
         }
-        
+
         $ignorarFinesDeSemana = !in_array($tipo, ['1', '2', '6']) && !$isTodoWeekend;
 
         $period = new \DatePeriod($start, $tempInterval, (clone $end)->modify('+1 day'));
@@ -291,12 +293,12 @@ class CreateCalendario extends Component
             if ($is_vacaciones) {
                 $diasRegistrados = 0;
                 $targetYear = date('Y', strtotime($inicio));
-                
+
                 foreach ($this->eventosRegistrados as $reg) {
                     if (($reg['id'] ?? null) == $eventoInfo->id_evento) {
                         $sReg = new \DateTime($reg['inicio']);
                         $eReg = new \DateTime($reg['fin']);
-                        
+
                         $isTodoWeekendReg = true;
                         $tempInterval = new \DateInterval('P1D');
                         $tempPeriod = new \DatePeriod($sReg, $tempInterval, (clone $eReg)->modify('+1 day'));
@@ -319,7 +321,7 @@ class CreateCalendario extends Component
                         }
                     }
                 }
-                
+
                 if (($diasRegistrados + $duracionReal) > $cantidadRequerida) {
                     $disponibles = max(0, $cantidadRequerida - $diasRegistrados);
                     $this->showAlert('error', "No puedes registrar {$duracionReal} día(s) de Vacaciones Colectivas porque solo quedan {$disponibles} día(s) disponibles de los {$cantidadRequerida} permitidos en el año {$targetYear}.");
@@ -650,10 +652,72 @@ class CreateCalendario extends Component
     public function validarSeccionFechas()
     {
         $this->form->validarSeccionFechas();
+
+        $mensajes = [];
+
+        $lapsoUno = (int) $this->form->semana_lapso_uno_calendario_academico;
+        if ($lapsoUno < 16) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 1 con una cantidad inferior a 16 semanas?";
+        } elseif ($lapsoUno > 18) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 1 con una cantidad superior a 18 semanas?";
+        }
+
+        $lapsoDos = (int) $this->form->semana_lapso_dos_calendario_academico;
+        if ($lapsoDos < 16) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 2 con una cantidad inferior a 16 semanas?";
+        } elseif ($lapsoDos > 18) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 2 con una cantidad superior a 18 semanas?";
+        }
+
+        $inicialUno = (int) $this->form->semana_lapso_uno_introductorio_calendario_academico;
+        if ($inicialUno < 12) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 1 con una cantidad inferior a 12 semanas?";
+        } elseif ($inicialUno > 12) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 1 con una cantidad superior a 12 semanas?";
+        }
+
+        $inicialDos = (int) $this->form->semana_lapso_dos_introductorio_calendario_academico;
+        if ($inicialDos < 12) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 2 con una cantidad inferior a 12 semanas?";
+        } elseif ($inicialDos > 12) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 2 con una cantidad superior a 12 semanas?";
+        }
+
+        $intensivo = (int) $this->form->semana_intensibo_introductorio_calendario_academico;
+        if ($intensivo < 6) {
+            $mensajes[] = "¿Está seguro de registrar las Semanas del curso Intensivo con una cantidad inferior a 6 semanas?";
+        } elseif ($intensivo > 6) {
+            $mensajes[] = "¿Está seguro de registrar las Semanas del curso Intensivo con una cantidad superior a 6 semanas?";
+        }
+
+        if (!empty($mensajes)) {
+            $mensajeFinal = "";
+            if (count($mensajes) > 1) {
+                foreach ($mensajes as $i => $msg) {
+                    $mensajeFinal .= "• " . $msg;
+                    if ($i < count($mensajes) - 1) {
+                        $mensajeFinal .= "\n\n";
+                    }
+                }
+            } else {
+                $mensajeFinal = $mensajes[0];
+            }
+
+            $this->dispatch('show-alert', [
+                'type' => 'warning',
+                'message' => $mensajeFinal,
+                'showCancelButton' => true,
+                'cancelText' => 'Cancelar',
+                'okText' => 'Continuar',
+                'onOkEvent' => 'seccion-fechas-validada'
+            ]);
+            return;
+        }
+
         $this->dispatch('seccion-fechas-validada');
     }
 
-    public function save()
+    public function save($confirmado = false)
     {
         if (!Gate::allows('crear-calendario')) {
             abort(403);
@@ -673,6 +737,65 @@ class CreateCalendario extends Component
             $msg = "Hay errores en el formulario:\n\n• " . implode("\n• ", $validacion['errores']);
             $this->showAlert('error', $msg);
             return;
+        }
+
+        if (!$confirmado) {
+            $tieneVacacionesEnAgosto = false;
+            $tieneIntensivoEnAgosto = false;
+
+            foreach ($this->eventosRegistrados as $ev) {
+                $fechaInicio = \Carbon\Carbon::parse($ev['dia_inicio_detalle_evento']);
+                $fechaFin = \Carbon\Carbon::parse($ev['dia_fin_detalle_evento']);
+                $cruzaAgosto = false;
+                
+                for ($d = $fechaInicio->copy(); $d->lte($fechaFin); $d->addDay()) {
+                    if ($d->month === 8) {
+                        $cruzaAgosto = true;
+                        break;
+                    }
+                }
+
+                if ($cruzaAgosto) {
+                    if ($ev['especial_evento'] == 1) {
+                        $tieneVacacionesEnAgosto = true;
+                    }
+                    if ($ev['especial_evento'] == 9 || $ev['especial_evento'] == 10) {
+                        $tieneIntensivoEnAgosto = true;
+                    }
+                }
+            }
+
+            $mensajesAgosto = [];
+            if (!$tieneVacacionesEnAgosto) {
+                $mensajesAgosto[] = "¿Está seguro de guardar la planificación sin haber asignado días de vacaciones colectivas en agosto?";
+            }
+            if (!$tieneIntensivoEnAgosto) {
+                $mensajesAgosto[] = "¿Está seguro de guardar el calendario sin haber asignado intensivos en agosto?";
+            }
+
+            if (!empty($mensajesAgosto)) {
+                $mensajeFinal = "";
+                if (count($mensajesAgosto) > 1) {
+                    foreach ($mensajesAgosto as $i => $msg) {
+                        $mensajeFinal .= "• " . $msg;
+                        if ($i < count($mensajesAgosto) - 1) {
+                            $mensajeFinal .= "\n\n";
+                        }
+                    }
+                } else {
+                    $mensajeFinal = $mensajesAgosto[0];
+                }
+
+                $this->dispatch('show-alert', [
+                    'type' => 'warning',
+                    'message' => $mensajeFinal,
+                    'showCancelButton' => true,
+                    'cancelText' => 'Cancelar',
+                    'okText' => 'Continuar',
+                    'onOkEvent' => 'confirmar-guardado-calendario'
+                ]);
+                return;
+            }
         }
 
         try {
@@ -704,7 +827,13 @@ class CreateCalendario extends Component
 
     public function cancelar()
     {
-        return redirect()->route('calendario.list');
+        return redirect()->to('/calendario/list');
+    }
+
+    #[\Livewire\Attributes\On('confirmar-guardado-calendario')]
+    public function confirmarGuardado()
+    {
+        $this->save(true);
     }
 
     #[Computed]
@@ -729,7 +858,7 @@ class CreateCalendario extends Component
             $idEv = $ev['id'] ?? null;
             if ($idEv) {
                 $conteosAsignadosTotal[$idEv] = ($conteosAsignadosTotal[$idEv] ?? 0) + 1;
-                
+
                 $evStart = $ev['inicio'] ?? null;
                 if ($evStart) {
                     $evYear = date('Y', strtotime($evStart));

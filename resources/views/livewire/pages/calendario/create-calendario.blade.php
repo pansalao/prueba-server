@@ -114,9 +114,11 @@
                     openSection: 'fechas',
                     inicio: @entangle('form.dia_inicio_calendario_academico'),
                     fin: @entangle('form.dia_fin_calendario_academico'),
+                    minFechaInicio: @entangle('minFechaInicio'),
                     showListModal: false,
                     searchListQuery: ''
-                }">
+                }"
+            x-init="setTimeout(() => { $dispatch('show-alert', { type: 'warning', message: 'Recuerde actualizar las configuraciones de los eventos si es necesario antes de crear el calendario' }) }, 500)">
 
             {{-- Acordeón 1: Fechas --}}
             <div
@@ -132,14 +134,7 @@
                 </div>
                 <div x-show="openSection === 'fechas'" x-collapse class="p-4 space-y-6">
 
-                    @if($esProsecucion)
-                        <div class="mb-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300">
-                            <div class="flex items-center gap-2">
-                                <span class="material-icons">info</span>
-                                <p class="text-sm"><strong>Prosecución:</strong> Este calendario se inicia a partir del día siguiente del último evento del calendario anterior. Los eventos pasados han sido precargados como referencia y no pueden eliminarse.</p>
-                            </div>
-                        </div>
-                    @endif
+
 
                     {{-- Selección de Fechas y Lapsos --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-6">
@@ -147,8 +142,7 @@
                             <x-input-label for="dia_inicio_calendario_academico" :value="__('Inicio del Período')" />
                             <x-text-input id="dia_inicio_calendario_academico" type="date"
                                 wire:model.live="form.dia_inicio_calendario_academico"
-                                class="w-full mt-1 date-input-dark" 
-                                min="{{ $minFechaInicio }}" required />
+                                class="w-full mt-1 date-input-dark" required />
                             <x-input-error :messages="$errors->first('form.dia_inicio_calendario_academico')"
                                 class="mt-2" />
                         </div>
@@ -162,7 +156,8 @@
                         </div>
                         <div class="w-full">
                             <x-input-label for="semana_lapso_uno_calendario_academico" :value="__('Semanas del Lapso Académico 1')" />
-                            <x-text-input id="semana_lapso_uno_calendario_academico" type="number" min="1" max="99"
+                            <x-text-input id="semana_lapso_uno_calendario_academico" type="number" min="1" max="20"
+                                oninput="if(this.value > 20) this.value = 20;"
                                 wire:model.live="form.semana_lapso_uno_calendario_academico" class="w-full mt-1"
                                 placeholder="Ej: 18" required />
                             <x-input-error :messages="$errors->first('form.semana_lapso_uno_calendario_academico')"
@@ -171,7 +166,8 @@
                         <div class="w-full">
                             <x-input-label for="semana_lapso_uno_introductorio_calendario_academico" :value="__('Semanas del Lapso Académico Trayecto Inicial 1')" />
                             <x-text-input id="semana_lapso_uno_introductorio_calendario_academico" type="number" min="0"
-                                max="99" wire:model.live="form.semana_lapso_uno_introductorio_calendario_academico"
+                                max="20" oninput="if(this.value > 20) this.value = 20;"
+                                wire:model.live="form.semana_lapso_uno_introductorio_calendario_academico"
                                 class="w-full mt-1" placeholder="Ej: 18" required />
                             <x-input-error
                                 :messages="$errors->first('form.semana_lapso_uno_introductorio_calendario_academico')"
@@ -180,7 +176,8 @@
                         <div class="w-full">
                             <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Semanas del curso Intensivo')" />
                             <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" min="0"
-                                max="99" wire:model.live="form.semana_intensibo_introductorio_calendario_academico"
+                                max="20" oninput="if(this.value > 20) this.value = 20;"
+                                wire:model.live="form.semana_intensibo_introductorio_calendario_academico"
                                 class="w-full mt-1" placeholder="Ej: 18" required />
                             <x-input-error
                                 :messages="$errors->first('form.semana_intensibo_introductorio_calendario_academico')"
@@ -188,7 +185,8 @@
                         </div>
                         <div class="w-full">
                             <x-input-label for="semana_lapso_dos_calendario_academico" :value="__('Semanas del Lapso Académico 2')" />
-                            <x-text-input id="semana_lapso_dos_calendario_academico" type="number" min="1" max="99"
+                            <x-text-input id="semana_lapso_dos_calendario_academico" type="number" min="1" max="20"
+                                oninput="if(this.value > 20) this.value = 20;"
                                 wire:model.live="form.semana_lapso_dos_calendario_academico" class="w-full mt-1"
                                 placeholder="Ej: 18" required />
                             <x-input-error :messages="$errors->first('form.semana_lapso_dos_calendario_academico')"
@@ -197,7 +195,8 @@
                         <div class="w-full">
                             <x-input-label for="semana_lapso_dos_introductorio_calendario_academico" :value="__('Semanas del Lapso Académico Trayecto Inicial 2')" />
                             <x-text-input id="semana_lapso_dos_introductorio_calendario_academico" type="number" min="0"
-                                max="99" wire:model.live="form.semana_lapso_dos_introductorio_calendario_academico"
+                                max="20" oninput="if(this.value > 20) this.value = 20;"
+                                wire:model.live="form.semana_lapso_dos_introductorio_calendario_academico"
                                 class="w-full mt-1" placeholder="Ej: 18" required />
                             <x-input-error
                                 :messages="$errors->first('form.semana_lapso_dos_introductorio_calendario_academico')"
@@ -326,6 +325,7 @@
                                     
                                     getVanillaConfig(year, monthIndex) {
                                         const isDark = document.documentElement.classList.contains('dark');
+                                        const minDateLimit = (minFechaInicio && minFechaInicio > inicio) ? minFechaInicio : inicio;
                                         return {
                                             type: 'multiple',
                                             months: 3,
@@ -336,7 +336,7 @@
                                                     year: year
                                                 },
                                                 range: { 
-                                                    min: inicio, 
+                                                    min: minDateLimit, 
                                                     max: fin, 
                                                     disablePast: false, 
                                                     disableAllDays: false

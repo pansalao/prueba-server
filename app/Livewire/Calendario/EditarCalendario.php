@@ -274,12 +274,12 @@ class EditarCalendario extends Component
             if ($is_vacaciones) {
                 $diasRegistrados = 0;
                 $targetYear = date('Y', strtotime($inicio));
-                
+
                 foreach ($this->eventosRegistrados as $reg) {
                     if (($reg['id'] ?? null) == $eventoInfo->id_evento) {
                         $sReg = new \DateTime($reg['inicio']);
                         $eReg = new \DateTime($reg['fin']);
-                        
+
                         $isTodoWeekendReg = true;
                         $tempInterval = new \DateInterval('P1D');
                         $tempPeriod = new \DatePeriod($sReg, $tempInterval, (clone $eReg)->modify('+1 day'));
@@ -302,7 +302,7 @@ class EditarCalendario extends Component
                         }
                     }
                 }
-                
+
                 if (($diasRegistrados + $duracionReal) > $cantidadRequerida) {
                     $disponibles = max(0, $cantidadRequerida - $diasRegistrados);
                     $this->showAlert('error', "No puedes registrar {$duracionReal} día(s) de Vacaciones Colectivas porque solo quedan {$disponibles} día(s) disponibles de los {$cantidadRequerida} permitidos en el año {$targetYear}.");
@@ -632,10 +632,72 @@ class EditarCalendario extends Component
     public function validarSeccionFechas()
     {
         $this->form->validarSeccionFechas();
+
+        $mensajes = [];
+
+        $lapsoUno = (int) $this->form->semana_lapso_uno_calendario_academico;
+        if ($lapsoUno < 16) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 1 con una cantidad inferior a 16 semanas?";
+        } elseif ($lapsoUno > 18) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 1 con una cantidad superior a 18 semanas?";
+        }
+
+        $lapsoDos = (int) $this->form->semana_lapso_dos_calendario_academico;
+        if ($lapsoDos < 16) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 2 con una cantidad inferior a 16 semanas?";
+        } elseif ($lapsoDos > 18) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 2 con una cantidad superior a 18 semanas?";
+        }
+
+        $inicialUno = (int) $this->form->semana_lapso_uno_introductorio_calendario_academico;
+        if ($inicialUno < 12) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 1 con una cantidad inferior a 12 semanas?";
+        } elseif ($inicialUno > 12) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 1 con una cantidad superior a 12 semanas?";
+        }
+
+        $inicialDos = (int) $this->form->semana_lapso_dos_introductorio_calendario_academico;
+        if ($inicialDos < 12) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 2 con una cantidad inferior a 12 semanas?";
+        } elseif ($inicialDos > 12) {
+            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 2 con una cantidad superior a 12 semanas?";
+        }
+
+        $intensivo = (int) $this->form->semana_intensibo_introductorio_calendario_academico;
+        if ($intensivo < 6) {
+            $mensajes[] = "¿Está seguro de registrar las Semanas del curso Intensivo con una cantidad inferior a 6 semanas?";
+        } elseif ($intensivo > 6) {
+            $mensajes[] = "¿Está seguro de registrar las Semanas del curso Intensivo con una cantidad superior a 6 semanas?";
+        }
+
+        if (!empty($mensajes)) {
+            $mensajeFinal = "";
+            if (count($mensajes) > 1) {
+                foreach ($mensajes as $i => $msg) {
+                    $mensajeFinal .= "• " . $msg;
+                    if ($i < count($mensajes) - 1) {
+                        $mensajeFinal .= "\n\n";
+                    }
+                }
+            } else {
+                $mensajeFinal = $mensajes[0];
+            }
+
+            $this->dispatch('show-alert', [
+                'type' => 'warning',
+                'message' => $mensajeFinal,
+                'showCancelButton' => true,
+                'cancelText' => 'Cancelar',
+                'okText' => 'Continuar',
+                'onOkEvent' => 'seccion-fechas-validada'
+            ]);
+            return;
+        }
+
         $this->dispatch('seccion-fechas-validada');
     }
 
-    public function aprobar()
+    public function aprobar($confirmadoAgosto = false, $confirmadoIrreversible = false)
     {
         if (!Gate::allows('cambiar-estatus-calendario')) {
             abort(403);
@@ -656,9 +718,89 @@ class EditarCalendario extends Component
             return;
         }
 
+        if (!$confirmadoAgosto) {
+            $tieneVacacionesEnAgosto = false;
+            $tieneIntensivoEnAgosto = false;
+
+            foreach ($this->eventosRegistrados as $ev) {
+                $fechaInicio = \Carbon\Carbon::parse($ev['dia_inicio_detalle_evento']);
+                $fechaFin = \Carbon\Carbon::parse($ev['dia_fin_detalle_evento']);
+                $cruzaAgosto = false;
+                
+                for ($d = $fechaInicio->copy(); $d->lte($fechaFin); $d->addDay()) {
+                    if ($d->month === 8) {
+                        $cruzaAgosto = true;
+                        break;
+                    }
+                }
+
+                if ($cruzaAgosto) {
+                    if ($ev['especial_evento'] == 1) {
+                        $tieneVacacionesEnAgosto = true;
+                    }
+                    if ($ev['especial_evento'] == 9 || $ev['especial_evento'] == 10) {
+                        $tieneIntensivoEnAgosto = true;
+                    }
+                }
+            }
+
+            $mensajesAgosto = [];
+            if (!$tieneVacacionesEnAgosto) {
+                $mensajesAgosto[] = "¿Está seguro de guardar la planificación sin haber asignado días de vacaciones colectivas en agosto?";
+            }
+            if (!$tieneIntensivoEnAgosto) {
+                $mensajesAgosto[] = "¿Está seguro de guardar el calendario sin haber asignado intensivos en agosto?";
+            }
+
+            if (!empty($mensajesAgosto)) {
+                $mensajeFinal = "";
+                if (count($mensajesAgosto) > 1) {
+                    foreach ($mensajesAgosto as $i => $msg) {
+                        $mensajeFinal .= "• " . $msg;
+                        if ($i < count($mensajesAgosto) - 1) {
+                            $mensajeFinal .= "\n\n";
+                        }
+                    }
+                } else {
+                    $mensajeFinal = $mensajesAgosto[0];
+                }
+
+                $this->dispatch('show-alert', [
+                    'type' => 'warning',
+                    'message' => $mensajeFinal,
+                    'showCancelButton' => true,
+                    'cancelText' => 'Cancelar',
+                    'okText' => 'Continuar',
+                    'onOkEvent' => 'confirmar-aprobacion-calendario'
+                ]);
+                return;
+            }
+        }
+
+        if (!$confirmadoIrreversible) {
+            $this->dispatch('show-alert', [
+                'type' => 'warning',
+                'message' => '¿Está seguro de Aprobar este calendario? Esta es una acción irreversible que afectará la planificación activa.',
+                'showCancelButton' => true,
+                'cancelText' => 'Cancelar',
+                'okText' => 'Aprobar',
+                'countdown' => 20,
+                'onOkEvent' => 'confirmar-aprobacion-irreversible'
+            ]);
+            return;
+        }
+
         try {
             DB::transaction(function () {
-                $this->calendarioRepository->actualizarEstatus($this->id_calendario, '1', [
+                // Verificar si ya existe un calendario activo (estatus 1)
+                $calendarioActivo = DB::table('calendario_academico')
+                    ->where('estatus', '1')
+                    ->where('id_calendario_academico', '!=', $this->id_calendario)
+                    ->first();
+
+                $nuevoEstatus = $calendarioActivo ? '4' : '1';
+
+                $this->calendarioRepository->actualizarEstatus($this->id_calendario, $nuevoEstatus, [
                     'dia_inicio_calendario_academico' => $this->form->dia_inicio_calendario_academico,
                     'dia_fin_calendario_academico' => $this->form->dia_fin_calendario_academico,
                     'semana_lapso_uno_calendario_academico' => $this->form->semana_lapso_uno_calendario_academico,
@@ -669,15 +811,23 @@ class EditarCalendario extends Component
                 ]);
 
                 $this->calendarioRepository->sincronizarEventos($this->id_calendario, $this->eventosRegistrados);
+
+                // Guardar el estatus resultante para usarlo en el mensaje
+                session()->flash('calendario_nuevo_estatus', $nuevoEstatus);
             });
 
-            $this->showAlert('success', 'Calendario aprobado y activado correctamente.', '/calendario/list');
+            $nuevoEstatus = session('calendario_nuevo_estatus');
+            if ($nuevoEstatus === '4') {
+                $this->showAlert('success', 'Calendario aprobado. Pasó a estatus "En Espera" hasta que finalice el calendario actual.', '/calendario/list');
+            } else {
+                $this->showAlert('success', 'Calendario aprobado y activado correctamente.', '/calendario/list');
+            }
         } catch (Exception $e) {
             $this->showAlert('error', 'Error al aprobar el calendario: ' . $e->getMessage());
         }
     }
 
-    public function actualizar()
+    public function actualizar($confirmado = false)
     {
         if (!Gate::allows('cambiar-estatus-calendario')) {
             abort(403);
@@ -696,6 +846,65 @@ class EditarCalendario extends Component
             $msg = "Hay errores en el formulario:\n\n• " . implode("\n• ", $validacion['errores']);
             $this->showAlert('error', $msg);
             return;
+        }
+
+        if (!$confirmado) {
+            $tieneVacacionesEnAgosto = false;
+            $tieneIntensivoEnAgosto = false;
+
+            foreach ($this->eventosRegistrados as $ev) {
+                $fechaInicio = \Carbon\Carbon::parse($ev['dia_inicio_detalle_evento']);
+                $fechaFin = \Carbon\Carbon::parse($ev['dia_fin_detalle_evento']);
+                $cruzaAgosto = false;
+                
+                for ($d = $fechaInicio->copy(); $d->lte($fechaFin); $d->addDay()) {
+                    if ($d->month === 8) {
+                        $cruzaAgosto = true;
+                        break;
+                    }
+                }
+
+                if ($cruzaAgosto) {
+                    if ($ev['especial_evento'] == 1) {
+                        $tieneVacacionesEnAgosto = true;
+                    }
+                    if ($ev['especial_evento'] == 9 || $ev['especial_evento'] == 10) {
+                        $tieneIntensivoEnAgosto = true;
+                    }
+                }
+            }
+
+            $mensajesAgosto = [];
+            if (!$tieneVacacionesEnAgosto) {
+                $mensajesAgosto[] = "¿Está seguro de guardar la planificación sin haber asignado días de vacaciones colectivas en agosto?";
+            }
+            if (!$tieneIntensivoEnAgosto) {
+                $mensajesAgosto[] = "¿Está seguro de guardar el calendario sin haber asignado intensivos en agosto?";
+            }
+
+            if (!empty($mensajesAgosto)) {
+                $mensajeFinal = "";
+                if (count($mensajesAgosto) > 1) {
+                    foreach ($mensajesAgosto as $i => $msg) {
+                        $mensajeFinal .= "• " . $msg;
+                        if ($i < count($mensajesAgosto) - 1) {
+                            $mensajeFinal .= "\n\n";
+                        }
+                    }
+                } else {
+                    $mensajeFinal = $mensajesAgosto[0];
+                }
+
+                $this->dispatch('show-alert', [
+                    'type' => 'warning',
+                    'message' => $mensajeFinal,
+                    'showCancelButton' => true,
+                    'cancelText' => 'Cancelar',
+                    'okText' => 'Continuar',
+                    'onOkEvent' => 'confirmar-actualizacion-calendario'
+                ]);
+                return;
+            }
         }
 
         try {
@@ -730,6 +939,24 @@ class EditarCalendario extends Component
         return redirect()->route('calendario.list');
     }
 
+    #[\Livewire\Attributes\On('confirmar-aprobacion-calendario')]
+    public function confirmarAprobacionAgosto()
+    {
+        $this->aprobar(true, false);
+    }
+
+    #[\Livewire\Attributes\On('confirmar-aprobacion-irreversible')]
+    public function confirmarAprobacionIrreversible()
+    {
+        $this->aprobar(true, true);
+    }
+
+    #[\Livewire\Attributes\On('confirmar-actualizacion-calendario')]
+    public function confirmarActualizacion()
+    {
+        $this->actualizar(true);
+    }
+
     #[Computed]
     public function bibliotecaFiltrada()
     {
@@ -752,7 +979,7 @@ class EditarCalendario extends Component
             $idEv = $ev['id'] ?? null;
             if ($idEv) {
                 $conteosAsignadosTotal[$idEv] = ($conteosAsignadosTotal[$idEv] ?? 0) + 1;
-                
+
                 $evStart = $ev['inicio'] ?? null;
                 if ($evStart) {
                     $evYear = date('Y', strtotime($evStart));

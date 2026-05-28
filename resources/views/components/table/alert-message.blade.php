@@ -6,19 +6,44 @@
     alertMessage: '',
     redirectUrl: null,
     onOkEvent: null,
+    showCancelButton: false,
+    cancelText: 'Cancelar',
+    okText: 'OK',
+    countdown: 0,
+    countdownInterval: null,
     isSuccess() { return this.alertType === 'success' },
     isWarning() { return this.alertType === 'warning' },
     showAlert(data) {
-        this.alertType = data.type || 'success';
-        this.alertMessage = data.message || 'Operación completada';
-        this.redirectUrl = data.redirect || null;
-        this.onOkEvent = data.onOkEvent || null;
+        let d = (Array.isArray(data) && data.length > 0) ? data[0] : data;
+        this.alertType = d.type || 'success';
+        this.alertMessage = d.message || 'Operación completada';
+        this.redirectUrl = d.redirect || null;
+        this.onOkEvent = d.onOkEvent || null;
+        this.showCancelButton = d.showCancelButton || false;
+        this.cancelText = d.cancelText || 'Cancelar';
+        this.okText = d.okText || 'OK';
+        this.countdown = d.countdown || 0;
+        
+        if (this.countdownInterval) clearInterval(this.countdownInterval);
+        
+        if (this.countdown > 0) {
+            this.countdownInterval = setInterval(() => {
+                this.countdown--;
+                if (this.countdown <= 0) {
+                    clearInterval(this.countdownInterval);
+                }
+            }, 1000);
+        }
+        
         this.show = true;
     },
     handleOk() {
         this.show = false;
         if (this.onOkEvent) {
             setTimeout(() => {
+                if (typeof Livewire !== 'undefined') {
+                    Livewire.dispatch(this.onOkEvent);
+                }
                 window.dispatchEvent(new CustomEvent(this.onOkEvent));
             }, 10);
         }
@@ -61,11 +86,29 @@ x-transition:leave-end="opacity-0 scale-95">
                    x-text="alertMessage"></p>
             </div>
             
-            <button type="button" @click="handleOk()"
-                    class="w-full py-4 px-6 text-white rounded-xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 text-base"
-                    :class="isSuccess() ? 'bg-green-600 hover:bg-green-700' : (isWarning() ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700')">
-                OK
-            </button>
+            <div class="flex flex-col sm:flex-row gap-3 w-full">
+                <template x-if="showCancelButton">
+                    <button type="button" @click="show = false"
+                            class="w-full sm:w-1/2 py-4 px-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 text-base">
+                        <span x-text="cancelText"></span>
+                    </button>
+                </template>
+                
+                <button type="button" @click="if(countdown <= 0) handleOk()"
+                        :disabled="countdown > 0"
+                        class="w-full py-4 px-6 text-white rounded-xl font-black uppercase tracking-widest transition-all shadow-lg text-base"
+                        :class="{
+                            'bg-green-600 hover:bg-green-700': isSuccess() && countdown <= 0,
+                            'bg-yellow-600 hover:bg-yellow-700': isWarning() && countdown <= 0,
+                            'bg-red-600 hover:bg-red-700': !isSuccess() && !isWarning() && countdown <= 0,
+                            'bg-gray-400 cursor-not-allowed opacity-70': countdown > 0,
+                            'active:scale-95': countdown <= 0,
+                            'sm:w-1/2': showCancelButton,
+                            'w-full': !showCancelButton
+                        }">
+                    <span x-text="countdown > 0 ? okText + ' (' + countdown + 's)' : okText"></span>
+                </button>
+            </div>
         </div>
     </div>
     
