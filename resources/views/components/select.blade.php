@@ -44,12 +44,12 @@
 
     <div class="flex items-center gap-1 w-full">
         <select id="{{ $finalWireModel ?: Str::random(8) }}" name="{{ $name ?? $finalWireModel }}"
-            @if ($finalWireModel) wire:model.live.debounce.250ms="{{ $finalWireModel }}" @endif
+            @if ($finalWireModel && $attributes->whereStartsWith('wire:model')->isEmpty()) wire:model.live.debounce.250ms="{{ $finalWireModel }}" @endif
             @required($required) @disabled($disabled) {{ $attributes->class([$selectClasses, $attributes->get('selectClass')]) }}>
             <option value="">{{ $placeholder }}</option>
             @foreach ($options as $option)
-                <option value="{{ $option->{$valueField} }}">
-                    {{ $option->{$textField} }}
+                <option value="{{ is_array($option) ? $option[$valueField] : $option->{$valueField} }}">
+                    {{ is_array($option) ? $option[$textField] : $option->{$textField} }}
                 </option>
             @endforeach
         </select>

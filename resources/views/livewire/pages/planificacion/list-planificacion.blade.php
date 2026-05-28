@@ -86,7 +86,7 @@
                                     <div class="flex items-center justify-end space-x-4">
                                         <!-- Ver -->
                                         <a href="{{ route('planificacion/show', $planificacion->planificacion_id) }}"
-                                            class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
+                                            class="flex items-center gap-1 bg-blue-600 text-white text-xs font-medium px-2.5 py-1 rounded-md hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-sm transition-colors">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
                                             </svg>
@@ -94,7 +94,7 @@
                                         </a>
                                         @if($planificacion->estatus != 1 && !in_array(session('active_role'), [1, 5, 11]))
                                         <a href="{{ route('planificaciones.update', $planificacion->planificacion_id) }}"
-                                            class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
+                                            class="flex items-center gap-1 {{ $planificacion->estatus == 4 ? 'bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600' : 'bg-amber-500 hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-600' }} text-white text-xs font-medium px-2.5 py-1 rounded-md shadow-sm transition-colors">
                                             @if($planificacion->estatus == 4)
                                                 <span class="material-icons text-sm">play_arrow</span>
                                                 Continuar
@@ -168,7 +168,7 @@
 
                         <div class="flex justify-end space-x-4 mt-3">
                             <a href="{{ route('planificacion/show', $planificacion->planificacion_id) }}"
-                                class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
+                                class="flex items-center gap-1 bg-blue-600 text-white text-xs font-medium px-2.5 py-1 rounded-md hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-sm transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
                                 </svg>
@@ -176,7 +176,7 @@
                             </a>
                             @if($planificacion->estatus != 1 && !in_array(session('active_role'), [1, 5, 11]))
                             <a href="{{ route('planificaciones.update', $planificacion->planificacion_id) }}"
-                                class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
+                                class="flex items-center gap-1 {{ $planificacion->estatus == 4 ? 'bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600' : 'bg-amber-500 hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-600' }} text-white text-xs font-medium px-2.5 py-1 rounded-md shadow-sm transition-colors">
                                 @if($planificacion->estatus == 4)
                                     <span class="material-icons text-sm">play_arrow</span>
                                     Continuar

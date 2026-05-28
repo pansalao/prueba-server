@@ -16,14 +16,7 @@ class CreatePlanificacion extends Component
     public $planificacionDraftId = null;
     public Collection $tecnica, $recursosMaestros, $evaluaciones, $bibliografiasMaestras, $asignaciones, $tecnicasActividad;
     public \App\Livewire\Forms\Planificacion\CreatePlanificacionForm $form;
-    public array $temasPorUnidad = [];
-    protected $planificacionRepository;
-
-    // public array $bibliografias = [['bibliografia_id' => '']]; // Moved to unit level
-
-    public Collection $contenidosPorTema;
-    public Collection $todosLosContenidos;
-    public Collection $todosLosObjetivos;
+    // Removed public array $temasPorUnidad, $todosLosContenidos, $todosLosObjetivos to avoid dehydration issues
 
     public $formasParticipacion = [];
 
@@ -49,10 +42,7 @@ class CreatePlanificacion extends Component
         $this->docente_id = Auth::id();
         // Inicializar colecciones vacías para evitar errores de null
         $this->asignaciones = collect();
-        $this->temasPorUnidad = [];
         $this->contenidosPorTema = collect();
-        $this->todosLosContenidos = collect();
-        $this->todosLosObjetivos = collect();
 
         $this->loadInitialData();
         $this->verifyDocenteRole();
@@ -70,20 +60,8 @@ class CreatePlanificacion extends Component
                 // Obtener ID de unidad y sección desde la base de datos para asegurar integridad
                 $detalle = $this->planificacionRepository->getDetalleProfesorAsignado($value);
                 if ($detalle) {
-                    // 1. Cargar TEMAS agrupados por unidad_tema (1, 2, 3, 4)
-                    $todosLosTemas = $this->planificacionRepository->select_temas_por_unidad($detalle->id_unidad_curricular);
-
-                    $this->temasPorUnidad = [];
-                    foreach (range(1, 4) as $num) {
-                        $this->temasPorUnidad[$num] = $todosLosTemas->where('unidad_tema', (string) $num)->values();
-                    }
-
-                    // 2. Cargar TODOS los CONTENIDOS de la unidad curricular
-                    // Se usarán para filtrar opciones cuando se seleccione un tema
-                    $this->todosLosContenidos = $this->planificacionRepository->select_contenidos($detalle->id_unidad_curricular);
-
-                    // 3. Cargar TODOS los OBJETIVOS de la unidad curricular
-                    $this->todosLosObjetivos = $this->planificacionRepository->select_objetivos($detalle->id_unidad_curricular);
+                    // Note: temas, contenidos and objetivos are now loaded dynamically in render()
+                    // to prevent Livewire dehydration array casting issues.
 
                     // Obtener propósito de la unidad curricular
                     $unidad = $this->planificacionRepository->getUnidadCurricular($detalle->id_unidad_curricular);
@@ -355,11 +333,41 @@ class CreatePlanificacion extends Component
         }
     }
 
+    protected function loadContenidosUnidad()
+    {
+        $temasPorUnidadLocal = [];
+        $todosLosContenidosLocal = collect();
+        $todosLosObjetivosLocal = collect();
+
+        if ($this->form->id_profesor_asignado) {
+            $detalle = $this->planificacionRepository->getDetalleProfesorAsignado($this->form->id_profesor_asignado);
+            if ($detalle) {
+                $todosLosTemas = $this->planificacionRepository->select_temas_por_unidad($detalle->id_unidad_curricular);
+                foreach (range(1, 4) as $num) {
+                    $temasPorUnidadLocal[$num] = $todosLosTemas->where('unidad_tema', (string) $num)->values();
+                }
+                $todosLosContenidosLocal = $this->planificacionRepository->select_contenidos($detalle->id_unidad_curricular);
+                $todosLosObjetivosLocal = $this->planificacionRepository->select_objetivos($detalle->id_unidad_curricular);
+            }
+        }
+
+        return [
+            'temasPorUnidad' => $temasPorUnidadLocal,
+            'todosLosContenidos' => $todosLosContenidosLocal,
+            'todosLosObjetivos' => $todosLosObjetivosLocal
+        ];
+    }
+
     public function render()
     {
+        $contenidosData = $this->loadContenidosUnidad();
+
         return view('livewire.pages.planificacion.create-planificacion', [
             'weekDays' => ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'], // No longer used but kept for compatibility
-            'timeSlots' => $this->generateTimeSlots()
+            'timeSlots' => $this->generateTimeSlots(),
+            'temasPorUnidad' => $contenidosData['temasPorUnidad'],
+            'todosLosContenidos' => $contenidosData['todosLosContenidos'],
+            'todosLosObjetivos' => $contenidosData['todosLosObjetivos']
         ]);
     }
 
@@ -597,7 +605,8 @@ class CreatePlanificacion extends Component
                 $this->form->id_profesor_asignado,
                 $this->form->unidades,
                 $this->form->tipos_seccion,
-                '4'
+                '4',
+                $this->form->proposito_unidad
             );
 
             $this->showAlert('success', 'Progreso de la unidad ' . ($index + 1) . ' guardado exitosamente como borrador.', '/planificacion/list');
@@ -644,12 +653,8 @@ class CreatePlanificacion extends Component
         try {
             $this->planificacionRepository->saveNuevoObjetivo($this->newObjetivoNombre, $this->selectedTemaIdForObjetivo);
 
-            // Recargar objetivos
-            $detalle = $this->planificacionRepository->getDetalleProfesorAsignado($this->form->id_profesor_asignado);
-            if ($detalle) {
-                // Refresh objectives list
-                $this->todosLosObjetivos = $this->planificacionRepository->select_objetivos($detalle->id_unidad_curricular);
-            }
+            // Objetivos list is now automatically reloaded in render(), 
+            // no need to manually reload it here anymore.
 
             session()->flash('message', 'Objetivo creado correctamente.');
             $this->closeObjetivoModal();

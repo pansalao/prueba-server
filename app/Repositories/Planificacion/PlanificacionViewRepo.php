@@ -71,7 +71,7 @@ class PlanificacionViewRepo
             ->select('c.id_unidad_corte as detalle_id', 'c.numero_unidad_corte as numero', 'c.estatus', 'c.indicador_logro_unidad_corte as indicadores_logro')
             ->orderBy('c.numero_unidad_corte')
             ->get()
-            ->map(function ($corte) {
+            ->map(function ($corte) use ($resultado) {
                 $corteArray = (array) $corte;
 
                 // 3.1 Motivo Rechazo (Último)
@@ -117,6 +117,7 @@ class PlanificacionViewRepo
                     ->join('tema_unidad as tu', 'o.id_tema_unidad', '=', 'tu.id_tema_unidad')
                     ->where('dc.id_unidad_corte', $corte->detalle_id)
                     ->where('dc.estatus', '1')
+                    ->where('tu.id_unidad_curricular', $resultado['id_unidad_curricular'])
                     ->select(
                         'c.id_contenido as contenido_id',
                         'c.titulo_contenido as titulo_contenido',

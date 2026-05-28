@@ -118,21 +118,7 @@
                     </div>
 
                     @foreach ($form->unidades as $index => $unidad)
-                        @php
-                            $totalPonderacion = $this->form->getTotalPonderacionForUnidad($index);
-                            $validPonderacion = abs($totalPonderacion - 25) < 0.01;
-
-                            // Temas disponibles para esta unidad específica (Renamed for clarity)
-                            $temasUnidad = isset($temasPorUnidad[$index + 1]) ? $temasPorUnidad[$index + 1] : [];
-
-                            // Opciones para la forma de participación
-                            $formasParticipacion = collect([
-                                (object) ['id' => '1', 'nombre' => 'Individual'],
-                                (object) ['id' => '2', 'nombre' => 'Grupal'],
-                            ]);
-                        @endphp
-
-                        <div x-show="openUnidad === {{ $index }}" 
+                        <div wire:key="unidad-{{ $index }}" x-show="openUnidad === {{ $index }}" 
                             wire:key="unit-content-{{ $index }}"
                             x-transition:enter="transition ease-out duration-300"
                             x-transition:enter-start="opacity-0 transform translate-x-8"
@@ -158,29 +144,31 @@
                                 </div>
 
                                 <div class="flex flex-col sm:items-end gap-2 w-full sm:w-auto mt-4 sm:mt-0">
-                                    <div class="flex flex-wrap justify-center sm:justify-end items-center gap-2 sm:gap-3 px-3 py-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm w-full sm:w-auto">
+                                    <div class="flex flex-col items-start gap-3 px-4 py-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md w-full sm:w-auto">
                                         <div class="flex items-center gap-2">
-                                            <span class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">Estado</span>
+                                            <span class="text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-widest">Estado</span>
+                                            @php
+                                                $totalPonderacion = $this->form->getTotalPonderacionForUnidad($index);
+                                                $validPonderacion = abs($totalPonderacion - 25) < 0.01;
+                                            @endphp
                                             @if($validPonderacion)
-                                                <span class="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-black rounded-full uppercase">Completo</span>
+                                                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs sm:text-sm font-black rounded-full uppercase">Completo</span>
                                             @else
-                                                <span class="px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-full uppercase">Pendiente</span>
+                                                <span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs sm:text-sm font-black rounded-full uppercase">Pendiente</span>
                                             @endif
                                         </div>
-                                        
-                                        <div class="hidden sm:block h-4 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
 
-                                        <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
-                                            <span class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">Pond.</span>
+                                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                            <span class="text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-widest">Pond.</span>
                                             <div class="flex items-center gap-2">
-                                                <div class="w-20 sm:w-24 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                <div class="w-24 sm:w-32 h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                                     <div class="h-full transition-all duration-500 {{ $validPonderacion ? 'bg-green-500' : 'bg-amber-500' }}" 
                                                          style="width: {{ ($totalPonderacion / 25) * 100 }}%"></div>
                                                 </div>
-                                                <span class="text-xs sm:text-sm font-black {{ $validPonderacion ? 'text-green-600' : 'text-amber-600' }}">
+                                                <span class="text-sm sm:text-base font-black {{ $validPonderacion ? 'text-green-600' : 'text-amber-600' }}">
                                                     {{ $totalPonderacion }}%
                                                 </span>
-                                                <span class="text-[9px] sm:text-[10px] text-gray-400 font-bold">/ 25%</span>
+                                                <span class="text-xs sm:text-sm text-gray-400 font-bold">/ 25%</span>
                                             </div>
                                         </div>
                                     </div>
@@ -197,12 +185,26 @@
                                         $isIndicadoresDone = $form->isIndicadoresComplete($index);
                                         $isEvaluacionDone = $form->isEvaluacionComplete($index);
                                         $isBibliografiasDone = $form->isBibliografiasComplete($index);
+                                        
+                                        $numeroUnidad = $unidad['numero'] ?? ($index + 1);
+                                        $temasUnidad = isset($temasPorUnidad[$numeroUnidad]) ? $temasPorUnidad[$numeroUnidad] : [];
+                                        $formasParticipacion = collect([
+                                            (object) ['id' => '1', 'nombre' => 'Individual'],
+                                            (object) ['id' => '2', 'nombre' => 'Grupal'],
+                                        ]);
                                     } else {
                                         $isTematicaDone = false;
                                         $isEstrategiasDone = false;
                                         $isIndicadoresDone = false;
                                         $isEvaluacionDone = false;
                                         $isBibliografiasDone = false;
+
+                                        $numeroUnidad = $unidad['numero'] ?? ($index + 1);
+                                        $temasUnidad = isset($temasPorUnidad[$numeroUnidad]) ? $temasPorUnidad[$numeroUnidad] : [];
+                                        $formasParticipacion = collect([
+                                            (object) ['id' => '1', 'nombre' => 'Individual'],
+                                            (object) ['id' => '2', 'nombre' => 'Grupal'],
+                                        ]);
                                     }
 
                                     $canShowEstrategias = $isTematicaDone;
@@ -230,7 +232,7 @@
                                         </div>
                                         <div x-show="openSection === 'tematica'" x-collapse class="p-4 space-y-6">
                                             @foreach ($unidad['objetivos'] as $objetivoIndex => $objetivo)
-                                                <div class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 space-y-4">
+                                                <div wire:key="objetivo-{{ $index }}-{{ $objetivoIndex }}" class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 space-y-4">
                                                     <div class="grid grid-cols-1 gap-4">
                                                         <div class="space-y-2">
                                                             <div class="flex items-center justify-between">
@@ -278,7 +280,7 @@
                                                         </div>
                                                         <div class="space-y-3">
                                                             @foreach ($objetivo['contenidos'] as $contenidoIndex => $contenido)
-                                                                <div class="flex items-start gap-2">
+                                                                <div wire:key="contenido-{{ $index }}-{{ $objetivoIndex }}-{{ $contenidoIndex }}" class="flex items-start gap-2">
                                                                     <div class="flex-grow">
                                                                         @php
                                                                             $selectedObjetivoId = $unidad['objetivos'][$objetivoIndex]['objetivo_id'] ?? null;
@@ -325,7 +327,7 @@
                                         </div>
                                         <div x-show="openSection === 'estrategias'" x-collapse class="p-4 space-y-6">
                                             @foreach ($unidad['estrategias'] as $estrategiaIndex => $estrategia)
-                                                <div class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 space-y-4">
+                                                <div wire:key="estrategia-{{ $index }}-{{ $estrategiaIndex }}" class="p-4 rounded-xl bg-gray-100 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 space-y-4">
                                                     <div class="flex items-center justify-end">
                                                         @if (count($unidad['estrategias']) > 1)
                                                             <button type="button" wire:click="removeItem({{ $index }}, 'estrategias', {{ $estrategiaIndex }})"
@@ -357,7 +359,7 @@
                                                                 </button>
                                                             </div>
                                                             @foreach ($estrategia['recursos'] as $recursoIndex => $recurso)
-                                                                <div class="flex items-center gap-2">
+                                                                <div wire:key="recurso-{{ $index }}-{{ $estrategiaIndex }}-{{ $recursoIndex }}" class="flex items-center gap-2">
                                                                     <div class="flex-grow">
                                                                         <x-datalist :options="$recursosMaestros" textField="nombre_recurso"
                                                                             wire:model.live="form.unidades.{{ $index }}.estrategias.{{ $estrategiaIndex }}.recursos.{{ $recursoIndex }}.recurso_id"
@@ -414,8 +416,8 @@
                                                 <span class="material-icons text-red-500">event_available</span>
                                                 Plan de Evaluación
                                                 @php $totalPond = $form->getTotalPonderacionForUnidad($index); @endphp
-                                                <span class="ml-2 px-2 py-0.5 text-xs rounded-full font-black {{ $totalPond == 25 ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300' }}">
-                                                    Total: {{ $totalPond }}% / 25%
+                                                <span class="ml-4 px-4 py-1.5 text-base rounded-full font-black uppercase {{ $totalPond == 25 ? 'bg-green-100 text-green-800 border border-green-400 shadow-sm' : 'bg-red-100 text-red-800 border border-red-400 shadow-sm' }}">
+                                                    TOTAL: {{ $totalPond }}% / 25%
                                                 </span>
                                             </h4>
                                             <div class="flex items-center gap-4">
@@ -428,7 +430,7 @@
                                         </div>
                                         <div x-show="openSection === 'evaluacion'" x-collapse class="p-4 space-y-4">
                                             @foreach ($unidad['evaluaciones'] as $evaluacionIndex => $evaluacion)
-                                                <div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm relative group">
+                                                <div wire:key="evaluacion-{{ $index }}-{{ $evaluacionIndex }}" class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm relative group">
                                                     @if (count($unidad['evaluaciones']) > 1)
                                                         <button type="button" wire:click="removeItem({{ $index }}, 'evaluaciones', {{ $evaluacionIndex }})"
                                                             class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors">
@@ -523,7 +525,7 @@
                                         </div>
                                         <div x-show="openSection === 'bibliografias'" x-collapse class="p-4 space-y-4">
                                             @foreach ($unidad['bibliografias'] as $biblioIndex => $bibliografia)
-                                                <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 space-y-3">
+                                                <div wire:key="biblio-{{ $index }}-{{ $biblioIndex }}" class="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 space-y-3">
                                                     <div class="flex items-center justify-between">
                                                         <label class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Referencia Bibliográfica <span class="text-red-500">*</span></label>
                                                         <div class="flex items-center gap-2">
@@ -556,12 +558,12 @@
                                     <div class="flex items-center gap-3">
                                         @if ($index > 0)
                                             <button type="button" wire:click="unidadAnterior({{ $index }})"
-                                                class="inline-flex items-center gap-2 px-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                                                class="inline-flex items-center gap-2 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-blue-700 transition-all hover:-translate-y-0.5 active:translate-y-0">
                                                 <span class="material-icons text-sm">arrow_back</span> Unidad Anterior
                                             </button>
                                         @endif
                                         <button type="button" wire:click="saveProgress({{ $index }})"
-                                            class="inline-flex items-center gap-2 px-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+                                            class="inline-flex items-center gap-2 px-8 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-orange-600 transition-all hover:-translate-y-0.5 active:translate-y-0"
                                             title="Guardar progreso actual para continuar luego">
                                             <span class="material-icons text-sm">save</span> GUARDAR Y SALIR
                                         </button>
