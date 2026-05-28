@@ -22,6 +22,7 @@ class CreateContenidoForm extends Form
                 'string',
                 'min:3',
                 'max:255',
+                'not_regex:/^[0-9]+$/',
                 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s0-9\.]+$/u', // Letras, números, espacios y puntos
                 Rule::unique('contenido', 'titulo_contenido')
             ],
@@ -41,6 +42,7 @@ class CreateContenidoForm extends Form
             'titulo_contenido.string' => 'El título debe ser texto.',
             'titulo_contenido.min' => 'El título debe tener al menos 3 caracteres.',
             'titulo_contenido.max' => 'El título no debe exceder los 255 caracteres.',
+            'titulo_contenido.not_regex' => 'El título del contenido no puede estar compuesto únicamente por números.',
             'titulo_contenido.regex' => 'El título contiene caracteres no permitidos.',
             'titulo_contenido.unique' => 'Ya existe un contenido con este título.',
         ];

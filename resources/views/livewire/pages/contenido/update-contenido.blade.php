@@ -66,6 +66,7 @@
                                 errorField="form.titulo_contenido"
                                 wire:model.live="form.titulo_contenido"
                                 placeholder="EJ: INVOCACIÓN DE MÉTODOS Y PASO DE PARÁMETROS"
+                                oninput="this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑüÜ0-9\s.,()':\/-]/g, '')"
                                 required 
                             />
                         </div>

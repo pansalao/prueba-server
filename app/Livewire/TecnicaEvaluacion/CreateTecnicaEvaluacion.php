@@ -30,6 +30,12 @@ class CreateTecnicaEvaluacion extends Component
             ->get();
     }
 
+    public function updated($propertyName)
+    {
+        $field = str_replace('form.', '', $propertyName);
+        $this->form->validateOnly($field);
+    }
+
     public function guardar()
     {
         try {

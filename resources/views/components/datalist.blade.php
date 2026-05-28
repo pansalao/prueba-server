@@ -10,6 +10,7 @@
     'extraClasses' => '',
     'labelClasses' => '',
     'errorClasses' => '',
+    'oninput' => null,
     'wireModelFromAttributes' => $attributes->whereStartsWith('wire:model')->first(),
 ])
 
@@ -100,6 +101,7 @@
                 @input="open = true"
                 placeholder="{{ $placeholder }}"
                 @disabled($disabled)
+                @if($oninput) oninput="{!! $oninput !!}" @endif
                 class="mt-1 block border-gray-300 rounded-md shadow-sm transition-all duration-200 cursor-text py-1.5 px-3 pr-10 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 sm:text-sm dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 {{ $extraClasses }} {{ $attributes->get('class') }}"
                 autocomplete="off"
             >

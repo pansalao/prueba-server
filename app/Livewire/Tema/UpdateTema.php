@@ -53,6 +53,12 @@ class UpdateTema extends Component
             ->get();
     }
 
+    public function updated($propertyName)
+    {
+        $field = str_replace('form.', '', $propertyName);
+        $this->form->validateOnly($field);
+    }
+
     public function addObjetivo()
     {
         $this->form->objetivos[] = ['titulo_objetivo' => ''];

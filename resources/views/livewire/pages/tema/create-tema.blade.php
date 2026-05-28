@@ -44,11 +44,12 @@
                                 textField="titulo_tema"
                                 wire:model.live="form.titulo_tema"
                                 placeholder="EJ: TEMA 1: HARDWARE Y SOFTWARE"
+                                oninput="this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑüÜ0-9\s.,()':\/-]/g, '')"
                                 required 
                             />
                         </div>
                     </div>
-
+ 
                     <!-- Sección de Objetivos -->
                     <div class="space-y-4 pt-4">
                         <div class="flex items-center justify-between">
@@ -61,7 +62,7 @@
                                 {{ __('AÑADIR OBJETIVO') }}
                             </button>
                         </div>
-
+ 
                         <div class="space-y-4">
                             @foreach ($form->objetivos as $index => $objetivo)
                                 <div class="flex items-center gap-3 group">
@@ -72,6 +73,7 @@
                                             textField="titulo_objetivo"
                                             wire:model.live="form.objetivos.{{ $index }}.titulo_objetivo"
                                             placeholder="DESCRIBA EL OBJETIVO..."
+                                            oninput="this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑüÜ0-9\s.,()':\/-]/g, '')"
                                             required 
                                         />
                                     </div>

@@ -172,6 +172,7 @@ class PanelVocero extends Component
 
     public function updatedSearch()
     {
+        $this->search = substr(preg_replace('/[^0-9]/', '', $this->search), 0, 12);
         $this->cargarSecciones();
     }
 

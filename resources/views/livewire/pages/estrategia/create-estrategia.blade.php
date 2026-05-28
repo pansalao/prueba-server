@@ -19,6 +19,7 @@
                         errorField="form.nombre"
                         wire:model.live="form.nombre"
                         placeholder="Ej: Aprendizaje basado en proyectos, etc."
+                        oninput="this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑüÜ0-9\s.,()':\/-]/g, '')"
                         required 
                     />
                 </div>

@@ -92,7 +92,7 @@
                                             </svg>
                                             Ver
                                         </a>
-                                        @if($planificacion->estatus != 1)
+                                        @if($planificacion->estatus != 1 && !in_array(session('active_role'), [1, 5, 11]))
                                         <a href="{{ route('planificaciones.update', $planificacion->planificacion_id) }}"
                                             class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
                                             @if($planificacion->estatus == 4)
@@ -174,7 +174,7 @@
                                 </svg>
                                 Ver
                             </a>
-                            @if($planificacion->estatus != 1)
+                            @if($planificacion->estatus != 1 && !in_array(session('active_role'), [1, 5, 11]))
                             <a href="{{ route('planificaciones.update', $planificacion->planificacion_id) }}"
                                 class="flex items-center gap-1 bg-[#f0f0f0] border border-[#767676] text-black text-xs font-semibold px-2.5 py-1 rounded hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500">
                                 @if($planificacion->estatus == 4)

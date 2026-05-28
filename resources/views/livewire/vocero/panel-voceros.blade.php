@@ -26,6 +26,7 @@
                                 />
                             </div>
                             
+<<<<<<< HEAD
                             <div class="w-full">
                                 <x-select 
                                     label="Filtrar por Trayecto" 
@@ -35,6 +36,42 @@
                                     textField="nombre" 
                                     placeholder="TODOS LOS TRAYECTOS" 
                                 />
+=======
+                            <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="w-full">
+                                    <x-input 
+                                        label="Buscar" 
+                                        name="search" 
+                                        placeholder="CÉDULA..." 
+                                        wire:model.live.debounce.300ms="search" 
+                                        maxlength="12"
+                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                    />
+                                </div>
+                                
+                                <div class="w-full">
+                                    <x-select 
+                                        label="Filtrar por Trayecto" 
+                                        wireModel="trayectoSeleccionado" 
+                                        :options="$trayectosDisponibles" 
+                                        valueField="id" 
+                                        textField="nombre" 
+                                        placeholder="TODOS LOS TRAYECTOS" 
+                                    />
+                                </div>
+
+                                <div class="w-full">
+                                    <x-select 
+                                        label="Filtrar por Sección" 
+                                        wireModel="seccionSeleccionada" 
+                                        :options="$seccionesDisponibles" 
+                                        valueField="codigo" 
+                                        textField="nombre" 
+                                        placeholder="TODAS LAS SECCIONES" 
+                                        :disabled="empty($trayectoSeleccionado)"
+                                    />
+                                </div>
+>>>>>>> b9d9d38a740b381b41d85442f1c902d1b186862f
                             </div>
 
                             <div class="w-full">

@@ -17,6 +17,7 @@ class UpdateTipoEvaluacionForm extends Form
                 'required',
                 'string',
                 'min:3',
+                'not_regex:/^[0-9]+$/',
                 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\\d\\s\\.,\\-\\(\\)\\\"\\\':\\/]+$/u',
                 Rule::unique('tipo_evaluacion', 'nombre_tipo_evaluacion')->ignore($this->id_tipo_evaluacion, 'id_tipo_evaluacion')
             ],
@@ -29,6 +30,7 @@ class UpdateTipoEvaluacionForm extends Form
             'nombre.required' => 'El tipo de evaluación es requerido.',
             'nombre.string' => 'El tipo de evaluación debe ser texto.',
             'nombre.min' => 'El tipo de evaluación debe tener al menos 3 caracteres.',
+            'nombre.not_regex' => 'El tipo de evaluación no puede estar compuesta únicamente por números.',
             'nombre.regex' => 'El tipo de evaluación contiene caracteres no permitidos.',
             'nombre.unique' => 'Este tipo de evaluación ya ha sido registrado.',
         ];
