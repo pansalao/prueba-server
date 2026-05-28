@@ -163,6 +163,16 @@ class ReporteController extends Controller
         // Combinamos pendientes y vencidos para el resumen general o mostramos ambos de forma premium
         $totalPendientesGeneral = $totalPendientes + $totalVencidos;
 
+        // Aplicar filtro por estado (KPIs)
+        $filtroEstado = $request->query('filtro_estado', '');
+        if ($filtroEstado === 'atiempo') {
+            $processed = $processed->where('estado', 'A tiempo');
+        } elseif ($filtroEstado === 'atrasado') {
+            $processed = $processed->where('estado', 'Atrasado');
+        } elseif ($filtroEstado === 'pendiente') {
+            $processed = $processed->whereIn('estado', ['Pendiente', 'Vencido/No entregado']);
+        }
+
         // 8. Paginación manual de la colección procesada
         $page = $request->query('page', 1);
         $perPage = 10;
@@ -188,6 +198,7 @@ class ReporteController extends Controller
             'totalVencidosSolo' => $totalVencidos,
             'filtroDocente' => $request->query('docente', ''),
             'filtroPeriodo' => $request->query('periodo', ''),
+            'filtroEstado' => $filtroEstado,
             'fechaLimite' => $fecha_limite
         ]);
     }

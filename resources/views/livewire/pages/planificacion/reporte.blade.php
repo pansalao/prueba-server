@@ -11,7 +11,8 @@
             {{-- 1. Tarjetas de Resumen (KPIs) --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Card A Tiempo -->
-                <div class="flex items-center p-6 bg-white dark:bg-gray-800 rounded-xl border-2 border-green-500 shadow-sm transition-all duration-300 hover:scale-[1.02]">
+                <a href="{{ request()->fullUrlWithQuery(['filtro_estado' => $filtroEstado === 'atiempo' ? null : 'atiempo', 'page' => 1]) }}" 
+                   class="flex items-center p-6 bg-white dark:bg-gray-800 rounded-xl border-2 {{ $filtroEstado === 'atiempo' ? 'border-green-600 bg-green-50 dark:bg-green-900/20 scale-[1.02]' : 'border-green-500' }} shadow-sm transition-all duration-300 hover:scale-[1.02] cursor-pointer">
                     <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-900">
                         <span class="material-icons text-3xl">check_circle</span>
                     </div>
@@ -20,10 +21,11 @@
                         <p class="text-3xl font-black text-gray-900 dark:text-white">{{ $totalATiempo }}</p>
                         <p class="text-[11px] text-green-600 dark:text-green-400 font-semibold mt-1">Entregas dentro de la fecha límite</p>
                     </div>
-                </div>
+                </a>
 
                 <!-- Card Atrasados -->
-                <div class="flex items-center p-6 bg-white dark:bg-gray-800 rounded-xl border-2 border-amber-500 shadow-sm transition-all duration-300 hover:scale-[1.02]">
+                <a href="{{ request()->fullUrlWithQuery(['filtro_estado' => $filtroEstado === 'atrasado' ? null : 'atrasado', 'page' => 1]) }}" 
+                   class="flex items-center p-6 bg-white dark:bg-gray-800 rounded-xl border-2 {{ $filtroEstado === 'atrasado' ? 'border-amber-600 bg-amber-50 dark:bg-amber-900/20 scale-[1.02]' : 'border-amber-500' }} shadow-sm transition-all duration-300 hover:scale-[1.02] cursor-pointer">
                     <div class="p-3 mr-4 text-amber-500 bg-amber-100 rounded-full dark:text-amber-100 dark:bg-amber-900">
                         <span class="material-icons text-3xl">warning</span>
                     </div>
@@ -32,10 +34,11 @@
                         <p class="text-3xl font-black text-gray-900 dark:text-white">{{ $totalAtrasados }}</p>
                         <p class="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-1">Entregas posterior a la fecha límite</p>
                     </div>
-                </div>
+                </a>
 
                 <!-- Card Pendientes / Vencidos -->
-                <div class="flex items-center p-6 bg-white dark:bg-gray-800 rounded-xl border-2 border-red-500 shadow-sm transition-all duration-300 hover:scale-[1.02]">
+                <a href="{{ request()->fullUrlWithQuery(['filtro_estado' => $filtroEstado === 'pendiente' ? null : 'pendiente', 'page' => 1]) }}" 
+                   class="flex items-center p-6 bg-white dark:bg-gray-800 rounded-xl border-2 {{ $filtroEstado === 'pendiente' ? 'border-red-600 bg-red-50 dark:bg-red-900/20 scale-[1.02]' : 'border-red-500' }} shadow-sm transition-all duration-300 hover:scale-[1.02] cursor-pointer">
                     <div class="p-3 mr-4 text-red-500 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-900">
                         <span class="material-icons text-3xl">error</span>
                     </div>
@@ -46,51 +49,62 @@
                             {{ $totalPendientesSolo }} activos | <span class="font-extrabold text-red-700 dark:text-red-300">{{ $totalVencidosSolo }} no entregados (vencidos)</span>
                         </p>
                     </div>
-                </div>
+                </a>
             </div>
 
             {{-- 2. Filtros y Tabla Detalle --}}
             <div class="sogat-table-container bg-white dark:bg-gray-800">
                 <!-- Formulario de Filtros -->
                 <form method="GET" action="{{ route('planificacion.reporte.cumplimiento') }}" class="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                    
+                    @if($filtroEstado)
+                        <input type="hidden" name="filtro_estado" value="{{ $filtroEstado }}">
+                    @endif
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
                         
                         <!-- Filtro Buscar Docente -->
-                        <div class="md:col-span-5">
-                            <label for="docente" class="block mb-2 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase">Buscar Docente</label>
-                            <div class="relative">
-                                <input type="text" id="docente" name="docente" value="{{ $filtroDocente }}"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sogat-red focus:border-sogat-red block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                    placeholder="Nombre, apellido o cédula...">
-                            </div>
+                        <div class="md:col-span-3">
+                            <x-input 
+                                label="Buscar Docente" 
+                                name="docente" 
+                                value="{{ $filtroDocente }}" 
+                                placeholder="NOMBRE, APELLIDO..." 
+                            />
                         </div>
 
                         <!-- Filtro Periodo Académico -->
-                        <div class="md:col-span-4">
-                            <label for="periodo" class="block mb-2 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase">Calendario Académico (Límite)</label>
-                            <select id="periodo" name="periodo" onchange="this.form.submit()"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sogat-red focus:border-sogat-red block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                @if($calendarios->isEmpty())
-                                    <option value="">No hay calendarios registrados</option>
-                                @else
-                                    @foreach($calendarios as $cal)
-                                        <option value="{{ $cal->id_calendario_academico }}" 
-                                            {{ $calendarioSeleccionado && $calendarioSeleccionado->id_calendario_academico == $cal->id_calendario_academico ? 'selected' : '' }}>
-                                            Semanas: {{ $cal->semana_calendario_academico }} ({{ \Carbon\Carbon::parse($cal->dia_inicio_calendario_academico)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($cal->dia_fin_calendario_academico)->format('d/m/Y') }})
-                                            @if($cal->estatus == 1) [ACTIVO] @endif
-                                        </option>
-                                    @endforeach
-                                @endif
-                            </select>
+                        <div class="md:col-span-5">
+                            <div class="mb-4">
+                                <label for="periodo" class="block font-bold text-sm text-gray-900 dark:text-white uppercase mb-1">
+                                    Calendario Académico (Límite)
+                                </label>
+                                <div class="flex items-center gap-1 w-full">
+                                    <select id="periodo" name="periodo" onchange="this.form.submit()"
+                                        class="block py-2 px-3 border border-black dark:border-gray-700 rounded-md shadow-sm w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 sm:text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 mt-1">
+                                        @if($calendarios->isEmpty())
+                                            <option value="">No hay calendarios registrados</option>
+                                        @else
+                                            @foreach($calendarios as $cal)
+                                                <option value="{{ $cal->id_calendario_academico }}" 
+                                                    {{ $calendarioSeleccionado && $calendarioSeleccionado->id_calendario_academico == $cal->id_calendario_academico ? 'selected' : '' }}>
+                                                    {{ $cal->semana_calendario_academico ? 'Sem. '.$cal->semana_calendario_academico.' | ' : '' }}{{ \Carbon\Carbon::parse($cal->dia_inicio_calendario_academico)->format('d/m/y') }} al {{ \Carbon\Carbon::parse($cal->dia_fin_calendario_academico)->format('d/m/y') }}
+                                                    @if($cal->estatus == 1) (ACTIVO) @endif
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Botones -->
-                        <div class="md:col-span-3 flex gap-2">
-                            <button type="submit" class="flex-1 inline-flex font-bold items-center justify-center px-4 py-2.5 bg-sogat-blue text-white rounded-lg text-xs uppercase tracking-widest hover:bg-blue-700 focus:outline-none transition ease-in-out duration-150 shadow-sm gap-2">
+                        <div class="md:col-span-4 flex gap-2 mb-4">
+                            <button type="submit" class="flex-1 inline-flex font-bold items-center justify-center px-2 py-2 bg-sogat-blue text-white rounded-md text-xs uppercase tracking-widest hover:bg-blue-700 focus:outline-none transition ease-in-out duration-150 shadow-sm gap-1">
                                 <span class="material-icons text-sm">search</span>
                                 Filtrar
                             </button>
-                            <a href="{{ route('planificacion.reporte.cumplimiento') }}" class="flex-1 inline-flex font-bold items-center justify-center px-4 py-2.5 bg-[#f0f0f0] border border-[#767676] rounded-lg text-xs text-black uppercase tracking-widest hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150 shadow-sm gap-2">
+                            <a href="{{ route('planificacion.reporte.cumplimiento') }}" class="flex-1 inline-flex font-bold items-center justify-center px-2 py-2 bg-[#f0f0f0] border border-[#767676] rounded-md text-xs text-black uppercase tracking-widest hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150 shadow-sm gap-1">
                                 <span class="material-icons text-sm">clear</span>
                                 Limpiar
                             </a>
