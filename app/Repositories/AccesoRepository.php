@@ -44,11 +44,32 @@ class AccesoRepository
             return false;
         }
 
+        $rolesToCheck = [$user->usu_cod_rol];
+
+        // Si el usuario es un estudiante (rol 3) y además es un vocero activo,
+        // heredará también todos los permisos asignados al rol 'VOCERO'.
+        if ($user->usu_cod_rol == 3) {
+            $isVocero = DB::table('vocero')
+                ->where('id_estudiante', $user->usu_cedula)
+                ->where('estatus', 1)
+                ->exists();
+
+            if ($isVocero) {
+                $voceroRol = DB::connection('external_db')
+                    ->table('rol')
+                    ->where('rol_nombre', 'VOCERO')
+                    ->first();
+                if ($voceroRol) {
+                    $rolesToCheck[] = $voceroRol->rol_codigo;
+                }
+            }
+        }
+
         // Buscamos el permiso en la tabla local 'rol_permiso' y 'permiso' (hp_10)
-        // El id_rol coincide con el usu_cod_rol de la BD externa.
+        // El id_rol coincide con el usu_cod_rol de la BD externa (o el rol VOCERO si aplica).
         return DB::table('rol_permiso as rp')
             ->join('permiso as p', 'rp.id_permiso', '=', 'p.id_permiso')
-            ->where('rp.id_rol', $user->usu_cod_rol)
+            ->whereIn('rp.id_rol', $rolesToCheck)
             ->where('p.nombre_permiso', $permissionName)
             ->where('p.estatus', '1')         // El permiso debe existir y estar activo
             ->where('rp.estatus', '1')        // La vinculación rol-permiso debe estar activa

@@ -11,9 +11,7 @@ use App\Models\User;
 class PanelVocero extends Component
 {
     public $isCoordinador = false;
-    public $isVocero = false;
     public $secciones = [];
-    public $voceroInfo = null;
 
     public $tempAsignarVocero = [];
     public $tempQuitarVocero = [];
@@ -36,17 +34,6 @@ class PanelVocero extends Component
         if ($activeRole == 5) {
             $this->isCoordinador = true;
             $this->cargarSecciones();
-        } elseif ($activeRole == 3) {
-            // Verificar si tiene rol de Estudiante (rol 3) y es vocero activo
-            $vocero = Vocero::where('id_estudiante', $user->usu_cedula)
-                            ->where('estatus', 'A')
-                            ->first();
-            if ($vocero) {
-                $this->isVocero = true;
-                $this->cargarInfoVocero($vocero);
-            } else {
-                abort(403, 'No tienes permisos para acceder a este módulo.');
-            }
         } else {
             abort(403, 'No tienes permisos para acceder a este módulo.');
         }
@@ -97,7 +84,7 @@ class PanelVocero extends Component
 
         // Agrupar estudiantes por sección
         $agrupados = [];
-        $vocerosData = Vocero::where('estatus', 'A')->get(['id_seccion', 'id_estudiante', 'tipo_vocero', 'updated_at'])->groupBy('id_seccion');
+        $vocerosData = Vocero::where('estatus', 1)->get(['id_seccion', 'id_estudiante', 'tipo_vocero', 'updated_at'])->groupBy('id_seccion');
 
         foreach ($estudiantes as $est) {
             if (!isset($agrupados[$est->sec_codigo])) {
@@ -188,29 +175,6 @@ class PanelVocero extends Component
         $this->cargarSecciones();
     }
 
-    public function cargarInfoVocero($vocero)
-    {
-        // Cargar datos del estudiante y su sección
-        $info = DB::connection('emulacion_sogac_2')
-            ->table('seccion as s')
-            ->join('seccion_unidad_docente as sud', 's.sec_codigo', '=', 'sud.sud_cod_seccion')
-            ->join('inscripcion as i', 'sud.sud_codigo', '=', 'i.ins_cod_seccion_unidad_docente')
-            ->join('persona as p', 'i.ins_cedula', '=', 'p.per_cedula')
-            ->join('semestre as sem', 's.sec_cod_semestre', '=', 'sem.sem_codigo')
-            ->join('trayecto as tr', 'sem.sem_cod_trayecto', '=', 'tr.tra_codigo')
-            ->where('p.per_cedula', $vocero->id_estudiante)
-            ->where('s.sec_codigo', $vocero->id_seccion)
-            ->select(
-                'p.per_cedula',
-                'p.per_nombres',
-                'p.per_apellidos',
-                's.sec_nombre',
-                'tr.tra_nombre as trayecto_nombre'
-            )
-            ->first();
-
-        $this->voceroInfo = $info;
-    }
 
     public function confirmarAsignar($cedula, $idSeccion, $tipo)
     {
@@ -247,7 +211,7 @@ class PanelVocero extends Component
             // Actualizar registro existente (reactivar y actualizar fecha por Eloquent automáticamente)
             $vocero->id_estudiante = $cedula;
             $vocero->id_coordinador = Auth::id();
-            $vocero->estatus = 'A';
+            $vocero->estatus = 1;
             // Para forzar la actualización de updated_at si el estudiante es el mismo
             $vocero->touch();
             $vocero->save();
@@ -258,7 +222,7 @@ class PanelVocero extends Component
                 'id_seccion' => $idSeccion,
                 'id_pnf' => $pnfCoordinador,
                 'id_coordinador' => Auth::id(),
-                'estatus' => 'A',
+                'estatus' => 1,
                 'tipo_vocero' => $tipo
             ]);
         }
@@ -299,7 +263,7 @@ class PanelVocero extends Component
     {
         $vocero = Vocero::where('id_seccion', $idSeccion)->where('tipo_vocero', $tipo)->first();
         if ($vocero) {
-            $vocero->estatus = 'I';
+            $vocero->estatus = 3;
             $vocero->save();
             $this->cargarSecciones();
             $this->dispatch('show-alert', [

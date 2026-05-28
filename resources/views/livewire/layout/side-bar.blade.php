@@ -255,13 +255,12 @@
             @php
                 $activeRole = session('active_role', auth()->user()->usu_cod_rol);
                 $isCoordinadorMenu = $activeRole == 5;
-                $isVoceroMenu = $activeRole == 3 && \App\Models\Vocero::where('id_estudiante', auth()->user()->usu_cedula)->where('estatus', 'A')->exists();
             @endphp
-            @if($isCoordinadorMenu || $isVoceroMenu)
+            @if($isCoordinadorMenu)
                 <!-- Voceros -->
                 <div>
                     <a href="{{ route('voceros.panel') }}" class="sogat-sidebar-item">
-                        Asignación de Voceros
+                        Voceros
                     </a>
                 </div>
             @endif
@@ -311,7 +310,19 @@
                     <div class="flex flex-col">
                         <span>Usuario: {{ auth()->user()->name }}</span>
                         <span class="text-[9px] text-sogat-blue dark:text-blue-400">
-                            {{ auth()->user()->rol->rol_nombre}}
+                            {{ auth()->user()->rol->rol_nombre }}
+                            @php
+                                $vocero = auth()->user()->usu_cod_rol == 3 ? \App\Models\Vocero::where('id_estudiante', auth()->user()->usu_cedula)->where('estatus', 1)->first() : null;
+                            @endphp
+                            @if($vocero)
+                                @if($vocero->tipo_vocero == 1)
+                                    (Vocero Principal)
+                                @elseif($vocero->tipo_vocero == 2)
+                                    (Vocero Secundario)
+                                @elseif($vocero->tipo_vocero == 3)
+                                    (Vocero Terciario)
+                                @endif
+                            @endif
                         </span>
                     </div>
                     <livewire:notification-bell />

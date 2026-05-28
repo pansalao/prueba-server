@@ -12,9 +12,21 @@ class PermisoIndexRepo
      */
     public function listar($busqueda = '', $paginacion = 5)
     {
+        $rolesPermitidos = [4, 3, 11, 31];
+
+        // Buscar dinámicamente el código del rol VOCERO
+        $voceroRol = DB::connection('external_db')
+            ->table('rol')
+            ->where('rol_nombre', 'VOCERO')
+            ->first();
+
+        if ($voceroRol) {
+            $rolesPermitidos[] = $voceroRol->rol_codigo;
+        }
+
         return DB::connection('external_db')->table('rol')
             ->select('rol_codigo', 'rol_nombre')
-            ->whereIn('rol_codigo', [4, 3, 11, 31])
+            ->whereIn('rol_codigo', $rolesPermitidos)
             ->when($busqueda, function ($consulta, $busqueda) {
                 // Compatible con Postgres e ILIKE para búsqueda insensible a mayúsculas
                 $consulta->where('rol_nombre', /*'ILIKE'*/ 'LIKE', '%' . $busqueda . '%');

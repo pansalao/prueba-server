@@ -112,6 +112,9 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
     Route::get('calendario/reporte/{id}', fn($id) => ExcelCalendarioExport::descargar($id))->middleware(['can:listar-calendario', 'log.activity:REPORTE'])->name('calendario.reporte.especifico');
 
     Route::get('planificacion/acuerdo-aprendizaje/{id}', [\App\Http\Controllers\ReportePlanificacionController::class, 'acuerdoAprendizaje'])->middleware(['can:ver-planificacion', 'log.activity:REPORTE'])->name('planificacion.acuerdo');
+    Route::get('planificacion/aprobacion-vocero/{id}', function () {
+        abort(404);
+    })->name('planificacion.aprobacion-vocero');
 
 
     Route::get('indicador-logro/list', ListIndicadorLogro::class)->middleware('can:listar-indicador-logro')->name('indicador-logro/listar');

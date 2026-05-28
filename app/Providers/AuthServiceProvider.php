@@ -258,14 +258,19 @@ class AuthServiceProvider extends ServiceProvider
             return $accesoRepository->checkPermission('Cambiar Estatus de Planificacion');
         });
 
+        Gate::define('aprobacion-vocero-planificacion', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Aprobacion Vocero de Planificacion');
+        });
+
         // --- GATES PARA EL MÓDULO DE FIRMA ---
         Gate::define('mi-firma', function ($user) use ($accesoRepository) {
             return $accesoRepository->checkPermission('Mi Firma de Firma');
         });
 
-
-
-        // ---------------------------------------------
+        // --- GATES PARA EL MÓDULO DE VOCEROS ---
+        Gate::define('cambiar-estatus-voceros', function ($user) use ($accesoRepository) {
+            return $accesoRepository->checkPermission('Cambiar Estatus de Voceros');
+        });
         // NOTA: Si ya habías creado directivas personalizadas en AppServiceProvider (ej. @ifcoordinador),
         // y ahora vas a usar Gates (@can), puedes considerar eliminar esas directivas duplicadas para evitar redundancia.
     }

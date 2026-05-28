@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight uppercase text-center">
-            {{ __('ASIGNACIÓN DE VOCEROS') }}
+            {{ __('GESTIÓN DE VOCEROS') }}
         </h2>
     </x-slot>
 
@@ -12,152 +12,122 @@
 
                     <x-table.alert-message />
 
-                    @if($isCoordinador)
-                        <div class="mb-6">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 uppercase mb-2">SELECCIONE A LOS ESTUDIANTES QUE VAN A SER VOCEROS</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Seleccione a un estudiante para que sea el vocero principal de su sección. y dos ayudantes de vocero</p>
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 uppercase mb-2">SELECCIONE A LOS ESTUDIANTES QUE VAN A SER VOCEROS</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Seleccione a un estudiante para que sea el vocero principal de su sección. y dos ayudantes de vocero</p>
+                        
+                        <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="w-full">
+                                <x-input 
+                                    label="Buscar" 
+                                    name="search" 
+                                    placeholder="CÉDULA, NOMBRE O SECCIÓN..." 
+                                    wire:model.live.debounce.300ms="search" 
+                                />
+                            </div>
                             
-                            <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="w-full">
-                                    <x-input 
-                                        label="Buscar" 
-                                        name="search" 
-                                        placeholder="CÉDULA, NOMBRE O SECCIÓN..." 
-                                        wire:model.live.debounce.300ms="search" 
-                                    />
-                                </div>
-                                
-                                <div class="w-full">
-                                    <x-select 
-                                        label="Filtrar por Trayecto" 
-                                        wireModel="trayectoSeleccionado" 
-                                        :options="$trayectosDisponibles" 
-                                        valueField="id" 
-                                        textField="nombre" 
-                                        placeholder="TODOS LOS TRAYECTOS" 
-                                    />
-                                </div>
-
-                                <div class="w-full">
-                                    <x-select 
-                                        label="Filtrar por Sección" 
-                                        wireModel="seccionSeleccionada" 
-                                        :options="$seccionesDisponibles" 
-                                        valueField="codigo" 
-                                        textField="nombre" 
-                                        placeholder="TODAS LAS SECCIONES" 
-                                        :disabled="empty($trayectoSeleccionado)"
-                                    />
-                                </div>
+                            <div class="w-full">
+                                <x-select 
+                                    label="Filtrar por Trayecto" 
+                                    wireModel="trayectoSeleccionado" 
+                                    :options="$trayectosDisponibles" 
+                                    valueField="id" 
+                                    textField="nombre" 
+                                    placeholder="TODOS LOS TRAYECTOS" 
+                                />
                             </div>
 
-                            <div class="space-y-6">
-                                @forelse($secciones as $seccion)
-                                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
-                                        <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-                                            <h4 class="font-bold text-md text-blue-600 dark:text-blue-400 uppercase">
-                                                Sección: {{ $seccion['sec_nombre'] }}
-                                            </h4>
-                                            <span class="text-xs font-bold text-gray-800 dark:text-gray-200 uppercase">{{ $seccion['trayecto_nombre'] }}</span>
-                                        </div>
+                            <div class="w-full">
+                                <x-select 
+                                    label="Filtrar por Sección" 
+                                    wireModel="seccionSeleccionada" 
+                                    :options="$seccionesDisponibles" 
+                                    valueField="codigo" 
+                                    textField="nombre" 
+                                    placeholder="TODAS LAS SECCIONES" 
+                                    :disabled="empty($trayectoSeleccionado)"
+                                />
+                            </div>
+                        </div>
 
-                                        <div class="overflow-x-auto">
-                                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                                <thead class="bg-gray-100 dark:bg-gray-800">
-                                                    <tr>
-                                                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Cédula</th>
-                                                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Estudiante</th>
-                                                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Estado Actual</th>
-                                                        <th class="px-4 py-2 text-right text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Acción</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                                    @foreach($seccion['estudiantes'] as $est)
-                                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $est['per_cedula'] }}</td>
-                                                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $est['per_nombres'] }} {{ $est['per_apellidos'] }}</td>
-                                                            <td class="px-4 py-2 whitespace-nowrap text-sm">
-                                                                @if($est['es_vocero'])
-                                                                    <div class="flex flex-col">
-                                                                        @if($est['tipo_vocero'] == 1)
-                                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200 w-max">Vocero Principal</span>
-                                                                        @elseif($est['tipo_vocero'] == 2)
-                                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 border border-blue-200 w-max">Vocero Secundario</span>
-                                                                        @elseif($est['tipo_vocero'] == 3)
-                                                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800 border border-orange-200 w-max">Vocero Terciario</span>
-                                                                        @endif
-                                                                        <span class="text-[10px] text-gray-600 dark:text-gray-400 mt-1 font-bold" title="Fecha de asignación">
-                                                                            <span class="material-icons text-[10px] align-middle font-bold">calendar_today</span>
-                                                                            {{ $est['fecha_asignacion'] }}
-                                                                        </span>
-                                                                    </div>
-                                                                @else
-                                                                    <span class="text-gray-700 dark:text-gray-300 text-xs font-bold">Estudiante</span>
-                                                                @endif
-                                                                </td>
-                                                            <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                                                @if(!$est['es_vocero'])
-                                                                    <div x-data="{ open: false }" class="relative inline-block text-left">
-                                                                        <button @click="open = !open" @click.away="open = false" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors flex items-center">
-                                                                            Asignar <span class="material-icons text-sm ml-1">arrow_drop_down</span>
-                                                                        </button>
-                                                                        <div x-show="open" style="display: none;" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
-                                                                            <div class="py-1" role="menu" aria-orientation="vertical">
-                                                                                <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 1)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Principal</button>
-                                                                                <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 2)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Secundario</button>
-                                                                                <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 3)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Terciario</button>
-                                                                            </div>
+                        <div class="space-y-6">
+                            @forelse($secciones as $seccion)
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+                                    <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+                                        <h4 class="font-bold text-md text-blue-600 dark:text-blue-400 uppercase">
+                                            Sección: {{ $seccion['sec_nombre'] }}
+                                        </h4>
+                                        <span class="text-xs font-bold text-gray-800 dark:text-gray-200 uppercase">{{ $seccion['trayecto_nombre'] }}</span>
+                                    </div>
+
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                            <thead class="bg-gray-100 dark:bg-gray-800">
+                                                <tr>
+                                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Cédula</th>
+                                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Estudiante</th>
+                                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Estado Actual</th>
+                                                    <th class="px-4 py-2 text-right text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Acción</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                                @foreach($seccion['estudiantes'] as $est)
+                                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $est['per_cedula'] }}</td>
+                                                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $est['per_nombres'] }} {{ $est['per_apellidos'] }}</td>
+                                                        <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                                            @if($est['es_vocero'])
+                                                                <div class="flex flex-col">
+                                                                    @if($est['tipo_vocero'] == 1)
+                                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200 w-max">Vocero Principal</span>
+                                                                    @elseif($est['tipo_vocero'] == 2)
+                                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 border border-blue-200 w-max">Vocero Secundario</span>
+                                                                    @elseif($est['tipo_vocero'] == 3)
+                                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800 border border-orange-200 w-max">Vocero Terciario</span>
+                                                                    @endif
+                                                                    <span class="text-[10px] text-gray-600 dark:text-gray-400 mt-1 font-bold" title="Fecha de asignación">
+                                                                        <span class="material-icons text-[10px] align-middle font-bold">calendar_today</span>
+                                                                        {{ $est['fecha_asignacion'] }}
+                                                                    </span>
+                                                                </div>
+                                                            @else
+                                                                <span class="text-gray-700 dark:text-gray-300 text-xs font-bold">Estudiante</span>
+                                                            @endif
+                                                            </td>
+                                                        <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
+                                                            @if(!$est['es_vocero'])
+                                                                <div x-data="{ open: false }" class="relative inline-block text-left">
+                                                                    <button @click="open = !open" @click.away="open = false" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors flex items-center">
+                                                                        Asignar <span class="material-icons text-sm ml-1">arrow_drop_down</span>
+                                                                    </button>
+                                                                    <div x-show="open" style="display: none;" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
+                                                                        <div class="py-1" role="menu" aria-orientation="vertical">
+                                                                            <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 1)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Principal</button>
+                                                                            <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 2)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Secundario</button>
+                                                                            <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 3)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Terciario</button>
                                                                         </div>
                                                                     </div>
-                                                                @else
-                                                                    <button wire:click="confirmarQuitar({{ $seccion['sec_codigo'] }}, {{ $est['tipo_vocero'] }})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors" title="Quitar rol de vocero">
-                                                                        Revocar
-                                                                    </button>
-                                                                @endif
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                                        <span class="material-icons text-4xl mb-2">info</span>
-                                        <p>No se encontraron secciones o estudiantes.</p>
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
-                    @elseif($isVocero && $voceroInfo)
-                        <div class="mb-6">
-                            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 uppercase mb-6 border-b pb-2">Mi Perfil de Vocero</h3>
-                            
-                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
-                                <div class="flex items-center gap-4 mb-6">
-                                    <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-lg">
-                                        <span class="material-icons text-3xl">record_voice_over</span>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-2xl font-black text-gray-800 dark:text-white uppercase">{{ $voceroInfo->per_nombres }} {{ $voceroInfo->per_apellidos }}</h4>
-                                        <p class="text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider text-sm">Vocero Principal Asignado</p>
+                                                                </div>
+                                                            @else
+                                                                <button wire:click="confirmarQuitar({{ $seccion['sec_codigo'] }}, {{ $est['tipo_vocero'] }})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors" title="Quitar rol de vocero">
+                                                                    Revocar
+                                                                </button>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-                                        <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cédula de Identidad</span>
-                                        <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $voceroInfo->per_cedula }}</span>
-                                    </div>
-                                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-                                        <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Sección Representada</span>
-                                        <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $voceroInfo->sec_nombre }}</span>
-                                        <span class="block text-xs text-blue-500 font-semibold mt-1">{{ $voceroInfo->trayecto_nombre }}</span>
-                                    </div>
+                            @empty
+                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    <span class="material-icons text-4xl mb-2">info</span>
+                                    <p>No se encontraron secciones o estudiantes.</p>
                                 </div>
-                            </div>
+                            @endforelse
                         </div>
-                    @endif
+                    </div>
 
                 </div>
             </div>

@@ -97,7 +97,7 @@ class ShowPlanificacion extends Component
 
     public function eliminarMotivoRechazo($detalleId)
     {
-        if (!Gate::allows('editar-planificacion')) {
+        if (!Gate::allows('editar-planificacion') && !Gate::allows('aprobacion-vocero-planificacion')) {
             session()->flash('error', 'No tienes permisos para eliminar motivos de rechazo.');
             return;
         }
@@ -110,7 +110,7 @@ class ShowPlanificacion extends Component
 
     public function mostrarTextareaMotivo($detalleId)
     {
-        if (!Gate::allows('editar-planificacion')) {
+        if (!Gate::allows('editar-planificacion') && !Gate::allows('aprobacion-vocero-planificacion')) {
             session()->flash('error', 'No tienes permisos para rechazar planificaciones.');
             return;
         }
@@ -126,7 +126,7 @@ class ShowPlanificacion extends Component
 
     public function confirmarRechazoCorte($detalleId)
     {
-        if (!Gate::allows('editar-planificacion')) {
+        if (!Gate::allows('editar-planificacion') && !Gate::allows('aprobacion-vocero-planificacion')) {
             session()->flash('error', 'No tienes permisos para rechazar planificaciones.');
             return;
         }
@@ -164,7 +164,7 @@ class ShowPlanificacion extends Component
 
     public function aprobarCorte($detalleId)
     {
-        if (!Gate::allows('editar-planificacion')) {
+        if (!Gate::allows('editar-planificacion') && !Gate::allows('aprobacion-vocero-planificacion')) {
             session()->flash('error', 'No tienes permisos para aprobar planificaciones.');
             return;
         }
