@@ -4,6 +4,7 @@
     show: false,
     alertType: 'success',
     alertMessage: '',
+    alertTitle: null,
     redirectUrl: null,
     onOkEvent: null,
     showCancelButton: false,
@@ -17,6 +18,7 @@
         let d = (Array.isArray(data) && data.length > 0) ? data[0] : data;
         this.alertType = d.type || 'success';
         this.alertMessage = d.message || 'Operación completada';
+        this.alertTitle = d.title || null;
         this.redirectUrl = d.redirect || null;
         this.onOkEvent = d.onOkEvent || null;
         this.showCancelButton = d.showCancelButton || false;
@@ -78,8 +80,8 @@ x-transition:leave-end="opacity-0 scale-95">
 
         <div class="p-6 text-center">
             <h3 class="text-2xl font-black mb-3 tracking-tight" 
-                :class="isSuccess() ? 'text-green-600 dark:text-green-400' : (isWarning() ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400')"
-                x-text="isSuccess() ? '¡GUARDADO EXITOSAMENTE!' : (isWarning() ? 'RECOMENDACIÓN' : '¡HAY ERRORES!')"></h3>
+                :class="isSuccess() ? 'text-green-600 dark:text-green-400' : (isWarning() ? 'text-yellow-600 dark:text-yellow-400' : (alertType === 'info' ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'))"
+                x-text="alertTitle ? alertTitle : (isSuccess() ? '¡GUARDADO EXITOSAMENTE!' : (isWarning() ? 'RECOMENDACIÓN' : '¡HAY ERRORES!'))"></h3>
             
             <div class="mt-3 mb-6 max-h-[40vh] overflow-y-auto px-3 py-3 text-left bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
                 <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed" 

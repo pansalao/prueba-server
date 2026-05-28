@@ -252,7 +252,12 @@
                 </div>
             @endcan
 
-            @if(auth()->user()->can('listar-voceros') || auth()->user()->can('listar-vocero') || auth()->user()->can('modulo-voceros') || auth()->user()->can('modulo-vocero') || in_array(auth()->user()->usu_cod_rol, [1, 5, 11]) || in_array(session('active_role'), [1, 5, 11]) || \App\Models\Vocero::where('id_estudiante', auth()->user()->usu_cedula)->exists())
+            @php
+                $activeRole = session('active_role', auth()->user()->usu_cod_rol);
+                $isCoordinadorMenu = $activeRole == 5;
+                $isVoceroMenu = $activeRole == 3 && \App\Models\Vocero::where('id_estudiante', auth()->user()->usu_cedula)->where('estatus', 'A')->exists();
+            @endphp
+            @if($isCoordinadorMenu || $isVoceroMenu)
                 <!-- Voceros -->
                 <div>
                     <a href="{{ route('voceros.panel') }}" class="sogat-sidebar-item">

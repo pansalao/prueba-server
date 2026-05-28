@@ -10,11 +10,7 @@
             <div class="sogat-card">
                 <div>
 
-                    @if (session()->has('message'))
-                        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                            <span class="block sm:inline">{{ session('message') }}</span>
-                        </div>
-                    @endif
+                    <x-table.alert-message />
 
                     @if($isCoordinador)
                         <div class="mb-6">
@@ -107,14 +103,14 @@
                                                                         </button>
                                                                         <div x-show="open" style="display: none;" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
                                                                             <div class="py-1" role="menu" aria-orientation="vertical">
-                                                                                <button wire:click="asignarVocero('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 1)" wire:confirm="¿Estás seguro de asignar a este estudiante como Vocero Principal? Si ya hay uno asignado, será reemplazado automáticamente." class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Principal</button>
-                                                                                <button wire:click="asignarVocero('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 2)" wire:confirm="¿Estás seguro de asignar a este estudiante como Vocero Secundario? Si ya hay uno asignado, será reemplazado automáticamente." class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Secundario</button>
-                                                                                <button wire:click="asignarVocero('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 3)" wire:confirm="¿Estás seguro de asignar a este estudiante como Vocero Terciario? Si ya hay uno asignado, será reemplazado automáticamente." class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Terciario</button>
+                                                                                <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 1)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Principal</button>
+                                                                                <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 2)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Secundario</button>
+                                                                                <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 3)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Terciario</button>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 @else
-                                                                    <button wire:click="quitarVocero({{ $seccion['sec_codigo'] }}, {{ $est['tipo_vocero'] }})" wire:confirm="¿Estás seguro de revocar el cargo de vocero a este estudiante?" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors" title="Quitar rol de vocero">
+                                                                    <button wire:click="confirmarQuitar({{ $seccion['sec_codigo'] }}, {{ $est['tipo_vocero'] }})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors" title="Quitar rol de vocero">
                                                                         Revocar
                                                                     </button>
                                                                 @endif
