@@ -48,16 +48,7 @@
                         <div>
                             <x-input-label value="Evento Especial:" />
                             <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
-                                @if($evento->especial_evento == 1) Vacaciones Colectivas
-                                @elseif($evento->especial_evento == 2) Inicio del Lapso Académico
-                                @elseif($evento->especial_evento == 3) Fin del Lapso Académico
-                                @elseif($evento->especial_evento == 4) Semana Santa
-                                @elseif($evento->especial_evento == 5) Carnaval
-                                @elseif($evento->especial_evento == 7) Inicio del Lapso Académico Trayecto Inicial
-                                @elseif($evento->especial_evento == 8) Fin del Lapso Académico Trayecto Inicial
-                                @elseif($evento->especial_evento == 9) Inicio del Curso Intensivo
-                                @elseif($evento->especial_evento == 10) Fin del Curso Intensivo
-                                @else Ninguno @endif
+                                {{ $evento->especialEvento ? $evento->especialEvento->especial_evento_name : 'Ninguno' }}
                             </p>
                         </div>
 
@@ -108,6 +99,59 @@
                                 </span>
                             </div>
                         </div>
+
+                        {{-- Superponible --}}
+                        <div>
+                            <x-input-label value="Superponible a vacaciones:" />
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="material-icons {{ $evento->is_superponible_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
+                                    {{ $evento->is_superponible_evento ? 'check' : 'close' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- Día Específico --}}
+                        <div>
+                            <x-input-label value="Ocurre en un Día Específico:" />
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="material-icons {{ $evento->is_dia_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
+                                    {{ $evento->is_dia_evento ? 'check' : 'close' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        @if($evento->is_dia_evento && $evento->dia_evento)
+                        <div>
+                            <x-input-label value="Fecha Específica:" />
+                            <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                {{ \Carbon\Carbon::parse($evento->dia_evento)->format('d/m/Y') }}
+                            </p>
+                        </div>
+                        @endif
+
+                        {{-- Semana Específica --}}
+                        <div>
+                            <x-input-label value="Ocurre en Semanas Específicas:" />
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="material-icons {{ $evento->is_semana_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
+                                    {{ $evento->is_semana_evento ? 'check' : 'close' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        @if($evento->is_semana_evento && $evento->semana_evento)
+                        <div>
+                            <x-input-label value="Semanas Configuradas:" />
+                            <p class="text-gray-700 dark:text-gray-300 text-sm font-medium">
+                                @php
+                                    $semanas = json_decode($evento->semana_evento, true) ?? [];
+                                @endphp
+                                @foreach($semanas as $s)
+                                    Lapso {{ $s['lapso'] ?? '?' }} - Semana {{ $s['semana'] ?? '?' }}<br>
+                                @endforeach
+                            </p>
+                        </div>
+                        @endif
 
                         {{-- Cantidad de Días --}}
                         @if($evento->is_cantidad_dias_evento)
