@@ -600,8 +600,6 @@ class UpdateCalendarioForm extends Form
 
         $paresNoSolapables = [
             ['Lapso 1', 'Lapso 2'],
-            ['Lapso 1', 'Curso Intensivo'],
-            ['Lapso 2', 'Curso Intensivo'],
             ['Lapso 1 Académico Trayecto Inicial', 'Lapso 2 Académico Trayecto Inicial'],
             ['Lapso 1 Académico Trayecto Inicial', 'Curso Intensivo'],
             ['Lapso 2 Académico Trayecto Inicial', 'Curso Intensivo']
@@ -617,6 +615,39 @@ class UpdateCalendarioForm extends Form
                 // Check overlap: max(start1, start2) <= min(end1, end2)
                 if (max($per1['inicio'], $per2['inicio']) <= min($per1['fin'], $per2['fin'])) {
                     $msg = "Los periodos no pueden solaparse. '{$per1['nombre']}' ({$per1['inicio']} al {$per1['fin']}) choca con '{$per2['nombre']}' ({$per2['inicio']} al {$per2['fin']}).";
+                    $this->addError('eventosRegistrados', $msg);
+                    $errores[] = [$msg];
+                }
+            }
+        }
+
+        // Validar que el Curso Intensivo, si choca con un lapso regular, esté completamente dentro de Vacaciones Colectivas
+        if (isset($periodosRegistrados['Curso Intensivo'])) {
+            $intensivo = $periodosRegistrados['Curso Intensivo'];
+            $overlapsWithLapso = false;
+            
+            foreach (['Lapso 1', 'Lapso 2'] as $lapsoName) {
+                if (isset($periodosRegistrados[$lapsoName])) {
+                    $lapso = $periodosRegistrados[$lapsoName];
+                    if (max($intensivo['inicio'], $lapso['inicio']) <= min($intensivo['fin'], $lapso['fin'])) {
+                        $overlapsWithLapso = true;
+                        break;
+                    }
+                }
+            }
+
+            if ($overlapsWithLapso) {
+                $dentroDeVacaciones = false;
+                $vacaciones = collect($eventosParaValidar)->filter(fn($ev) => ($ev['especial_evento'] ?? '') === '1')->values();
+                foreach ($vacaciones as $vac) {
+                    if ($intensivo['inicio'] >= $vac['inicio'] && $intensivo['fin'] <= $vac['fin']) {
+                        $dentroDeVacaciones = true;
+                        break;
+                    }
+                }
+
+                if (!$dentroDeVacaciones) {
+                    $msg = "El Curso Intensivo no puede solaparse con un Lapso Académico regular a menos que esté programado completamente dentro de un período de Vacaciones Colectivas.";
                     $this->addError('eventosRegistrados', $msg);
                     $errores[] = [$msg];
                 }

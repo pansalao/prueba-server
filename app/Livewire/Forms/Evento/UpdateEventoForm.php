@@ -101,6 +101,9 @@ class UpdateEventoForm extends Form
                     if ($this->is_especial && in_array($this->id_especial_evento, ['1', '11']) && $value) {
                         $fail('Para este evento especial, no puede ser superponible.');
                     }
+                    if ($this->is_especial && in_array($this->id_especial_evento, ['9', '10']) && !$value) {
+                        $fail('Para el inicio y fin del curso intensivo, el evento debe ser obligatoriamente superponible.');
+                    }
                 }
             ],
             'is_semana_evento' => [

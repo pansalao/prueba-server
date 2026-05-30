@@ -276,7 +276,7 @@ class EditarCalendario extends Component
         }
 
         // VALIDAR QUE TRAYECTO INICIAL CAIGA DENTRO DE UN LAPSO REGULAR
-        if ($especial === '7') {
+        if (in_array($especial, ['7', '8'])) {
             $iniciosLapsoReg = collect($this->eventosRegistrados)
                 ->filter(fn($ev) => ($ev['especial_evento'] ?? '') === '2')
                 ->sortBy('inicio')
@@ -302,7 +302,7 @@ class EditarCalendario extends Component
             if (!$dentroDeAlgunLapso) {
                 $this->dispatch('show-alert', [
                     'type' => 'error',
-                    'message' => 'El Lapso Académico Trayecto Inicial debe iniciar dentro del período de un Lapso Académico regular previamente registrado.'
+                    'message' => 'El Lapso Académico Trayecto Inicial debe estar dentro del período de un Lapso Académico regular previamente registrado.'
                 ]);
                 return;
             }
@@ -383,6 +383,52 @@ class EditarCalendario extends Component
         // VALIDAR REGLA DE SUPERPOSICIÓN CON VACACIONES COLECTIVAS
         $is_superponible = $eventoInfo ? (bool) $eventoInfo->is_superponible_evento : false;
         $is_vacaciones = ($eventoInfo->especial_evento ?? '') === '1';
+        // VALIDAR REGLA DEL CURSO INTENSIVO (9)
+        if (in_array($especial, ['9', '10'])) {
+            $iniciosLapsoReg = collect($this->eventosRegistrados)
+                ->filter(fn($ev) => ($ev['especial_evento'] ?? '') === '2')
+                ->sortBy('inicio')
+                ->values();
+            $finesLapsoReg = collect($this->eventosRegistrados)
+                ->filter(fn($ev) => ($ev['especial_evento'] ?? '') === '3')
+                ->sortBy('inicio')
+                ->values();
+
+            $overlapsWithLapso = false;
+            foreach ($iniciosLapsoReg as $index => $inicioReg) {
+                $fechaInicioReg = $inicioReg['inicio'];
+                $fechaFinReg = isset($finesLapsoReg[$index]) ? $finesLapsoReg[$index]['inicio'] : null;
+
+                if ($fechaFinReg) {
+                    if ($inicio >= $fechaInicioReg && $inicio <= $fechaFinReg) {
+                        $overlapsWithLapso = true;
+                        break;
+                    }
+                }
+            }
+
+            if ($overlapsWithLapso) {
+                $dentroDeVacaciones = false;
+                $vacaciones = collect($this->eventosRegistrados)
+                    ->filter(fn($ev) => ($ev['especial_evento'] ?? '') === '1')
+                    ->values();
+                
+                foreach ($vacaciones as $vac) {
+                    if ($inicio >= $vac['inicio'] && $inicio <= $vac['fin']) {
+                        $dentroDeVacaciones = true;
+                        break;
+                    }
+                }
+
+                if (!$dentroDeVacaciones) {
+                    $this->dispatch('show-alert', [
+                        'type' => 'error',
+                        'message' => 'El Curso Intensivo no puede estar directamente dentro de un Lapso Académico regular, a menos que esté dentro de un período de Vacaciones Colectivas.'
+                    ]);
+                    return;
+                }
+            }
+        }
 
         if (!$is_superponible && !$is_vacaciones) {
             foreach ($this->eventosRegistrados as $evReg) {

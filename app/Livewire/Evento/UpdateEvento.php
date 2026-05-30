@@ -75,6 +75,7 @@ class UpdateEvento extends Component
                 $this->form->is_rango_dias = true;
                 $this->form->rango_dias = '1';
                 $this->form->is_independiente = true;
+                $this->form->is_superponible = true;
                 $this->form->cantidad_dias_evento = 0;
             } elseif ($this->form->id_especial_evento == '1') {
                 $this->form->is_laborable = false;

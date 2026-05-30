@@ -63,6 +63,7 @@ class CreateEvento extends Component
                 $this->form->tipo_evento = '4';
                 $this->form->is_cantidad_dias_evento = true;
                 $this->form->is_independiente = true;
+                $this->form->is_superponible = true;
                 $this->form->cantidad_dias_evento = 1;
             } elseif ($this->form->id_especial_evento == '1') {
                 $this->form->is_laborable = false;

@@ -15,7 +15,7 @@
                     $deshabilitarIndependienteLaborable = $form->is_especial
                         || in_array($form->tipo_evento, ['1', '2', '6'], true);
                     $deshabilitarSuperponible = (in_array($form->tipo_evento, ['1', '2', '6'], true) && !($form->is_especial && in_array($form->id_especial_evento, ['4', '5'])))
-                        || ($form->is_especial && in_array($form->id_especial_evento, ['1', '11']));
+                        || ($form->is_especial && in_array($form->id_especial_evento, ['1', '9', '10', '11']));
                     $deshabilitarRangoDias = $form->is_especial;
                     $deshabilitarCantidadRango = $form->is_especial || !$form->is_rango_dias;
                     $deshabilitarSemanaEvento = in_array($form->tipo_evento, ['1', '2', '6'], true) || $form->is_especial;
