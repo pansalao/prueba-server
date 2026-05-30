@@ -133,7 +133,8 @@ class CalendarioCreateRepo
                 'dia_fin_calendario_academico' => $data['dia_fin_calendario_academico'],
                 'semana_lapso_uno_calendario_academico' => $data['semana_lapso_uno_calendario_academico'] ?? 0,
                 'semana_lapso_dos_calendario_academico' => $data['semana_lapso_dos_calendario_academico'] ?? 0,
-                'semana_lapso_introductorio_calendario_academico' => $data['semana_lapso_uno_introductorio_calendario_academico'] ?? null,
+                'semana_lapso_uno_introductorio_calendario_academico' => $data['semana_lapso_uno_introductorio_calendario_academico'] ?? null,
+                'semana_lapso_dos_introductorio_calendario_academico' => $data['semana_lapso_dos_introductorio_calendario_academico'] ?? null,
                 'semana_intensibo_introductorio_calendario_academico' => $data['semana_intensibo_introductorio_calendario_academico'] ?? null,
                 'estatus' => $data['estatus'] ?? '4' // Por defecto incompleto
             ];

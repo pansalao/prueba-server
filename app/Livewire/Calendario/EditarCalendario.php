@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 
 class EditarCalendario extends Component
 {
@@ -22,6 +23,9 @@ class EditarCalendario extends Component
     public $eventosPorFecha = []; // Mapa de eventos agrupados por fecha
     public $bibliotecaEventos = [];
     public $currentYear;
+
+    public $selectedYearTemporal = null;
+    public $esProsecucion = false;
 
     public $id_calendario;
     public $estatus_calendario;
@@ -886,6 +890,8 @@ class EditarCalendario extends Component
                 $mensajeFinal = $mensajes[0];
             }
 
+            $this->guardarBorrador();
+
             $this->dispatch('show-alert', [
                 'type' => 'warning',
                 'message' => $mensajeFinal,
@@ -897,7 +903,14 @@ class EditarCalendario extends Component
             return;
         }
 
+        $this->guardarBorrador();
         $this->dispatch('seccion-fechas-validada');
+    }
+
+    #[On('seccion-fechas-validada')]
+    public function alContinuarAEventos()
+    {
+        $this->guardarBorrador();
     }
 
     public function aprobar($confirmadoAgosto = false, $confirmadoIrreversible = false)

@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 
 class CreateCalendario extends Component
 {
@@ -849,6 +850,7 @@ class CreateCalendario extends Component
                 'semana_lapso_uno_introductorio_calendario_academico' => $this->form->semana_lapso_uno_introductorio_calendario_academico,
                 'semana_lapso_dos_introductorio_calendario_academico' => $this->form->semana_lapso_dos_introductorio_calendario_academico,
                 'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
+                'estatus' => '4'
             ], $this->eventosRegistrados, $this->id_calendario_borrador);
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error guardando borrador: ' . $e->getMessage());
@@ -909,6 +911,8 @@ class CreateCalendario extends Component
                 $mensajeFinal = $mensajes[0];
             }
 
+            $this->guardarBorrador();
+
             $this->dispatch('show-alert', [
                 'type' => 'warning',
                 'message' => $mensajeFinal,
@@ -920,7 +924,14 @@ class CreateCalendario extends Component
             return;
         }
 
+        $this->guardarBorrador();
         $this->dispatch('seccion-fechas-validada');
+    }
+
+    #[On('seccion-fechas-validada')]
+    public function alContinuarAEventos()
+    {
+        $this->guardarBorrador();
     }
 
     public function save($confirmado = false)
