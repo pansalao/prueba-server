@@ -13,6 +13,8 @@ class UpdateCalendarioForm extends Form
     public $semana_lapso_uno_introductorio_calendario_academico = '';
     public $semana_lapso_dos_introductorio_calendario_academico = '';
     public $semana_intensibo_introductorio_calendario_academico = '';
+    public $semana_per_uno_calendario_academico = '';
+    public $semana_per_dos_calendario_academico = '';
     public $dia_inicio_calendario_academico = '';
     public $dia_fin_calendario_academico = '';
     public $tipo_calendario = '1';
@@ -40,6 +42,8 @@ class UpdateCalendarioForm extends Form
             'semana_lapso_uno_introductorio_calendario_academico' => ['required', 'integer', 'min:0', 'max:20'],
             'semana_lapso_dos_introductorio_calendario_academico' => ['required', 'integer', 'min:0', 'max:20'],
             'semana_intensibo_introductorio_calendario_academico' => ['required', 'integer', 'min:0', 'max:20'],
+            'semana_per_uno_calendario_academico' => ['required', 'integer', 'min:0', 'max:20'],
+            'semana_per_dos_calendario_academico' => ['required', 'integer', 'min:0', 'max:20'],
             'dia_inicio_calendario_academico' => [
                 'required',
                 'date',
@@ -226,6 +230,14 @@ class UpdateCalendarioForm extends Form
             'semana_intensibo_introductorio_calendario_academico.integer' => 'Las semanas para el curso intensivo deben ser un número.',
             'semana_intensibo_introductorio_calendario_academico.min' => 'El mínimo de semanas para el curso intensivo es 0.',
             'semana_intensibo_introductorio_calendario_academico.max' => 'El máximo de semanas para el curso intensivo es 20.',
+            'semana_per_uno_calendario_academico.required' => 'Las semanas para el período 1 son obligatorias.',
+            'semana_per_uno_calendario_academico.integer' => 'Las semanas para el período 1 deben ser un número.',
+            'semana_per_uno_calendario_academico.min' => 'El mínimo de semanas para el período 1 es 0.',
+            'semana_per_uno_calendario_academico.max' => 'El máximo de semanas para el período 1 es 20.',
+            'semana_per_dos_calendario_academico.required' => 'Las semanas para el período 2 son obligatorias.',
+            'semana_per_dos_calendario_academico.integer' => 'Las semanas para el período 2 deben ser un número.',
+            'semana_per_dos_calendario_academico.min' => 'El mínimo de semanas para el período 2 es 0.',
+            'semana_per_dos_calendario_academico.max' => 'El máximo de semanas para el período 2 es 20.',
             'nombreEventoTemporal.required' => 'La descripción es obligatoria.',
             'nombreEventoTemporal.max' => 'La descripción no debe exceder 100 caracteres.',
             'nombreEventoTemporal.regex' => 'Formato inválido en la descripción.',
@@ -256,6 +268,8 @@ class UpdateCalendarioForm extends Form
         $this->semana_lapso_uno_introductorio_calendario_academico = $calendario->semana_lapso_uno_introductorio_calendario_academico;
         $this->semana_lapso_dos_introductorio_calendario_academico = $calendario->semana_lapso_dos_introductorio_calendario_academico;
         $this->semana_intensibo_introductorio_calendario_academico = $calendario->semana_intensibo_introductorio_calendario_academico;
+        $this->semana_per_uno_calendario_academico = $calendario->semana_per_uno_calendario_academico ?? 0;
+        $this->semana_per_dos_calendario_academico = $calendario->semana_per_dos_calendario_academico ?? 0;
         $this->dia_inicio_calendario_academico = $calendario->dia_inicio_calendario_academico;
         $this->dia_fin_calendario_academico = $calendario->dia_fin_calendario_academico;
         $this->tipo_calendario = $calendario->tipo_calendario ?? '1';
@@ -293,6 +307,8 @@ class UpdateCalendarioForm extends Form
             'semana_lapso_uno_introductorio_calendario_academico' => $allRules['semana_lapso_uno_introductorio_calendario_academico'],
             'semana_lapso_dos_introductorio_calendario_academico' => $allRules['semana_lapso_dos_introductorio_calendario_academico'],
             'semana_intensibo_introductorio_calendario_academico' => $allRules['semana_intensibo_introductorio_calendario_academico'],
+            'semana_per_uno_calendario_academico' => $allRules['semana_per_uno_calendario_academico'],
+            'semana_per_dos_calendario_academico' => $allRules['semana_per_dos_calendario_academico'],
         ]);
 
         // Cálculo de Semanas Exactas (Sin forzar Lunes-Domingo)
@@ -365,6 +381,8 @@ class UpdateCalendarioForm extends Form
         $fines_intro = [];
         $inicios_intensi = [];
         $fines_intensi = [];
+        $inicios_per = [];
+        $fines_per = [];
         $visitados = [];
 
         foreach ($eventosParaValidar as $reg) {
@@ -383,6 +401,10 @@ class UpdateCalendarioForm extends Form
                     $inicios_intensi[] = $reg['inicio'] ?? null;
                 } elseif ($evento->especial_evento == '10') {
                     $fines_intensi[] = $reg['fin'] ?? null;
+                } elseif ($evento->especial_evento == '13') {
+                    $inicios_per[] = $reg['inicio'] ?? null;
+                } elseif ($evento->especial_evento == '14') {
+                    $fines_per[] = $reg['fin'] ?? null;
                 }
             }
         }
@@ -393,6 +415,8 @@ class UpdateCalendarioForm extends Form
         $fines_intro = array_filter(array_unique($fines_intro));
         $inicios_intensi = array_filter(array_unique($inicios_intensi));
         $fines_intensi = array_filter(array_unique($fines_intensi));
+        $inicios_per = array_filter(array_unique($inicios_per));
+        $fines_per = array_filter(array_unique($fines_per));
 
         sort($inicios);
         sort($fines);
@@ -400,6 +424,8 @@ class UpdateCalendarioForm extends Form
         sort($fines_intro);
         sort($inicios_intensi);
         sort($fines_intensi);
+        sort($inicios_per);
+        sort($fines_per);
 
         foreach ($eventosParaValidar as $reg) {
             $id = $reg['id'] ?? null;
@@ -476,9 +502,18 @@ class UpdateCalendarioForm extends Form
                     if (count($inicios_intensi) === 1 && count($fines_intensi) === 1) {
                         $dentroDeAlgunPeriodo = $dentroDeAlgunPeriodo || ($regInicio && $regInicio >= $inicios_intensi[0] && $regFin && $regFin <= $fines_intensi[0]);
                     }
+                    // Comprobar Períodos
+                    if (count($inicios_per) > 0 && count($fines_per) > 0 && count($inicios_per) === count($fines_per)) {
+                        if (isset($inicios_per[0]) && isset($fines_per[0])) {
+                            $dentroDeAlgunPeriodo = $dentroDeAlgunPeriodo || ($regInicio && $regInicio >= $inicios_per[0] && $regFin && $regFin <= $fines_per[0]);
+                        }
+                        if (isset($inicios_per[1]) && isset($fines_per[1])) {
+                            $dentroDeAlgunPeriodo = $dentroDeAlgunPeriodo || ($regInicio && $regInicio >= $inicios_per[1] && $regFin && $regFin <= $fines_per[1]);
+                        }
+                    }
 
                     if (!$dentroDeAlgunPeriodo) {
-                        $msg = "El evento \"{$evento->nombre_evento}\" debe estar comprendido dentro de alguno de los periodos académicos (Lapsos, Trayecto Inicial o Intensivo).";
+                        $msg = "El evento \"{$evento->nombre_evento}\" debe estar comprendido dentro de alguno de los periodos académicos (Lapsos, Trayecto Inicial, Intensivo o Períodos).";
                         $this->addError('eventosRegistrados', $msg);
                         $errores[] = [$msg];
                     }
@@ -563,6 +598,24 @@ class UpdateCalendarioForm extends Form
             $errores[] = [$msg];
         }
 
+        $expectedPers = 0;
+        if ($this->semana_per_uno_calendario_academico > 0)
+            $expectedPers++;
+        if ($this->semana_per_dos_calendario_academico > 0)
+            $expectedPers++;
+
+        if ($expectedPers > 0) {
+            if (count($inicios_per) !== $expectedPers || count($fines_per) !== $expectedPers) {
+                $msg = "Debe haber exactamente {$expectedPers} Inicio(s) y {$expectedPers} Fin(es) del Período basado en la configuración de semanas.";
+                $this->addError('eventosRegistrados', $msg);
+                $errores[] = [$msg];
+            }
+        } elseif (count($inicios_per) > 0 || count($fines_per) > 0) {
+            $msg = "No puede agregar eventos de Período si configuró sus semanas en 0.";
+            $this->addError('eventosRegistrados', $msg);
+            $errores[] = [$msg];
+        }
+
         $periodosRegistrados = [];
 
         if (count($inicios) === 2 && count($fines) === 2) {
@@ -579,6 +632,14 @@ class UpdateCalendarioForm extends Form
         }
         if (count($inicios_intensi) === 1 && count($fines_intensi) === 1) {
             $periodosRegistrados['Curso Intensivo'] = ['nombre' => 'Curso Intensivo', 'inicio' => $inicios_intensi[0], 'fin' => $fines_intensi[0], 'semanas_configuradas' => $this->semana_intensibo_introductorio_calendario_academico];
+        }
+        if (count($inicios_per) > 0 && count($fines_per) > 0 && count($inicios_per) === count($fines_per)) {
+            if (isset($inicios_per[0]) && isset($fines_per[0]) && $this->semana_per_uno_calendario_academico > 0) {
+                $periodosRegistrados['Período 1'] = ['nombre' => 'Período 1', 'inicio' => $inicios_per[0], 'fin' => $fines_per[0], 'semanas_configuradas' => $this->semana_per_uno_calendario_academico];
+            }
+            if (isset($inicios_per[1]) && isset($fines_per[1]) && $this->semana_per_dos_calendario_academico > 0) {
+                $periodosRegistrados['Período 2'] = ['nombre' => 'Período 2', 'inicio' => $inicios_per[1], 'fin' => $fines_per[1], 'semanas_configuradas' => $this->semana_per_dos_calendario_academico];
+            }
         }
 
         foreach ($periodosRegistrados as $key => $periodo) {
@@ -602,7 +663,14 @@ class UpdateCalendarioForm extends Form
             ['Lapso 1', 'Lapso 2'],
             ['Lapso 1 Académico Trayecto Inicial', 'Lapso 2 Académico Trayecto Inicial'],
             ['Lapso 1 Académico Trayecto Inicial', 'Curso Intensivo'],
-            ['Lapso 2 Académico Trayecto Inicial', 'Curso Intensivo']
+            ['Lapso 2 Académico Trayecto Inicial', 'Curso Intensivo'],
+            ['Período 1', 'Período 2'],
+            ['Período 1', 'Curso Intensivo'],
+            ['Período 2', 'Curso Intensivo'],
+            ['Lapso 1 Académico Trayecto Inicial', 'Período 1'],
+            ['Lapso 1 Académico Trayecto Inicial', 'Período 2'],
+            ['Lapso 2 Académico Trayecto Inicial', 'Período 1'],
+            ['Lapso 2 Académico Trayecto Inicial', 'Período 2'],
         ];
 
         foreach ($paresNoSolapables as $par) {

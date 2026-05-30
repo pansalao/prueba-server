@@ -100,6 +100,8 @@ class CreateCalendario extends Component
                 $this->form->semana_lapso_uno_introductorio_calendario_academico = $calendario->semana_lapso_uno_introductorio_calendario_academico;
                 $this->form->semana_lapso_dos_introductorio_calendario_academico = $calendario->semana_lapso_dos_introductorio_calendario_academico;
                 $this->form->semana_intensibo_introductorio_calendario_academico = $calendario->semana_intensibo_introductorio_calendario_academico;
+                $this->form->semana_per_uno_calendario_academico = $calendario->semana_per_uno_calendario_academico ?? 0;
+                $this->form->semana_per_dos_calendario_academico = $calendario->semana_per_dos_calendario_academico ?? 0;
 
                 // Cargar eventos registrados desde el repositorio
                 $eventos = $this->calendarioRepository->obtenerEventosDetalle($id);
@@ -744,6 +746,19 @@ class CreateCalendario extends Component
             $generarFin($inicioEv, $semanas, '10');
         }
 
+        // Períodos (13 -> 14)
+        $iniciosPer = collect($this->eventosRegistrados)
+            ->filter(fn($ev) => ($ev['especial_evento'] ?? '') === '13')
+            ->sortBy('inicio')
+            ->values();
+
+        foreach ($iniciosPer as $index => $inicioEv) {
+            $semanas = $index === 0
+                ? (int) $this->form->semana_per_uno_calendario_academico
+                : (int) $this->form->semana_per_dos_calendario_academico;
+            $generarFin($inicioEv, $semanas, '14');
+        }
+
         $this->actualizarMapaEventos();
     }
 
@@ -806,14 +821,14 @@ class CreateCalendario extends Component
 
         $idsFestivos = \App\Support\CalendarioLapsoSemanas::idsEventosFestivos($this->eventosRegistrados);
         $eraFestivo = \App\Support\CalendarioLapsoSemanas::registroEsFestivo($removido, $idsFestivos) || ($removido['especial_evento'] ?? '') === '1';
-        $eraInicioLapso = in_array($removido['especial_evento'] ?? '', ['2', '7', '9']);
+        $eraInicioLapso = in_array($removido['especial_evento'] ?? '', ['2', '7', '9', '13']);
 
         unset($this->eventosRegistrados[$index]);
         $this->eventosRegistrados = array_values($this->eventosRegistrados);
         $this->actualizarMapaEventos();
 
         $hayInicios = collect($this->eventosRegistrados)->contains(
-            fn($e) => in_array($e['especial_evento'] ?? '', ['2', '7', '9'])
+            fn($e) => in_array($e['especial_evento'] ?? '', ['2', '7', '9', '13'])
         );
 
         if ($hayInicios && ($eraFestivo || $eraInicioLapso)) {
@@ -919,6 +934,8 @@ class CreateCalendario extends Component
                 'semana_lapso_uno_introductorio_calendario_academico' => $this->form->semana_lapso_uno_introductorio_calendario_academico,
                 'semana_lapso_dos_introductorio_calendario_academico' => $this->form->semana_lapso_dos_introductorio_calendario_academico,
                 'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
+                'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
+                'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
                 'estatus' => '4'
             ], $this->eventosRegistrados, $this->id_calendario_borrador);
         } catch (Exception $e) {
@@ -1027,11 +1044,26 @@ class CreateCalendario extends Component
 
         if (!$confirmado) {
             $tieneVacacionesEnAgosto = false;
-            $tieneIntensivoEnAgosto = false;
+            $eventosEspecialesAExigir = ['1'];
+            $lapso1Intro = (int) $this->form->semana_lapso_uno_introductorio_calendario_academico;
+            $lapso2Intro = (int) $this->form->semana_lapso_dos_introductorio_calendario_academico;
+            $intensivo = (int) $this->form->semana_intensibo_introductorio_calendario_academico;
+            $per1 = (int) $this->form->semana_per_uno_calendario_academico;
+            $per2 = (int) $this->form->semana_per_dos_calendario_academico;
+            
+            if ($lapso1Intro > 0 || $lapso2Intro > 0) {
+                $eventosEspecialesAExigir = array_merge($eventosEspecialesAExigir, ['7', '8']);
+            }
+            if ($intensivo > 0) {
+                $eventosEspecialesAExigir = array_merge($eventosEspecialesAExigir, ['9', '10']);
+            }
+            if ($per1 > 0 || $per2 > 0) {
+                $eventosEspecialesAExigir = array_merge($eventosEspecialesAExigir, ['13', '14']);
+            }
 
             foreach ($this->eventosRegistrados as $ev) {
-                $fechaInicio = \Carbon\Carbon::parse($ev['dia_inicio_detalle_evento']);
-                $fechaFin = \Carbon\Carbon::parse($ev['dia_fin_detalle_evento']);
+                $fechaInicio = \Carbon\Carbon::parse($ev['inicio']);
+                $fechaFin = \Carbon\Carbon::parse($ev['fin']);
                 $cruzaAgosto = false;
                 
                 for ($d = $fechaInicio->copy(); $d->lte($fechaFin); $d->addDay()) {
@@ -1042,11 +1074,8 @@ class CreateCalendario extends Component
                 }
 
                 if ($cruzaAgosto) {
-                    if ($ev['especial_evento'] == 1) {
+                    if (in_array($ev['especial_evento'] ?? '', $eventosEspecialesAExigir)) {
                         $tieneVacacionesEnAgosto = true;
-                    }
-                    if ($ev['especial_evento'] == 9 || $ev['especial_evento'] == 10) {
-                        $tieneIntensivoEnAgosto = true;
                     }
                 }
             }
@@ -1090,6 +1119,8 @@ class CreateCalendario extends Component
                 'semana_lapso_uno_introductorio_calendario_academico' => $this->form->semana_lapso_uno_introductorio_calendario_academico,
                 'semana_lapso_dos_introductorio_calendario_academico' => $this->form->semana_lapso_dos_introductorio_calendario_academico,
                 'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
+                'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
+                'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
             ], $this->eventosRegistrados, $this->id_calendario_borrador);
 
             if ($id) {

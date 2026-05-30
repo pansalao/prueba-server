@@ -55,6 +55,8 @@ class CalendarioUpdateRepo
                 'semana_lapso_uno_introductorio_calendario_academico' => $data['semana_lapso_uno_introductorio_calendario_academico'] ?? null,
                 'semana_lapso_dos_introductorio_calendario_academico' => $data['semana_lapso_dos_introductorio_calendario_academico'] ?? null,
                 'semana_intensibo_introductorio_calendario_academico' => $data['semana_intensibo_introductorio_calendario_academico'] ?? null,
+                'semana_per_uno_calendario_academico' => $data['semana_per_uno_calendario_academico'] ?? null,
+                'semana_per_dos_calendario_academico' => $data['semana_per_dos_calendario_academico'] ?? null,
                 'estatus' => $data['estatus'] ?? '2' // En revisión por defecto en update
             ];
 

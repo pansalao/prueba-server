@@ -638,10 +638,10 @@ class EditarCalendario extends Component
 
         $this->eventosRegistrados = array_values(array_filter(
             $this->eventosRegistrados,
-            fn($ev) => !in_array($ev['especial_evento'] ?? '', ['3', '8', '10'])
+            fn($ev) => !in_array($ev['especial_evento'] ?? '', ['3', '8', '10', '14'])
         ));
 
-        $eventosFinTemplates = \App\Models\Evento::whereIn('id_especial_evento', ['3', '8', '10'])
+        $eventosFinTemplates = \App\Models\Evento::whereIn('id_especial_evento', ['3', '8', '10', '14'])
             ->where('estatus', '1')
             ->get()
             ->keyBy('id_especial_evento');
@@ -657,7 +657,7 @@ class EditarCalendario extends Component
             $template = $eventosFinTemplates[$templateKey];
 
             // Determinar si debemos incluir vacaciones colectivas (especial_evento = 1) en el conteo de semanas
-            $incluirVacaciones = in_array($templateKey, ['3', '8']);
+            $incluirVacaciones = in_array($templateKey, ['3', '8', '14']);
 
             $fechaFinAuto = \App\Support\CalendarioLapsoSemanas::fechaFinLapso(
                 $inicioEv['inicio'],
@@ -720,6 +720,19 @@ class EditarCalendario extends Component
         foreach ($iniciosIntensivo as $inicioEv) {
             $semanas = (int) $this->form->semana_intensibo_introductorio_calendario_academico;
             $generarFin($inicioEv, $semanas, '10');
+        }
+
+        // Períodos (13 -> 14)
+        $iniciosPer = collect($this->eventosRegistrados)
+            ->filter(fn($ev) => ($ev['especial_evento'] ?? '') === '13')
+            ->sortBy('inicio')
+            ->values();
+
+        foreach ($iniciosPer as $index => $inicioEv) {
+            $semanas = $index === 0
+                ? (int) $this->form->semana_per_uno_calendario_academico
+                : (int) $this->form->semana_per_dos_calendario_academico;
+            $generarFin($inicioEv, $semanas, '14');
         }
 
         $this->actualizarMapaEventos();
@@ -891,6 +904,8 @@ class EditarCalendario extends Component
                 'semana_lapso_uno_introductorio_calendario_academico' => $this->form->semana_lapso_uno_introductorio_calendario_academico,
                 'semana_lapso_dos_introductorio_calendario_academico' => $this->form->semana_lapso_dos_introductorio_calendario_academico,
                 'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
+                'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
+                'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
                 'estatus' => '2' // Sigue en revisión
             ], $this->eventosRegistrados, $this->id_calendario);
         } catch (Exception $e) {
@@ -1079,6 +1094,8 @@ class EditarCalendario extends Component
                     'semana_lapso_uno_introductorio_calendario_academico' => $this->form->semana_lapso_uno_introductorio_calendario_academico,
                     'semana_lapso_dos_introductorio_calendario_academico' => $this->form->semana_lapso_dos_introductorio_calendario_academico,
                     'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
+                    'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
+                    'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
                 ]);
 
                 $this->calendarioRepository->sincronizarEventos($this->id_calendario, $this->eventosRegistrados);
@@ -1181,6 +1198,8 @@ class EditarCalendario extends Component
                     'semana_lapso_uno_introductorio_calendario_academico' => $this->form->semana_lapso_uno_introductorio_calendario_academico,
                     'semana_lapso_dos_introductorio_calendario_academico' => $this->form->semana_lapso_dos_introductorio_calendario_academico,
                     'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
+                    'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
+                    'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
                 ]);
 
                 $this->calendarioRepository->sincronizarEventos($this->id_calendario, $this->eventosRegistrados);
