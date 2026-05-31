@@ -37,6 +37,9 @@ class ListUsuario extends Component
 
     public function cambiarEstatusUsuario($userId)
     {
+        if (!auth()->user()?->esCoordinadorOVicerrector()) {
+            abort(403);
+        }
         try {
             $user = User::findOrFail($userId);
             $user->estatus = ($user->estatus == 1) ? 2 : 1;

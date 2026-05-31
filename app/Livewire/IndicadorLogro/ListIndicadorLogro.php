@@ -34,6 +34,9 @@ class ListIndicadorLogro extends Component
 
     public function inhabilitar()
     {
+        if (!auth()->user()?->esCoordinadorOVicerrector()) {
+            abort(403);
+        }
         if (!\Illuminate\Support\Facades\Gate::allows('cambiar-estatus-indicador-logro')) {
             abort(403);
         }
@@ -58,6 +61,9 @@ class ListIndicadorLogro extends Component
 
     public function restaurar()
     {
+        if (!auth()->user()?->esCoordinadorOVicerrector()) {
+            abort(403);
+        }
         if (!\Illuminate\Support\Facades\Gate::allows('cambiar-estatus-indicador-logro')) {
             abort(403);
         }

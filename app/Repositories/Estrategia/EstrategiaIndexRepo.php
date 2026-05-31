@@ -12,8 +12,14 @@ class EstrategiaIndexRepo
      */
     public function listar($busqueda = '', $paginacion = 5)
     {
+        $user = auth()->user();
+        $esCoordinadorOVicerrector = $user && $user->esCoordinadorOVicerrector();
+
         return DB::table('tecnica_actividad')
             ->select('id_tecnica_actividad as id_estrategia_pedagogica', 'nombre_tecnica_actividad as nombre', 'estatus')
+            ->when(!$esCoordinadorOVicerrector, function ($consulta) {
+                $consulta->where('estatus', '1');
+            })
             ->when($busqueda, function ($consulta, $busqueda) {
                 $consulta->where('nombre_tecnica_actividad', 'LIKE', '%' . $busqueda . '%');
             })

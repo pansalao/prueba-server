@@ -26,8 +26,10 @@
                         </th>
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Roles
                         </th>
+                        @if(auth()->user()?->esCoordinadorOVicerrector())
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                             Estatus</th>
+                        @endif
                         <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                             Acciones</th>
                     </tr>
@@ -50,6 +52,7 @@
                                     {{ $user->roles_nombres ?? 'Sin Rol' }}
                                 </td>
                                 <!-- Estatus -->
+                                @if(auth()->user()?->esCoordinadorOVicerrector())
                                 <td class="px-4 py-4 text-right">
                                     @if ($user->estatus == 1)
                                         <span
@@ -59,6 +62,7 @@
                                             class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">Inactivo</span>
                                     @endif
                                 </td>
+                                @endif
                                 <!-- Acciones -->
                                 <td class="px-4 py-4">
                                     <div class="flex items-center justify-end space-x-4">
@@ -81,6 +85,7 @@
                                             Editar
                                         </button>
                                         <!-- Cambiar Estatus -->
+                                        @if(auth()->user()?->esCoordinadorOVicerrector())
                                         @if ($user->estatus == 1)
                                             <button wire:click="cambiarEstatusUsuario({{ $user->id }})"
                                                 class="flex items-center gap-1 bg-red-50 text-red-600 text-xs font-medium px-2.5 py-0.5 rounded hover:bg-red-100 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800">
@@ -96,13 +101,14 @@
                                                 Activar
                                             </button>
                                         @endif
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
                         @endforeach
                     @else
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="{{ auth()->user()?->esCoordinadorOVicerrector() ? 5 : 4 }}" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                 No hay usuarios registrados.
                             </td>
                         </tr>
@@ -129,6 +135,7 @@
                             <span class="font-semibold text-gray-700 dark:text-gray-300">Roles:</span>
                             <span class="text-gray-900 dark:text-white">{{ $user->roles_nombres ?? 'Sin Rol' }}</span>
                         </div>
+                        @if(auth()->user()?->esCoordinadorOVicerrector())
                         <div class="mb-2">
                             <span class="font-semibold text-gray-700 dark:text-gray-300">Estatus:</span>
                             @if ($user->estatus == 1)
@@ -139,6 +146,7 @@
                                     class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">Inactivo</span>
                             @endif
                         </div>
+                        @endif
                         <div class="flex justify-end space-x-4">
                             <button x-data
                                 x-on:click="$dispatch('openModal', { component: 'usuario.show-usuario', arguments: { userId: {{ $user->id }} } })"
@@ -156,6 +164,7 @@
                                 </svg>
                                 Editar
                             </button>
+                            @if(auth()->user()?->esCoordinadorOVicerrector())
                             @if ($user->estatus == 1)
                                 <button wire:click="cambiarEstatusUsuario({{ $user->id }})"
                                     class="flex items-center gap-1 bg-red-50 text-red-600 text-xs font-medium px-2.5 py-0.5 rounded hover:bg-red-100 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800">
@@ -171,6 +180,7 @@
                                     </svg>
                                     Activar
                                 </button>
+                            @endif
                             @endif
                         </div>
                     </div>

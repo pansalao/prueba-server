@@ -23,10 +23,10 @@
                             </th>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Unidad
                                 Curricular</th>
-                            @can('cambiar-estatus-tema')
+                            @if(auth()->user()?->esCoordinadorOVicerrector())
                                 <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                                     Estatus</th>
-                            @endcan
+                            @endif
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                                 Acciones</th>
                         </tr>
@@ -40,14 +40,14 @@
                                     <td class="px-4 py-4 text-gray-900 dark:text-white">
                                         {{ $tema->nombre_unidad_curricular }}
                                     </td>
-                                    @can('cambiar-estatus-tema')
+                                    @if(auth()->user()?->esCoordinadorOVicerrector())
                                         <td class="px-4 py-4 text-right">
                                             <span
                                                 class="{{ $tema->estatus == 1 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }} text-xs font-medium px-2.5 py-0.5 rounded">
                                                 {{ $tema->estatus == 1 ? 'Activo' : 'Inactivo' }}
                                             </span>
                                         </td>
-                                    @endcan
+                                    @endif
                                     <td class="px-4 py-4">
                                         <div class="flex items-center justify-end space-x-3">
                                             <!-- Ver -->
@@ -76,7 +76,7 @@
                                             @endcan
 
                                             <!-- Acciones según estado -->
-                                            @can('cambiar-estatus-tema')
+                                            @if(auth()->user()?->esCoordinadorOVicerrector())
                                                 @if ($tema->estatus == 1)
                                                     <!-- Inactivar -->
                                                     <button wire:click="confirmarInhabilitar({{ $tema->id_tema_unidad }})"
@@ -99,14 +99,14 @@
                                                         Activar
                                                     </button>
                                                 @endif
-                                            @endcan
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
                             @endforeach
                         @else
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <td colspan="{{ auth()->user()->can('cambiar-estatus-tema') ? 4 : 3 }}"
+                                <td colspan="{{ auth()->user()?->esCoordinadorOVicerrector() ? 4 : 3 }}"
                                     class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                     {{ $busqueda ? 'No se encontraron temas' : 'No hay temas registrados' }}
                                 </td>

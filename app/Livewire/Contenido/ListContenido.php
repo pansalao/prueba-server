@@ -35,6 +35,9 @@ class ListContenido extends Component
 
     public function inhabilitar()
     {
+        if (!auth()->user()?->esCoordinadorOVicerrector()) {
+            abort(403);
+        }
         if (!\Illuminate\Support\Facades\Gate::allows('cambiar-estatus-contenido')) {
             abort(403);
         }
@@ -50,6 +53,9 @@ class ListContenido extends Component
 
     public function restaurar()
     {
+        if (!auth()->user()?->esCoordinadorOVicerrector()) {
+            abort(403);
+        }
         if (!\Illuminate\Support\Facades\Gate::allows('cambiar-estatus-contenido')) {
             abort(403);
         }

@@ -8,6 +8,9 @@ class ContenidoIndexRepo
 {
     public function listar($busqueda = '', $paginacion = 5)
     {
+        $user = auth()->user();
+        $esCoordinadorOVicerrector = $user && $user->esCoordinadorOVicerrector();
+
         $contenidos = DB::table('contenido as c')
             ->join('detalle_objetivo as do', 'c.id_contenido', '=', 'do.id_contenido')
             ->join('objetivo as o', 'do.id_objetivo', '=', 'o.id_objetivo')
@@ -21,6 +24,9 @@ class ContenidoIndexRepo
                 'c.estatus'
             )
             ->groupBy('c.id_contenido', 'c.titulo_contenido', 't.id_unidad_curricular', 't.titulo_tema', 'c.estatus')
+            ->when(!$esCoordinadorOVicerrector, function ($query) {
+                return $query->where('c.estatus', '1');
+            })
             ->when($busqueda, function ($query, $busqueda) {
                 // Si hay búsqueda, buscar coincidencias en la DB externa primero
                 $unidadesCoincidentes = DB::connection('external_db')->table('unidad_curricular')

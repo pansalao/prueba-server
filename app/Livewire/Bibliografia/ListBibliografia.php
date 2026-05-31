@@ -35,6 +35,9 @@ class ListBibliografia extends Component
 
     public function inhabilitar()
     {
+        if (!auth()->user()?->esCoordinadorOVicerrector()) {
+            abort(403);
+        }
         if (!\Illuminate\Support\Facades\Gate::allows('cambiar-estatus-bibliografia')) {
             abort(403);
         }
@@ -57,6 +60,9 @@ class ListBibliografia extends Component
 
     public function restaurar()
     {
+        if (!auth()->user()?->esCoordinadorOVicerrector()) {
+            abort(403);
+        }
         if (!\Illuminate\Support\Facades\Gate::allows('cambiar-estatus-bibliografia')) {
             abort(403);
         }

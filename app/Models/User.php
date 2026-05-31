@@ -138,4 +138,19 @@ class User extends Authenticatable
             ->select('u.usu_cod_rol', 'r.rol_nombre', 'u.usu_codigo')
             ->get();
     }
+
+    public function esCoordinador(): bool
+    {
+        return in_array($this->usu_cod_rol, [1, 5, 11, 30]);
+    }
+
+    public function esVicerrector(): bool
+    {
+        return in_array($this->usu_cod_rol, [4, 31]);
+    }
+
+    public function esCoordinadorOVicerrector(): bool
+    {
+        return $this->esCoordinador() || $this->esVicerrector();
+    }
 }

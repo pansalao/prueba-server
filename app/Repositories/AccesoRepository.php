@@ -78,7 +78,7 @@ class AccesoRepository
 
     public function checkCoordinador(): bool
     {
-        return Auth::check() && in_array(Auth::user()->usu_cod_rol, [1, 5, 11]) && Auth::user()->usu_estatus == 'A';
+        return Auth::check() && in_array(Auth::user()->usu_cod_rol, [1, 5, 11, 30]) && Auth::user()->usu_estatus == 'A';
     }
 
     public function checkProfesor(): bool
