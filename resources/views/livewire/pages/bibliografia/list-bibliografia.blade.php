@@ -24,10 +24,10 @@
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white">Nombre</th>
-                            @can('cambiar-estatus-bibliografia')
+                            @if(auth()->user()?->esCoordinadorOVicerrector())
                                 <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                                     Estatus</th>
-                            @endcan
+                            @endif
                             <th scope="col" class="px-4 py-3 font-medium text-gray-900 dark:text-white text-right">
                                 Acciones</th>
                         </tr>
@@ -41,16 +41,16 @@
                                     <td class="px-4 py-4 text-gray-900 dark:text-white">
                                         {{ $bibliografia->nombre }}
                                     </td>
-                                    @can('cambiar-estatus-bibliografia')
+                                    @if(auth()->user()?->esCoordinadorOVicerrector())
                                         <!-- Estatus -->
                                         <td class="px-4 py-4 text-right">
                                             <span
                                                 class="{{ $bibliografia->estatus == 1 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }} 
-                                                                                                                            text-xs font-medium px-2.5 py-0.5 rounded">
+                                                                                                                             text-xs font-medium px-2.5 py-0.5 rounded">
                                                 {{ $bibliografia->estatus == 1 ? 'Activo' : 'Inactivo' }}
                                             </span>
                                         </td>
-                                    @endcan
+                                    @endif
                                     <!-- Acciones -->
                                     <td class="px-4 py-4">
                                         <div class="flex items-center justify-end space-x-3">
@@ -82,7 +82,7 @@
                                             @endcan
 
                                             <!-- Acciones según estado -->
-                                            @can('cambiar-estatus-bibliografia')
+                                            @if(auth()->user()?->esCoordinadorOVicerrector())
                                                 @if ($bibliografia->estatus == 1)
                                                     <!-- Inactivar -->
                                                     <button wire:click="confirmarInhabilitar({{ $bibliografia->id_bibliografia }})"
@@ -105,14 +105,14 @@
                                                         Activar
                                                     </button>
                                                 @endif
-                                            @endcan
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
                             @endforeach
                         @else
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <td colspan="{{ auth()->user()->can('cambiar-estatus-bibliografia') ? 3 : 2 }}"
+                                <td colspan="{{ auth()->user()?->esCoordinadorOVicerrector() ? 3 : 2 }}"
                                     class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                     {{ $busqueda ? 'No se encontraron bibliografías' : 'No hay bibliografías registradas' }}
                                 </td>

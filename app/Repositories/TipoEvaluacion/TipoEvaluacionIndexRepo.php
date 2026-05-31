@@ -13,8 +13,14 @@ class TipoEvaluacionIndexRepo
      */
     public function listar($busqueda = '', $paginacion = 5)
     {
+        $user = auth()->user();
+        $esCoordinadorOVicerrector = $user && $user->esCoordinadorOVicerrector();
+
         return DB::table('tipo_evaluacion')
             ->select('id_tipo_evaluacion', 'nombre_tipo_evaluacion as nombre', 'estatus')
+            ->when(!$esCoordinadorOVicerrector, function ($consulta) {
+                $consulta->where('estatus', '1');
+            })
             ->when($busqueda, function ($consulta, $busqueda) {
                 $consulta->where('nombre_tipo_evaluacion', 'LIKE', '%' . $busqueda . '%');
             })

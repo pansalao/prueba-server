@@ -9,8 +9,14 @@ class RecursoIndexRepo
 {
     public function listar($busqueda = '', $paginacion = 5)
     {
+        $user = auth()->user();
+        $esCoordinadorOVicerrector = $user && $user->esCoordinadorOVicerrector();
+
         return DB::table('recurso')
             ->select('id_recurso', 'nombre_recurso as nombre', 'estatus')
+            ->when(!$esCoordinadorOVicerrector, function ($consulta) {
+                $consulta->where('estatus', '1');
+            })
             ->when($busqueda, function ($consulta, $busqueda) {
                 $consulta->where('nombre_recurso', 'LIKE', '%' . $busqueda . '%');
             })

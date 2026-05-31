@@ -8,6 +8,9 @@ class TemaIndexRepo
 {
     public function listar($busqueda = '', $paginacion = 5)
     {
+        $user = auth()->user();
+        $esCoordinadorOVicerrector = $user && $user->esCoordinadorOVicerrector();
+
         $temas = DB::table('tema_unidad as t')
             ->select(
                 't.id_tema_unidad',
@@ -15,6 +18,9 @@ class TemaIndexRepo
                 't.id_unidad_curricular',
                 't.estatus'
             )
+            ->when(!$esCoordinadorOVicerrector, function ($query) {
+                return $query->where('t.estatus', '1');
+            })
             ->when($busqueda, function ($query, $busqueda) {
                 return $query->where(function ($q) use ($busqueda) {
                     $q->where('t.titulo_tema', 'LIKE', '%' . $busqueda . '%')

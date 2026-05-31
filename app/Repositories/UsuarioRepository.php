@@ -22,6 +22,9 @@ class UsuarioRepository
 
     public function listar($busqueda = '', $paginacion = 5)
     {
+        $user = Auth::user();
+        $esCoordinadorOVicerrector = $user && $user->esCoordinadorOVicerrector();
+
         return DB::connection('external_db')
             ->table('usuario as u')
             ->join('persona as p', 'u.usu_cedula', '=', 'p.per_cedula')
@@ -34,10 +37,15 @@ class UsuarioRepository
                 'r.rol_nombre as roles_nombres'
             )
             ->where('u.usu_codigo', '!=', Auth::id())
+            ->when(!$esCoordinadorOVicerrector, function ($consulta) {
+                $consulta->where('u.usu_estatus', 'A');
+            })
             ->when($busqueda, function ($consulta, $busqueda) {
-                $consulta->where('p.per_nombres', 'LIKE', '%' . $busqueda . '%')
-                    ->orWhere('p.per_apellidos', 'LIKE', '%' . $busqueda . '%')
-                    ->orWhere('u.usu_cedula', 'LIKE', '%' . $busqueda . '%');
+                $consulta->where(function ($query) use ($busqueda) {
+                    $query->where('p.per_nombres', 'LIKE', '%' . $busqueda . '%')
+                        ->orWhere('p.per_apellidos', 'LIKE', '%' . $busqueda . '%')
+                        ->orWhere('u.usu_cedula', 'LIKE', '%' . $busqueda . '%');
+                });
             })
             ->orderBy('u.usu_codigo', 'desc')
             ->paginate($paginacion);
@@ -103,18 +111,18 @@ class UsuarioRepository
         foreach ($allRoles as $role) {
             $rolId = $role->usu_cod_rol;
 
-            // 1. Coordinador PNFINF (ID: 11) - Pertenece a Informática
-            if ($rolId == 11) {
+            // 1. Coordinador PNFINF (ID: 1, 5, 11, 30) - Pertenece a Informática
+            if (in_array($rolId, [1, 5, 11, 30])) {
                 $filteredRoles[] = $role;
                 continue;
             }
 
-            // 2. Estudiante (ID: 4) - Pertenece a Informática si está inscrito en programa 4
-            if ($rolId == 4) {
+            // 2. Estudiante (ID: 3) - Pertenece a Informática si está inscrito en programa 1 o 4
+            if ($rolId == 3) {
                 $esEstudianteInf = DB::connection('emulacion_sogac_2')
                     ->table('estudiante')
                     ->where('est_cedula', $cedula)
-                    ->where('est_cod_programa', 4)
+                    ->whereIn('est_cod_programa', [1, 4])
                     ->exists();
                 if ($esEstudianteInf) {
                     $filteredRoles[] = $role;
@@ -122,14 +130,14 @@ class UsuarioRepository
                 continue;
             }
 
-            // 3. Docente (ID: 3) - Pertenece a Informática si tiene carga activa en programa 4
-            if ($rolId == 3) {
+            // 3. Docente (ID: 2) - Pertenece a Informática si tiene carga activa en programa 1 o 4
+            if ($rolId == 2) {
                 $esDocenteInf = DB::connection('emulacion_sogac_2')
                     ->table('seccion_unidad_docente as sud')
                     ->join('unidad_curricular as uc', 'sud.sud_cod_unidad', '=', 'uc.ucu_codigo')
                     ->join('malla as m', 'uc.ucu_cod_malla', '=', 'm.mal_codigo')
                     ->where('sud.sud_ced_docente', $cedula)
-                    ->where('m.mal_cod_programa', 4)
+                    ->whereIn('m.mal_cod_programa', [1, 4])
                     ->where('sud.sud_estatus', 'A')
                     ->exists();
                 if ($esDocenteInf) {
@@ -138,14 +146,14 @@ class UsuarioRepository
                 continue;
             }
 
-            // 4. Vicerrector (ID: 31) - También puede usar el sistema
-            if ($rolId == 31) {
+            // 4. Vicerrector (ID: 4, 31) - También puede usar el sistema
+            if (in_array($rolId, [4, 31])) {
                 $filteredRoles[] = $role;
                 continue;
             }
         }
 
-        return collect($filteredRoles);
+        return collect($filteredRoles)->unique('rol_nombre');
     }
 
     /**

@@ -9,8 +9,14 @@ class BibliografiaIndexRepo
 {
     public function listar($busqueda = '', $paginacion = 5)
     {
+        $user = auth()->user();
+        $esCoordinadorOVicerrector = $user && $user->esCoordinadorOVicerrector();
+
         return DB::table('bibliografia')
             ->select('id_bibliografia', 'nombre_bibliografia as nombre', 'estatus')
+            ->when(!$esCoordinadorOVicerrector, function ($consulta) {
+                $consulta->where('estatus', '1');
+            })
             ->when($busqueda, function ($consulta, $busqueda) {
                 $consulta->where('nombre_bibliografia', 'LIKE', '%' . $busqueda . '%');
             })

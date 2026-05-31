@@ -22,6 +22,7 @@
                                     </p>
                                 </div>
 
+                                @if(auth()->user()?->esCoordinadorOVicerrector())
                                 <div>
                                     <x-input-label value="Estatus:" />
                                     <p class="text-gray-700 dark:text-gray-300 text-2xl font-semibold">
@@ -33,6 +34,7 @@
                                         </span>
                                     </p>
                                 </div>
+                                @endif
 
                             </div>
                 @else
