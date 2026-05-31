@@ -558,10 +558,12 @@
                                                 let semanasFestivasNormal = new Set();
                                                 let semanasFestivasIntensivo = new Set();
 
+                                                let eventosNoLaborablesNormal = [];
+                                                let eventosNoLaborablesIntensivo = [];
+
                                                 if (this.eventosAlpine) {
                                                     this.eventosAlpine.forEach(ev => {
                                                         const esp = ev.especial_evento ? String(ev.especial_evento) : null;
-                                                         const nombreEv = ev.nombre_evento ? ev.nombre_evento.toLowerCase() : (ev.nombre ? ev.nombre.toLowerCase() : '');
                                                         if (esp === '2') {
                                                             inicios.push(ev.inicio);
                                                         } else if (esp === '3') {
@@ -574,31 +576,75 @@
                                                             iniciosIntensivo.push(ev.inicio);
                                                         } else if (esp === '10') {
                                                             finesIntensivo.push(ev.fin);
-                                                        } else if (esp === '4' || esp === '5' || esp === '1' || nombreEv.includes('semana santa') || nombreEv.includes('carnaval') || nombreEv.includes('viernes santo') || nombreEv.includes('jueves santo') || nombreEv.includes('vacaciones colectivas')) {
-                                                            // Marcar cada lunes de semana festiva
-                                                            let d = new Date(ev.inicio + 'T00:00:00');
-                                                            let dFin = new Date(ev.fin + 'T00:00:00');
-                                                            while (d <= dFin) {
-                                                                const dayOfWeek = d.getDay();
-                                                                const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-                                                                const monday = new Date(d);
-                                                                monday.setDate(monday.getDate() + offset);
-
-                                                                const y = monday.getFullYear();
-                                                                const m = String(monday.getMonth() + 1).padStart(2, '0');
-                                                                const dayStr = String(monday.getDate()).padStart(2, '0');
-                                                                const dStrObj = `${y}-${m}-${dayStr}`;
-
-                                                                semanasFestivasNormal.add(dStrObj);
-                                                                if (esp !== '1' && !nombreEv.includes('vacaciones colectivas')) {
-                                                                    semanasFestivasIntensivo.add(dStrObj);
-                                                                }
-
-                                                                d.setDate(d.getDate() + 1);
+                                                        } else {
+                                                            const isLaborable = ev.is_laborable_evento !== undefined ? !!ev.is_laborable_evento : true;
+                                                            if (!isLaborable || esp === '1') {
+                                                                let dIni = new Date(ev.inicio + 'T00:00:00');
+                                                                let dFin = new Date(ev.fin + 'T23:59:59');
+                                                                eventosNoLaborablesNormal.push({inicio: dIni, fin: dFin});
+                                                            }
+                                                            if (!isLaborable && esp !== '1') {
+                                                                let dIni = new Date(ev.inicio + 'T00:00:00');
+                                                                let dFin = new Date(ev.fin + 'T23:59:59');
+                                                                eventosNoLaborablesIntensivo.push({inicio: dIni, fin: dFin});
                                                             }
                                                         }
                                                     });
                                                 }
+
+                                                let calculateSemanasFestivas = (eventosNL) => {
+                                                    let festivas = new Set();
+                                                    if (eventosNL.length === 0) return festivas;
+                                                    
+                                                    let minDate = new Date(Math.min(...eventosNL.map(e => e.inicio)));
+                                                    let maxDate = new Date(Math.max(...eventosNL.map(e => e.fin)));
+                                                    
+                                                    let dayOfWeek = minDate.getDay();
+                                                    let offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                                                    let lunesActual = new Date(minDate);
+                                                    lunesActual.setDate(lunesActual.getDate() + offset);
+                                                    lunesActual.setHours(0,0,0,0);
+                                                    
+                                                    let lunesFinal = new Date(maxDate);
+                                                    dayOfWeek = lunesFinal.getDay();
+                                                    offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                                                    lunesFinal.setDate(lunesFinal.getDate() + offset);
+                                                    lunesFinal.setHours(0,0,0,0);
+                                                    
+                                                    while (lunesActual <= lunesFinal) {
+                                                        let semanaCubierta = true;
+                                                        for (let d = 0; d < 5; d++) {
+                                                            let diaEvaluar = new Date(lunesActual);
+                                                            diaEvaluar.setDate(diaEvaluar.getDate() + d);
+                                                            diaEvaluar.setHours(12,0,0,0); // Evitar problemas de timezone
+                                                            
+                                                            let diaCubierto = false;
+                                                            for (let evNL of eventosNL) {
+                                                                if (diaEvaluar >= evNL.inicio && diaEvaluar <= evNL.fin) {
+                                                                    diaCubierto = true;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!diaCubierto) {
+                                                                semanaCubierta = false;
+                                                                break;
+                                                            }
+                                                        }
+                                                        
+                                                        if (semanaCubierta) {
+                                                            const y = lunesActual.getFullYear();
+                                                            const m = String(lunesActual.getMonth() + 1).padStart(2, '0');
+                                                            const dayStr = String(lunesActual.getDate()).padStart(2, '0');
+                                                            festivas.add(`${y}-${m}-${dayStr}`);
+                                                        }
+                                                        
+                                                        lunesActual.setDate(lunesActual.getDate() + 7);
+                                                    }
+                                                    return festivas;
+                                                };
+
+                                                semanasFestivasNormal = calculateSemanasFestivas(eventosNoLaborablesNormal);
+                                                semanasFestivasIntensivo = calculateSemanasFestivas(eventosNoLaborablesIntensivo);
                                                 inicios.sort();
                                                 fines.sort();
                                                 iniciosIntro.sort();
