@@ -136,8 +136,9 @@
 
 
 
-                    {{-- Selección de Fechas y Lapsos --}}
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-6">
+                    {{-- Sección 1: Fechas Generales --}}
+                    <h5 class="text-md font-bold mb-4 mt-2 border-b pb-2 text-gray-700 dark:text-gray-300">Fechas de Inicio y Fin</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-7xl mx-auto mb-6">
                         <div class="w-full">
                             <x-input-label for="dia_inicio_calendario_academico" :value="__('Inicio del Período')" />
                             <x-text-input id="dia_inicio_calendario_academico" type="date"
@@ -154,6 +155,11 @@
                             <x-input-error :messages="$errors->first('form.dia_fin_calendario_academico')"
                                 class="mt-2" />
                         </div>
+                    </div>
+
+                    {{-- Sección 2: Primer Lapso --}}
+                    <h5 class="text-md font-bold mb-4 mt-6 border-b pb-2 text-gray-700 dark:text-gray-300">Primer Lapso</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-6">
                         <div class="w-full">
                             <x-input-label for="semana_lapso_uno_calendario_academico" :value="__('Semanas del Lapso Académico 1')" />
                             <x-text-input id="semana_lapso_uno_calendario_academico" type="number" autocomplete="off" min="1" max="20"
@@ -183,6 +189,11 @@
                                 :messages="$errors->first('form.semana_per_uno_calendario_academico')"
                                 class="mt-2" />
                         </div>
+                    </div>
+
+                    {{-- Sección 3: Intensivo --}}
+                    <h5 class="text-md font-bold mb-4 mt-6 border-b pb-2 text-gray-700 dark:text-gray-300">Intensivo</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-6">
                         <div class="w-full">
                             <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Semanas del curso Intensivo')" />
                             <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" autocomplete="off" min="0"
@@ -193,6 +204,11 @@
                                 :messages="$errors->first('form.semana_intensibo_introductorio_calendario_academico')"
                                 class="mt-2" />
                         </div>
+                    </div>
+
+                    {{-- Sección 4: Segundo Lapso --}}
+                    <h5 class="text-md font-bold mb-4 mt-6 border-b pb-2 text-gray-700 dark:text-gray-300">Segundo Lapso</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-6">
                         <div class="w-full">
                             <x-input-label for="semana_lapso_dos_calendario_academico" :value="__('Semanas del Lapso Académico 2')" />
                             <x-text-input id="semana_lapso_dos_calendario_academico" type="number" autocomplete="off" min="1" max="20"
