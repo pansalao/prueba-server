@@ -116,6 +116,7 @@ class CreateCalendario extends Component
                         'color' => $ev->color,
                         'especial_evento' => isset($ev->especial_evento) ? (string) $ev->especial_evento : null,
                         'is_superponible_evento' => (bool) ($ev->is_superponible_evento ?? false),
+                        'is_laborable_evento' => (bool) ($ev->is_laborable_evento ?? true),
                     ];
                 }
                 $this->actualizarMapaEventos();
@@ -143,6 +144,7 @@ class CreateCalendario extends Component
                         'color' => $ev->color,
                         'especial_evento' => isset($ev->especial_evento) ? (string) $ev->especial_evento : null,
                         'is_superponible_evento' => (bool) ($ev->is_superponible_evento ?? false),
+                        'is_laborable_evento' => (bool) ($ev->is_laborable_evento ?? true),
                         'is_heredado' => true,
                     ];
 
@@ -337,6 +339,7 @@ class CreateCalendario extends Component
         // VALIDAR REGLA DE SUPERPOSICIÓN CON VACACIONES COLECTIVAS
         $is_superponible = $eventoInfo ? (bool) $eventoInfo->is_superponible_evento : false;
         $is_vacaciones = ($eventoInfo->especial_evento ?? '') === '1';
+        $is_laborable = $eventoInfo ? (bool) $eventoInfo->is_laborable_evento : true;
 
         // VALIDAR SOLAPAMIENTO DE LAPSOS ACADÉMICOS
         if ($especial === '2') {
@@ -493,20 +496,26 @@ class CreateCalendario extends Component
             }
         }
 
-        if (!$is_superponible && !$is_vacaciones) {
+        $is_no_laborable = !$is_laborable || $is_vacaciones;
+
+        if (!$is_superponible && !$is_no_laborable) {
             foreach ($this->eventosRegistrados as $evReg) {
-                if (($evReg['especial_evento'] ?? '') === '1') {
+                $evRegNoLaborable = !((bool)($evReg['is_laborable_evento'] ?? true)) || ($evReg['especial_evento'] ?? '') === '1';
+                
+                if ($evRegNoLaborable) {
                     if ($inicio <= $evReg['fin'] && $fin >= $evReg['inicio']) {
-                        $this->showAlert('error', "El evento '{$nombre}' no es superponible y no puede registrarse en la misma fecha que las Vacaciones Colectivas.");
+                        $nombreChoca = $evReg['nombre_evento'] ?? $evReg['nombre'] ?? 'Sin nombre';
+                        $this->showAlert('error', "El evento '{$nombre}' no es superponible y no puede registrarse en la misma fecha que el evento no laborable '{$nombreChoca}'.");
                         return;
                     }
                 }
             }
-        } else if ($is_vacaciones) {
+        } else if ($is_no_laborable) {
             foreach ($this->eventosRegistrados as $evReg) {
                 if (isset($evReg['is_superponible_evento']) && !$evReg['is_superponible_evento']) {
                     if ($inicio <= $evReg['fin'] && $fin >= $evReg['inicio']) {
-                        $this->showAlert('error', "No se pueden registrar Vacaciones Colectivas en estas fechas porque choca con el evento '{$evReg['nombre_evento']}', el cual no es superponible.");
+                        $nombreChoca = $evReg['nombre_evento'] ?? $evReg['nombre'] ?? 'Sin nombre';
+                        $this->showAlert('error', "No se puede registrar el evento no laborable '{$nombre}' en estas fechas porque choca con el evento '{$nombreChoca}', el cual no es superponible.");
                         return;
                     }
                 }

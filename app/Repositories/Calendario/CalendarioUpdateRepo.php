@@ -33,7 +33,8 @@ class CalendarioUpdateRepo
                 'e.tipo_evento as tipo',
                 'e.codigo_color_evento as color',
                 'e.is_superponible_evento',
-                'e.id_especial_evento as especial_evento'
+                'e.id_especial_evento as especial_evento',
+                'e.is_laborable_evento'
             )
             ->get();
     }
