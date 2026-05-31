@@ -638,7 +638,7 @@ class CreateCalendario extends Component
     protected function debeRecalcularFinesLapso(?\App\Models\Evento $eventoInfo): bool
     {
         $hayInicios = collect($this->eventosRegistrados)->contains(
-            fn($e) => in_array($e['especial_evento'] ?? '', ['2', '7', '9'])
+            fn($e) => in_array($e['especial_evento'] ?? '', ['2', '7', '9', '13'])
         );
 
         if (!$hayInicios || !$eventoInfo) {
@@ -650,6 +650,7 @@ class CreateCalendario extends Component
         return $esp === '2'
             || $esp === '7'
             || $esp === '9'
+            || $esp === '13'
             || $esp === '4'
             || $esp === '5'
             || $esp === '1'
@@ -665,10 +666,10 @@ class CreateCalendario extends Component
 
         $this->eventosRegistrados = array_values(array_filter(
             $this->eventosRegistrados,
-            fn($ev) => !in_array($ev['especial_evento'] ?? '', ['3', '8', '10'])
+            fn($ev) => !in_array($ev['especial_evento'] ?? '', ['3', '8', '10', '14'])
         ));
 
-        $eventosFinTemplates = \App\Models\Evento::whereIn('id_especial_evento', ['3', '8', '10'])
+        $eventosFinTemplates = \App\Models\Evento::whereIn('id_especial_evento', ['3', '8', '10', '14'])
             ->where('estatus', '1')
             ->get()
             ->keyBy('id_especial_evento');
@@ -684,8 +685,8 @@ class CreateCalendario extends Component
             $template = $eventosFinTemplates[$templateKey];
 
             // Determinar si debemos incluir vacaciones colectivas (especial_evento = 1) en el conteo de semanas
-            // Se incluyen para Lapso Académico (3) y Lapso Introductorio (8), pero NO para Lapso Intensivo (10)
-            $incluirVacaciones = in_array($templateKey, ['3', '8']);
+            // Se incluyen para Lapso Académico (3), Lapso Introductorio (8) y Período (14), pero NO para Lapso Intensivo (10)
+            $incluirVacaciones = in_array($templateKey, ['3', '8', '14']);
 
             $fechaFinAuto = \App\Support\CalendarioLapsoSemanas::fechaFinLapso(
                 $inicioEv['inicio'],

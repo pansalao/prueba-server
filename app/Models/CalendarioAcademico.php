@@ -34,18 +34,9 @@ class CalendarioAcademico extends Model
             }
         }
 
-        // Si no hay calendario activo, buscar si hay uno en espera
-        if (!$calendarioActivo) {
-            $calendarioEnEspera = self::where('estatus', '4')
-                ->orderBy('id_calendario_academico', 'asc') // El más antiguo en espera
-                ->first();
-
-            if ($calendarioEnEspera) {
-                // Verificar si ya debe estar activo (por ejemplo, si su fecha de inicio ya pasó o simplemente porque ya no hay otro activo)
-                $calendarioEnEspera->update(['estatus' => '1']);
-                $cantidadModificada++;
-            }
-        }
+        // Se eliminó la lógica de activar calendarios en espera (estatus 4)
+        // porque en el nuevo flujo de negocio solo puede existir 1 calendario a la vez.
+        // El estatus 4 ahora representa estrictamente 'Incompleto / Borrador'.
 
         // Adicionalmente, inactivar cualquier otro calendario que se haya quedado huérfano y vencido
         $cantidadModificada += self::where('estatus', '1')

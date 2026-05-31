@@ -613,7 +613,7 @@ class EditarCalendario extends Component
     protected function debeRecalcularFinesLapso(?\App\Models\Evento $eventoInfo): bool
     {
         $hayInicios = collect($this->eventosRegistrados)->contains(
-            fn($e) => in_array($e['especial_evento'] ?? '', ['2', '7', '9'])
+            fn($e) => in_array($e['especial_evento'] ?? '', ['2', '7', '9', '13'])
         );
 
         if (!$hayInicios || !$eventoInfo) {
@@ -625,6 +625,7 @@ class EditarCalendario extends Component
         return $esp === '2'
             || $esp === '7'
             || $esp === '9'
+            || $esp === '13'
             || $esp === '4'
             || $esp === '5'
             || $esp === '1'
@@ -1080,13 +1081,7 @@ class EditarCalendario extends Component
 
         try {
             DB::transaction(function () {
-                // Verificar si ya existe un calendario activo (estatus 1)
-                $calendarioActivo = DB::table('calendario_academico')
-                    ->where('estatus', '1')
-                    ->where('id_calendario_academico', '!=', $this->id_calendario)
-                    ->first();
-
-                $nuevoEstatus = $calendarioActivo ? '4' : '1';
+                $nuevoEstatus = '1'; // Siempre se activa porque ya no hay lista de espera
 
                 $this->calendarioRepository->actualizarEstatus($this->id_calendario, $nuevoEstatus, [
                     'dia_inicio_calendario_academico' => $this->form->dia_inicio_calendario_academico,
@@ -1101,17 +1096,9 @@ class EditarCalendario extends Component
                 ]);
 
                 $this->calendarioRepository->sincronizarEventos($this->id_calendario, $this->eventosRegistrados);
-
-                // Guardar el estatus resultante para usarlo en el mensaje
-                session()->flash('calendario_nuevo_estatus', $nuevoEstatus);
             });
 
-            $nuevoEstatus = session('calendario_nuevo_estatus');
-            if ($nuevoEstatus === '4') {
-                $this->showAlert('success', 'Calendario aprobado. Pasó a estatus "En Espera" hasta que finalice el calendario actual.', '/calendario/list');
-            } else {
-                $this->showAlert('success', 'Calendario aprobado y activado correctamente.', '/calendario/list');
-            }
+            $this->showAlert('success', 'Calendario aprobado y activado correctamente.', '/calendario/list');
         } catch (Exception $e) {
             $this->showAlert('error', 'Error al aprobar el calendario: ' . $e->getMessage());
         }
