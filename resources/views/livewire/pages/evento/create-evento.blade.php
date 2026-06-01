@@ -71,7 +71,7 @@
                 <x-toggle-switch id="is_independiente" :label="__('¿Puede registrarse fuera de un semestre?')"
                     model="form.is_independiente" :disabled="$deshabilitarIndependienteLaborable" required />
 
-                <x-toggle-switch id="is_superponible" :label="__('¿Puede asignarse en la misma fecha que días de vacaciones?')"
+                <x-toggle-switch id="is_superponible" :label="__('¿Se puede asignar en fechas no laborables?')"
                     model="form.is_superponible" :disabled="$deshabilitarSuperponible" required />
 
                 <x-toggle-switch id="is_dia_evento" :label="__('¿Ocurre en un día específico?')"
