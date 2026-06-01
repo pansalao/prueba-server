@@ -15,7 +15,7 @@
                     $deshabilitarIndependienteLaborable = $form->is_especial
                         || in_array($form->tipo_evento, ['1', '2', '6'], true);
                     $deshabilitarSuperponible = (in_array($form->tipo_evento, ['1', '2', '6'], true) && !($form->is_especial && in_array($form->id_especial_evento, ['4', '5'])))
-                        || ($form->is_especial && in_array($form->id_especial_evento, ['1', '7', '8', '9', '10', '11', '12', '13', '14']));
+                        || ($form->is_especial && in_array($form->id_especial_evento, ['1', '7', '8', '9', '10', '11', '13', '14']));
                     $deshabilitarIsCantidadDias = $form->is_especial;
                     $deshabilitarSemanaEvento = in_array($form->tipo_evento, ['1', '2', '6'], true) || $form->is_especial;
                     $deshabilitarInputDias = $form->is_especial && in_array($form->id_especial_evento, ['2', '3', '4', '5', '7', '8', '9', '10', '11', '13', '14']);
@@ -71,7 +71,7 @@
                 <x-toggle-switch id="is_independiente" :label="__('¿Puede registrarse fuera de un semestre?')"
                     model="form.is_independiente" :disabled="$deshabilitarIndependienteLaborable" required />
 
-                <x-toggle-switch id="is_superponible" :label="__('¿Puede asignarse en la misma fecha que días de vacaciones?')"
+                <x-toggle-switch id="is_superponible" :label="__('¿Se puede asignar en fechas no laborables?')"
                     model="form.is_superponible" :disabled="$deshabilitarSuperponible" required />
 
                 <x-toggle-switch id="is_dia_evento" :label="__('¿Ocurre en un día específico?')"

@@ -7,6 +7,7 @@
     alertTitle: null,
     redirectUrl: null,
     onOkEvent: null,
+    onCancelEvent: null,
     showCancelButton: false,
     cancelText: 'Cancelar',
     okText: 'OK',
@@ -21,6 +22,7 @@
         this.alertTitle = d.title || null;
         this.redirectUrl = d.redirect || null;
         this.onOkEvent = d.onOkEvent || null;
+        this.onCancelEvent = d.onCancelEvent || null;
         this.showCancelButton = d.showCancelButton || false;
         this.cancelText = d.cancelText || 'Cancelar';
         this.okText = d.okText || 'OK';
@@ -45,12 +47,25 @@
             setTimeout(() => {
                 if (typeof Livewire !== 'undefined') {
                     Livewire.dispatch(this.onOkEvent);
+                } else {
+                    window.dispatchEvent(new CustomEvent(this.onOkEvent));
                 }
-                window.dispatchEvent(new CustomEvent(this.onOkEvent));
             }, 10);
         }
         if (this.redirectUrl) {
             setTimeout(() => { window.location.href = this.redirectUrl; }, 100);
+        }
+    },
+    handleCancel() {
+        this.show = false;
+        if (this.onCancelEvent) {
+            setTimeout(() => {
+                if (typeof Livewire !== 'undefined') {
+                    Livewire.dispatch(this.onCancelEvent);
+                } else {
+                    window.dispatchEvent(new CustomEvent(this.onCancelEvent));
+                }
+            }, 10);
         }
     }
 }"
@@ -90,7 +105,7 @@ x-transition:leave-end="opacity-0 scale-95">
             
             <div class="flex flex-col sm:flex-row gap-3 w-full">
                 <template x-if="showCancelButton">
-                    <button type="button" @click="show = false"
+                    <button type="button" @click="handleCancel()"
                             class="w-full sm:w-1/2 py-4 px-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 text-base">
                         <span x-text="cancelText"></span>
                     </button>

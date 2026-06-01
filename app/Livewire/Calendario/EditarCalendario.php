@@ -440,6 +440,12 @@ class EditarCalendario extends Component
             $evRegNoSuperponible = isset($evReg['is_superponible_evento']) && !$evReg['is_superponible_evento'];
             
             if ($inicio <= $evReg['fin'] && $fin >= $evReg['inicio']) {
+                $evRegLaborable = isset($evReg['is_laborable_evento']) ? (bool) $evReg['is_laborable_evento'] : true;
+                $evRegTipo = $evReg['tipo'] ?? '';
+                if (!$is_superponible && !$evRegLaborable && $evRegTipo !== '2') {
+                    continue; // Skip overlap error because this non-working day is ignored in the event duration
+                }
+
                 $nombreChoca = $evReg['nombre_evento'] ?? $evReg['nombre'] ?? 'Sin nombre';
 
                 $esFeriadoLocalOverlap = false;
@@ -505,44 +511,55 @@ class EditarCalendario extends Component
             return;
         }
 
-        $subrangos = [];
+        // Calcular duración real que se va a insertar
+        $duracionReal = 0;
+        $start = new \DateTime($inicio);
+        $end = new \DateTime($fin);
 
-        // Feriados nacionales y locales (1 y 2), o si el rango completo está en fin de semana
-        if (in_array($tipo, ['1', '2', '6']) || $todoEsWeekend) {
-            $subrangos[] = ['inicio' => $inicio, 'fin' => $fin];
-        } else {
-            // Otros eventos: dividimos omitiendo los fines de semana
-            $currentStart = null;
-            $currentEnd = null;
-
-            foreach ($period as $date) {
-                $dayOfWeek = (int) $date->format('N');
-                $isWeekend = ($dayOfWeek >= 6);
-
-                if (!$isWeekend) {
-                    if ($currentStart === null) {
-                        $currentStart = $date->format('Y-m-d');
-                    }
-                    $currentEnd = $date->format('Y-m-d');
-                } else {
-                    if ($currentStart !== null) {
-                        $subrangos[] = ['inicio' => $currentStart, 'fin' => $currentEnd];
-                        $currentStart = null;
-                    }
-                }
-            }
-
-            if ($currentStart !== null) {
-                $subrangos[] = ['inicio' => $currentStart, 'fin' => $currentEnd];
+        $isTodoWeekend = true;
+        $tempInterval = new \DateInterval('P1D');
+        $tempPeriod = new \DatePeriod($start, $tempInterval, (clone $end)->modify('+1 day'));
+        foreach ($tempPeriod as $date) {
+            if ((int) $date->format('N') < 6) {
+                $isTodoWeekend = false;
+                break;
             }
         }
 
-        // Calcular duración real que se va a insertar (sumando días de cada subrango)
-        $duracionReal = 0;
-        foreach ($subrangos as $sub) {
-            $s = new \DateTime($sub['inicio']);
-            $e = new \DateTime($sub['fin']);
-            $duracionReal += $s->diff($e)->days + 1;
+        $ignorarFinesDeSemana = !in_array($tipo, ['1', '2', '6']) && !$isTodoWeekend;
+        $period = new \DatePeriod($start, $tempInterval, (clone $end)->modify('+1 day'));
+
+        foreach ($period as $date) {
+            if ($ignorarFinesDeSemana && (int) $date->format('N') >= 6) {
+                continue;
+            }
+
+            // Ignorar días no laborables registrados (Feriados no superponibles)
+            if (!$is_superponible) {
+                $esDiaNoLaborable = false;
+                $dateCarbon = \Carbon\Carbon::instance($date)->startOfDay();
+                foreach ($this->eventosRegistrados as $evReg) {
+                    $sReg = \Carbon\Carbon::parse($evReg['inicio'] ?? $evReg['dia_inicio_detalle_evento'])->startOfDay();
+                    $eReg = \Carbon\Carbon::parse($evReg['fin'] ?? $evReg['dia_fin_detalle_evento'])->startOfDay();
+
+                    if ($dateCarbon->between($sReg, $eReg)) {
+                        $evRegLaborable = isset($evReg['is_laborable_evento']) ? (bool) $evReg['is_laborable_evento'] : true;
+                        $evRegTipo = $evReg['tipo'] ?? '';
+
+                        // Feriados locales (tipo 2) no se saltan automáticamente, 
+                        // generan la alerta amarilla de superposición.
+                        if (!$evRegLaborable && $evRegTipo !== '2') {
+                            $esDiaNoLaborable = true;
+                            break;
+                        }
+                    }
+                }
+                if ($esDiaNoLaborable) {
+                    continue;
+                }
+            }
+
+            $duracionReal++;
         }
 
         // VALIDACIÓN DE is_cantidad_dias_evento
@@ -611,23 +628,19 @@ class EditarCalendario extends Component
             }
         }
 
-        foreach ($subrangos as $sub) {
-            $nuevoEvento = [
-                'id' => (int) $id_evento,
-                'inicio' => (string) $sub['inicio'],
-                'fin' => (string) $sub['fin'],
-                'nombre_evento' => (string) $nombre,
-                'tipo' => (string) $tipo,
-                'color' => (string) $color,
-                'is_cantidad_dias_evento' => $eventoInfo ? (bool) $eventoInfo->is_cantidad_dias_evento : false,
-                'cantidad_dias_evento' => $eventoInfo ? $eventoInfo->cantidad_dias_evento : null,
-                'especial_evento' => $eventoInfo ? (string) $eventoInfo->especial_evento : null,
-                'is_superponible_evento' => $eventoInfo ? (bool) $eventoInfo->is_superponible_evento : false,
-                'is_laborable_evento' => $eventoInfo ? (bool) $eventoInfo->is_laborable_evento : true,
-            ];
-
-            $this->eventosRegistrados[] = $nuevoEvento;
-        }
+        $this->eventosRegistrados[] = [
+            'id' => (int) $id_evento,
+            'inicio' => (string) $inicio,
+            'fin' => (string) $fin,
+            'nombre_evento' => (string) $nombre,
+            'tipo' => (string) $tipo,
+            'color' => (string) $color,
+            'is_cantidad_dias_evento' => $eventoInfo ? (bool) $eventoInfo->is_cantidad_dias_evento : false,
+            'cantidad_dias_evento' => $eventoInfo ? $eventoInfo->cantidad_dias_evento : null,
+            'especial_evento' => $eventoInfo ? (string) $eventoInfo->especial_evento : null,
+            'is_superponible_evento' => $eventoInfo ? (bool) $eventoInfo->is_superponible_evento : false,
+            'is_laborable_evento' => $eventoInfo ? (bool) $eventoInfo->is_laborable_evento : true,
+        ];
 
         $this->actualizarMapaEventos();
 
@@ -776,6 +789,7 @@ class EditarCalendario extends Component
             $start = \Carbon\Carbon::parse($ev['inicio']);
             $end = \Carbon\Carbon::parse($ev['fin']);
             $tipo = $ev['tipo'] ?? '1';
+            $es_especial_vacaciones = (string)($ev['especial_evento'] ?? '') === '1';
 
             // Determinar si el evento fue asignado exclusivamente en un fin de semana
             $isTodoWeekend = true;
@@ -788,13 +802,47 @@ class EditarCalendario extends Component
                 $temp->addDay();
             }
 
-            $ignorarFinesDeSemana = !in_array($tipo, ['1', '2', '6']) && !$isTodoWeekend;
+            $ignorarFinesDeSemana = !in_array($tipo, ['1', '2', '6']) && !$es_especial_vacaciones && !$isTodoWeekend;
 
             $actual = clone $start;
             while ($actual->lte($end)) {
                 $dayOfWeek = $actual->dayOfWeekIso;
 
-                if ($ignorarFinesDeSemana && $dayOfWeek >= 6) {
+                $isWeekend = ($dayOfWeek >= 6);
+
+                if ($ignorarFinesDeSemana && $isWeekend) {
+                    $actual->addDay();
+                    continue;
+                }
+
+                $is_superponible = isset($ev['is_superponible_evento']) ? (bool) $ev['is_superponible_evento'] : false;
+                $es_especial_vacaciones = (string)($ev['especial_evento'] ?? '') === '1';
+
+                $esDiaNoLaborable = false;
+                // Feriados y Vacaciones (1, 2, 6) o Vacaciones Colectivas (especial_evento 1) NUNCA saltan días visualmente
+                if (!$is_superponible && !in_array($tipo, ['1', '2', '6']) && !$es_especial_vacaciones) {
+                    $dateCarbon = \Carbon\Carbon::instance($actual)->startOfDay();
+                    foreach ($this->eventosRegistrados as $evReg) {
+                        // Evitar compararse consigo mismo si coinciden exactamente
+                        if ($evReg === $ev) continue;
+
+                        $sReg = \Carbon\Carbon::parse($evReg['inicio'] ?? $evReg['dia_inicio_detalle_evento'])->startOfDay();
+                        $eReg = \Carbon\Carbon::parse($evReg['fin'] ?? $evReg['dia_fin_detalle_evento'])->startOfDay();
+
+                        if ($dateCarbon->between($sReg, $eReg)) {
+                            $evRegLaborable = isset($evReg['is_laborable_evento']) ? (bool) $evReg['is_laborable_evento'] : true;
+                            $evRegTipo = $evReg['tipo'] ?? '';
+                            $ignorarFL = $ev['ignorar_feriados_locales'] ?? false;
+
+                            if (!$evRegLaborable && ($evRegTipo !== '2' || $ignorarFL)) {
+                                $esDiaNoLaborable = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if ($esDiaNoLaborable) {
                     $actual->addDay();
                     continue;
                 }
@@ -1299,6 +1347,21 @@ class EditarCalendario extends Component
                 $args[] = false;
             }
             $args[10] = true; // $confirmadoFeriadoLocal
+            $this->agregarEvento(...$args);
+            $this->tempEventoAgregar = null;
+        }
+    }
+
+    #[\Livewire\Attributes\On('cancelar-agregar-evento-feriado-local')]
+    public function cancelarAgregarEventoFeriadoLocal()
+    {
+        if ($this->tempEventoAgregar) {
+            $args = $this->tempEventoAgregar;
+            while (count($args) < 12) {
+                $args[] = false;
+            }
+            $args[10] = true; // $confirmadoFeriadoLocal
+            $args[11] = true; // $ignorarFeriadosLocales
             $this->agregarEvento(...$args);
             $this->tempEventoAgregar = null;
         }

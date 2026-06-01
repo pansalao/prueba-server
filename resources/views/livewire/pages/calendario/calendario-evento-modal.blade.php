@@ -136,9 +136,9 @@ $wireKey = $wireKey ?? 'datalist-calendario';
                 </div>
 
                 {{-- FILA 3 --}}
-                {{-- Columna 1: ¿Puede asignarse en la misma fecha que días de vacaciones? --}}
+                {{-- Columna 1: ¿Se puede asignar en fechas no laborables? --}}
                 <div>
-                    <x-toggle-switch id="{{ $wireKey }}_is_superponible_switch" :label="__('¿Puede asignarse en la misma fecha que días de vacaciones?')"
+                    <x-toggle-switch id="{{ $wireKey }}_is_superponible_switch" :label="__('¿Se puede asignar en fechas no laborables?')"
                         model="form.nuevoIsSuperponible" :disabled="$deshabilitarSuperponible" required />
                     <x-input-error :messages="$errors->get('form.nuevoIsSuperponible')" class="mt-2" />
                 </div>

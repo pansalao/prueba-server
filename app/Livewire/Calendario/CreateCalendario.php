@@ -179,7 +179,7 @@ class CreateCalendario extends Component
         $this->bibliotecaEventos = $eventoRepo->obtenerBiblioteca();
     }
 
-    public function agregarEvento($inicio, $fin, $id_evento, $nombre = null, $tipo = null, $color = null, $confirmadoIntensivo = false, $confirmadoIncorporacion = false, $confirmadoDuracion = false, $confirmadoIntroductorio = false, $confirmadoFeriadoLocal = false)
+    public function agregarEvento($inicio, $fin, $id_evento, $nombre = null, $tipo = null, $color = null, $confirmadoIntensivo = false, $confirmadoIncorporacion = false, $confirmadoDuracion = false, $confirmadoIntroductorio = false, $confirmadoFeriadoLocal = false, $ignorarFeriadosLocales = false)
     {
         $eventoInfo = \App\Models\Evento::find($id_evento);
 
@@ -502,6 +502,12 @@ class CreateCalendario extends Component
             $evRegNoSuperponible = isset($evReg['is_superponible_evento']) && !$evReg['is_superponible_evento'];
             
             if ($inicio <= $evReg['fin'] && $fin >= $evReg['inicio']) {
+                $evRegLaborable = isset($evReg['is_laborable_evento']) ? (bool) $evReg['is_laborable_evento'] : true;
+                $evRegTipo = $evReg['tipo'] ?? '';
+                if (!$is_superponible && !$evRegLaborable && $evRegTipo !== '2') {
+                    continue; // Skip overlap error because this non-working day is ignored in the event duration
+                }
+
                 $nombreChoca = $evReg['nombre_evento'] ?? $evReg['nombre'] ?? 'Sin nombre';
 
                 $esFeriadoLocalOverlap = false;
@@ -522,7 +528,8 @@ class CreateCalendario extends Component
                                 'showCancelButton' => true,
                                 'cancelText' => 'Cancelar',
                                 'okText' => 'Continuar',
-                                'onOkEvent' => 'confirmar-agregar-evento-feriado-local'
+                                'onOkEvent' => 'confirmar-agregar-evento-feriado-local',
+                                'onCancelEvent' => 'cancelar-agregar-evento-feriado-local'
                             ]);
                             return;
                         }
@@ -547,7 +554,9 @@ class CreateCalendario extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->showAlert('error', $e->validator->errors()->first());
             return;
-        }        // Calcular duración real que se va a insertar
+        }
+
+        // Calcular duración real que se va a insertar
         $duracionReal = 0;
         $start = new \DateTime($inicio);
         $end = new \DateTime($fin);
@@ -563,12 +572,38 @@ class CreateCalendario extends Component
         }
 
         $ignorarFinesDeSemana = !in_array($tipo, ['1', '2', '6']) && !$isTodoWeekend;
-
         $period = new \DatePeriod($start, $tempInterval, (clone $end)->modify('+1 day'));
+
         foreach ($period as $date) {
             if ($ignorarFinesDeSemana && (int) $date->format('N') >= 6) {
                 continue;
             }
+
+            // Ignorar días no laborables registrados (Feriados no superponibles)
+            if (!$is_superponible) {
+                $esDiaNoLaborable = false;
+                $dateCarbon = \Carbon\Carbon::instance($date)->startOfDay();
+                foreach ($this->eventosRegistrados as $evReg) {
+                    $sReg = \Carbon\Carbon::parse($evReg['inicio'])->startOfDay();
+                    $eReg = \Carbon\Carbon::parse($evReg['fin'])->startOfDay();
+
+                    if ($dateCarbon->between($sReg, $eReg)) {
+                        $evRegLaborable = isset($evReg['is_laborable_evento']) ? (bool) $evReg['is_laborable_evento'] : true;
+                        $evRegTipo = $evReg['tipo'] ?? '';
+
+                        // Feriados locales (tipo 2) no se saltan automáticamente, 
+                        // generan la alerta amarilla de superposición.
+                        if (!$evRegLaborable && ($evRegTipo !== '2' || $ignorarFeriadosLocales)) {
+                            $esDiaNoLaborable = true;
+                            break;
+                        }
+                    }
+                }
+                if ($esDiaNoLaborable) {
+                    continue;
+                }
+            }
+
             $duracionReal++;
         }
 
@@ -638,9 +673,9 @@ class CreateCalendario extends Component
             }
         }
 
-        // Se mantiene el rango completo sin dividir por fines de semana.
-        // Ejemplo: un evento que inicia viernes y termina lunes se guarda
-        // como una sola entrada (inicio=viernes, fin=lunes) en lugar de dividirlo.
+        // Se mantiene el rango completo sin dividir por fines de semana ni días no laborables.
+        // Esto permite que sea un solo evento, pero en actualizarMapaEventos se ignoran esos días
+        // para que visualmente sí se salte.
         $this->eventosRegistrados[] = [
             'id' => (int) $id_evento,
             'inicio' => (string) $inicio,
@@ -653,6 +688,7 @@ class CreateCalendario extends Component
             'especial_evento' => $eventoInfo ? (string) $eventoInfo->especial_evento : null,
             'is_superponible_evento' => $eventoInfo ? (bool) $eventoInfo->is_superponible_evento : false,
             'is_laborable_evento' => $eventoInfo ? (bool) $eventoInfo->is_laborable_evento : true,
+            'ignorar_feriados_locales' => $ignorarFeriadosLocales,
         ];
 
         $this->actualizarMapaEventos();
@@ -821,7 +857,41 @@ class CreateCalendario extends Component
             while ($actual->lte($end)) {
                 $dayOfWeek = $actual->dayOfWeekIso;
 
-                if ($ignorarFinesDeSemana && $dayOfWeek >= 6) {
+                $isWeekend = ($dayOfWeek >= 6);
+
+                if ($ignorarFinesDeSemana && $isWeekend) {
+                    $actual->addDay();
+                    continue;
+                }
+
+                $is_superponible = isset($ev['is_superponible_evento']) ? (bool) $ev['is_superponible_evento'] : false;
+                $es_especial_vacaciones = (string)($ev['especial_evento'] ?? '') === '1';
+
+                $esDiaNoLaborable = false;
+                // Feriados y Vacaciones (1, 2, 6) o Vacaciones Colectivas (especial_evento 1) NUNCA saltan días visualmente
+                if (!$is_superponible && !in_array($tipo, ['1', '2', '6']) && !$es_especial_vacaciones) {
+                    $dateCarbon = \Carbon\Carbon::instance($actual)->startOfDay();
+                    foreach ($this->eventosRegistrados as $evReg) {
+                        // Evitar compararse consigo mismo si coinciden exactamente (aunque es improbable en este punto de iteración)
+                        if ($evReg === $ev) continue;
+
+                        $sReg = \Carbon\Carbon::parse($evReg['inicio'])->startOfDay();
+                        $eReg = \Carbon\Carbon::parse($evReg['fin'])->startOfDay();
+
+                        if ($dateCarbon->between($sReg, $eReg)) {
+                            $evRegLaborable = isset($evReg['is_laborable_evento']) ? (bool) $evReg['is_laborable_evento'] : true;
+                            $evRegTipo = $evReg['tipo'] ?? '';
+                            $ignorarFL = $ev['ignorar_feriados_locales'] ?? false;
+
+                            if (!$evRegLaborable && ($evRegTipo !== '2' || $ignorarFL)) {
+                                $esDiaNoLaborable = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if ($esDiaNoLaborable) {
                     $actual->addDay();
                     continue;
                 }
@@ -872,7 +942,7 @@ class CreateCalendario extends Component
         $this->guardarBorrador();
     }
 
-    public function crearYAgregarEvento($inicio, $fin, $nombre, $tipo, $codigo_color_evento, $is_laborable, $is_repetible, $is_rango_dias, $rango_dias, $is_superponible = true, $confirmadoIntensivo = false)
+    public function crearYAgregarEvento($inicio, $fin, $nombre, $tipo, $codigo_color_evento, $is_laborable, $is_repetible, $is_rango_dias, $rango_dias, $is_superponible = true, $confirmadoIntensivo = false, $confirmadoFeriadoLocal = false, $ignorarFeriadosLocales = false)
     {
         if (strtotime($inicio) > strtotime($fin)) {
             $this->showAlert('error', 'La fecha de fin no puede ser menor a la fecha de inicio.');
@@ -891,18 +961,7 @@ class CreateCalendario extends Component
             $is_repetible = false;
         }
 
-        // VALIDAR REGLA DE SUPERPOSICIÓN CON VACACIONES COLECTIVAS ANTES DE CREAR EL TEMPLATE
-        $is_superponible_nuevo = in_array($tipo, ['1', '2', '6']) ? true : false;
-        if (!$is_superponible_nuevo) {
-            foreach ($this->eventosRegistrados as $evReg) {
-                if (($evReg['especial_evento'] ?? '') === '1') {
-                    if ($inicio <= $evReg['fin'] && $fin >= $evReg['inicio']) {
-                        $this->showAlert('error', "El evento '{$nombre}' no es superponible y no puede registrarse en la misma fecha que las Vacaciones Colectivas.");
-                        return false;
-                    }
-                }
-            }
-        }
+
 
         $this->form->isCreatingEvento = true;
 
@@ -1232,6 +1291,7 @@ class CreateCalendario extends Component
     #[\Livewire\Attributes\On('confirmar-agregar-evento-feriado-local')]
     public function confirmarAgregarEventoFeriadoLocal()
     {
+        \Illuminate\Support\Facades\Log::info("Confirmar feriado local, tempEventoAgregar: " . json_encode($this->tempEventoAgregar));
         if ($this->tempEventoAgregar) {
             $args = $this->tempEventoAgregar;
             while (count($args) < 11) {
@@ -1242,6 +1302,24 @@ class CreateCalendario extends Component
             $this->tempEventoAgregar = null;
         }
     }
+
+    #[\Livewire\Attributes\On('cancelar-agregar-evento-feriado-local')]
+    public function cancelarAgregarEventoFeriadoLocal()
+    {
+        \Illuminate\Support\Facades\Log::info("Cancelar feriado local, tempEventoAgregar: " . json_encode($this->tempEventoAgregar));
+        if ($this->tempEventoAgregar) {
+            $args = $this->tempEventoAgregar;
+            while (count($args) < 12) {
+                $args[] = false;
+            }
+            $args[10] = true; // $confirmadoFeriadoLocal
+            $args[11] = true; // $ignorarFeriadosLocales
+            $this->agregarEvento(...$args);
+            $this->tempEventoAgregar = null;
+        }
+    }
+
+
 
 
     #[\Livewire\Attributes\On('confirmar-agregar-evento-introductorio')]

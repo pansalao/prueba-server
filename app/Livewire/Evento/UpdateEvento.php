@@ -16,10 +16,10 @@ class UpdateEvento extends Component
     protected $eventoRepository;
     protected $viewRepository;
 
-    public function boot()
+    public function boot(EventoUpdateRepo $eventoRepo, EventoViewRepo $viewRepo)
     {
-        $this->eventoRepository = new EventoUpdateRepo();
-        $this->viewRepository = new EventoViewRepo();
+        $this->eventoRepository = $eventoRepo;
+        $this->viewRepository = $viewRepo;
     }
 
     public function mount($id)
@@ -78,16 +78,6 @@ class UpdateEvento extends Component
                 $this->form->rango_dias = '1';
                 $this->form->is_independiente = true;
                 $this->form->is_superponible = true;
-                $this->form->cantidad_dias_evento = 0;
-            } elseif ($this->form->id_especial_evento == '12') {
-                $this->form->is_laborable = false;
-                $this->form->is_repetible = true;
-                $this->form->tipo_evento = '5';
-                $this->form->codigo_color_evento = '#28a745';
-                $this->form->is_independiente = true;
-                $this->form->is_superponible = true;
-                $this->form->is_rango_dias = false;
-                $this->form->rango_dias = null;
                 $this->form->cantidad_dias_evento = 0;
             } elseif ($this->form->id_especial_evento == '1') {
                 $this->form->is_laborable = false;
@@ -157,7 +147,7 @@ class UpdateEvento extends Component
                 $this->form->dia_evento = null;
             }
 
-            if (!in_array($this->form->id_especial_evento, ['1', '2', '3', '4', '5', '7', '8', '9', '10', '11', '12', '13', '14'])) {
+            if (!in_array($this->form->id_especial_evento, ['1', '2', '3', '4', '5', '7', '8', '9', '10', '11', '13', '14'])) {
                 if (in_array($this->form->tipo_evento, ['1', '2', '6'])) {
                     $this->form->is_laborable = false;
                     $this->form->is_repetible = false;

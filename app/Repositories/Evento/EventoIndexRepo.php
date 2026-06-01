@@ -8,7 +8,7 @@ class EventoIndexRepo
 {
     public function listar($busqueda = '', $paginacion = 5)
     {
-        return \App\Models\Evento::select('evento.*')
+        return \App\Models\Evento::with('especialEvento')->select('evento.*')
             ->when($busqueda, function ($consulta, $busqueda) {
                 $consulta->where('nombre_evento', 'LIKE', '%' . $busqueda . '%');
             })

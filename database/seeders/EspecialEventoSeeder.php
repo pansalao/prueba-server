@@ -30,9 +30,8 @@ class EspecialEventoSeeder extends Seeder
             ['id_especial_evento' => 9, 'especial_evento_name' => 'Inicio del Curso Intensivo', 'estatus' => '1'],
             ['id_especial_evento' => 10, 'especial_evento_name' => 'Fin del Curso Intensivo', 'estatus' => '1'],
             ['id_especial_evento' => 11, 'especial_evento_name' => 'Incorporación después del Receso Vacacional', 'estatus' => '1'],
-            ['id_especial_evento' => 12, 'especial_evento_name' => 'Suspensión', 'estatus' => '1'],
-            ['id_especial_evento' => 13, 'especial_evento_name' => 'Inicio del Per', 'estatus' => '1'],
-            ['id_especial_evento' => 14, 'especial_evento_name' => 'Fin del Per', 'estatus' => '1'],
+            ['id_especial_evento' => 13, 'especial_evento_name' => 'Inicio del Período', 'estatus' => '1'],
+            ['id_especial_evento' => 14, 'especial_evento_name' => 'Fin del Período', 'estatus' => '1'],
         ];
 
         DB::table('especial_evento')->insert($eventosEspeciales);

@@ -14,9 +14,9 @@ class ShowEvento extends Component
     public $evento;
     protected $eventoRepository;
 
-    public function __construct()
+    public function boot(EventoViewRepo $repo)
     {
-        $this->eventoRepository = new EventoViewRepo();
+        $this->eventoRepository = $repo;
     }
 
     public function mount($id)

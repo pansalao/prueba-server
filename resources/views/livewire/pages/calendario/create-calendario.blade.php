@@ -136,91 +136,184 @@
 
 
 
-                    {{-- Selección de Fechas y Lapsos --}}
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-6">
-                        <div class="w-full">
-                            <x-input-label for="dia_inicio_calendario_academico" :value="__('Inicio del Período')" />
-                            <x-text-input id="dia_inicio_calendario_academico" type="date"
-                                wire:model.live="form.dia_inicio_calendario_academico"
-                                class="w-full mt-1 date-input-dark" required />
-                            <x-input-error :messages="$errors->first('form.dia_inicio_calendario_academico')"
-                                class="mt-2" />
+                    @php
+                        // Fechas Generales
+                        $errFechas = $errors->has('form.dia_inicio_calendario_academico') || $errors->has('form.dia_fin_calendario_academico');
+                        $valFechas = !empty($form->dia_inicio_calendario_academico) && !empty($form->dia_fin_calendario_academico);
+                        $colorFechas = $errFechas ? 'border-red-500 shadow-[0_0_10px_rgba(160,0,0,0.1)]' : ($valFechas ? 'border-green-500' : 'border-gray-200 dark:border-gray-700');
+
+                        // Primer Lapso
+                        $lapso1 = (int) $form->semana_lapso_uno_calendario_academico;
+                        $intro1 = (int) $form->semana_lapso_uno_introductorio_calendario_academico;
+                        $per1 = (int) $form->semana_per_uno_calendario_academico;
+
+                        $errLapso1 = $errors->has('form.semana_lapso_uno_calendario_academico') || $errors->has('form.semana_lapso_uno_introductorio_calendario_academico') || $errors->has('form.semana_per_uno_calendario_academico');
+                        $warnLapso1 = ($lapso1 > 0 && ($lapso1 < 16 || $lapso1 > 18)) || ($intro1 > 0 && $intro1 != 12);
+                        $valLapso1 = $lapso1 > 0;
+                        $colorLapso1 = $errLapso1 ? 'border-red-500 shadow-[0_0_10px_rgba(160,0,0,0.1)]' : ($warnLapso1 ? 'border-yellow-500 shadow-[0_0_10px_rgba(160,160,0,0.1)]' : ($valLapso1 ? 'border-green-500' : 'border-gray-200 dark:border-gray-700'));
+
+                        // Intensivo
+                        $int = (int) $form->semana_intensibo_introductorio_calendario_academico;
+                        $errInt = $errors->has('form.semana_intensibo_introductorio_calendario_academico');
+                        $warnInt = ($int > 0 && $int != 6);
+                        $valInt = $form->semana_intensibo_introductorio_calendario_academico !== null && $form->semana_intensibo_introductorio_calendario_academico !== '';
+                        $colorInt = $errInt ? 'border-red-500 shadow-[0_0_10px_rgba(160,0,0,0.1)]' : ($warnInt ? 'border-yellow-500 shadow-[0_0_10px_rgba(160,160,0,0.1)]' : ($valInt ? 'border-green-500' : 'border-gray-200 dark:border-gray-700'));
+
+                        // Segundo Lapso
+                        $lapso2 = (int) $form->semana_lapso_dos_calendario_academico;
+                        $intro2 = (int) $form->semana_lapso_dos_introductorio_calendario_academico;
+                        $per2 = (int) $form->semana_per_dos_calendario_academico;
+
+                        $errLapso2 = $errors->has('form.semana_lapso_dos_calendario_academico') || $errors->has('form.semana_lapso_dos_introductorio_calendario_academico') || $errors->has('form.semana_per_dos_calendario_academico');
+                        $warnLapso2 = ($lapso2 > 0 && ($lapso2 < 16 || $lapso2 > 18)) || ($intro2 > 0 && $intro2 != 12);
+                        $valLapso2 = $lapso2 > 0;
+                        $colorLapso2 = $errLapso2 ? 'border-red-500 shadow-[0_0_10px_rgba(160,0,0,0.1)]' : ($warnLapso2 ? 'border-yellow-500 shadow-[0_0_10px_rgba(160,160,0,0.1)]' : ($valLapso2 ? 'border-green-500' : 'border-gray-200 dark:border-gray-700'));
+                    @endphp
+
+                    <div x-data="{ openSubSection: 'fechas_generales' }" class="space-y-4">
+
+                        {{-- Sección 1: Fechas Generales --}}
+                        <div class="border-2 {{ $colorFechas }} rounded-xl transition-all duration-300" :class="openSubSection === 'fechas_generales' ? 'overflow-visible' : 'overflow-hidden'">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSubSection = openSubSection === 'fechas_generales' ? '' : 'fechas_generales'">
+                                <h5 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-icons {{ str_contains($colorFechas, 'red') ? 'text-red-500' : (str_contains($colorFechas, 'yellow') ? 'text-yellow-500' : (str_contains($colorFechas, 'green') ? 'text-green-500' : 'text-blue-500')) }}">date_range</span>
+                                    Fechas de Inicio y Fin
+                                </h5>
+                                <span class="material-icons transition-transform duration-200" :class="openSubSection === 'fechas_generales' ? 'rotate-180' : ''">expand_more</span>
+                            </div>
+                            <div x-show="openSubSection === 'fechas_generales'" x-collapse class="p-4 bg-white dark:bg-gray-800 rounded-b-[10px]">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-7xl mx-auto mb-2">
+                                    <div class="w-full">
+                                        <x-input-label for="dia_inicio_calendario_academico" :value="__('Inicio del Período')" />
+                                        <x-text-input id="dia_inicio_calendario_academico" type="date"
+                                            wire:model.live="form.dia_inicio_calendario_academico"
+                                            class="w-full mt-1 date-input-dark" required />
+                                        <x-input-error :messages="$errors->first('form.dia_inicio_calendario_academico')"
+                                            class="mt-2" />
+                                    </div>
+                                    <div class="w-full">
+                                        <x-input-label for="dia_fin_calendario_academico" :value="__('Fin del Período')" />
+                                        <x-text-input id="dia_fin_calendario_academico" type="date"
+                                            wire:model.live="form.dia_fin_calendario_academico" class="w-full mt-1 date-input-dark"
+                                            required />
+                                        <x-input-error :messages="$errors->first('form.dia_fin_calendario_academico')"
+                                            class="mt-2" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="w-full">
-                            <x-input-label for="dia_fin_calendario_academico" :value="__('Fin del Período')" />
-                            <x-text-input id="dia_fin_calendario_academico" type="date"
-                                wire:model.live="form.dia_fin_calendario_academico" class="w-full mt-1 date-input-dark"
-                                required />
-                            <x-input-error :messages="$errors->first('form.dia_fin_calendario_academico')"
-                                class="mt-2" />
+
+                        {{-- Sección 2: Primer Lapso --}}
+                        <div class="border-2 {{ $colorLapso1 }} rounded-xl transition-all duration-300" :class="openSubSection === 'primer_lapso' ? 'overflow-visible' : 'overflow-hidden'">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSubSection = openSubSection === 'primer_lapso' ? '' : 'primer_lapso'">
+                                <h5 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-icons {{ str_contains($colorLapso1, 'red') ? 'text-red-500' : (str_contains($colorLapso1, 'yellow') ? 'text-yellow-500' : (str_contains($colorLapso1, 'green') ? 'text-green-500' : 'text-blue-500')) }}">school</span>
+                                    Primer Lapso
+                                </h5>
+                                <span class="material-icons transition-transform duration-200" :class="openSubSection === 'primer_lapso' ? 'rotate-180' : ''">expand_more</span>
+                            </div>
+                            <div x-show="openSubSection === 'primer_lapso'" x-collapse class="p-4 bg-white dark:bg-gray-800 rounded-b-[10px]">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-2">
+                                    <div class="w-full">
+                                        <x-input-label for="semana_lapso_uno_calendario_academico" :value="__('Semanas del Lapso Académico 1')" />
+                                        <x-text-input id="semana_lapso_uno_calendario_academico" type="number" autocomplete="off" min="1" max="20"
+                                            oninput="if(this.value > 20) this.value = 20;"
+                                            wire:model.live="form.semana_lapso_uno_calendario_academico" class="w-full mt-1"
+                                            placeholder="Ej: 18" required />
+                                        <x-input-error :messages="$errors->first('form.semana_lapso_uno_calendario_academico')"
+                                            class="mt-2" />
+                                    </div>
+                                    <div class="w-full">
+                                        <x-input-label for="semana_lapso_uno_introductorio_calendario_academico" :value="__('Semanas del Lapso Académico Trayecto Inicial 1')" />
+                                        <x-text-input id="semana_lapso_uno_introductorio_calendario_academico" type="number" autocomplete="off" min="0"
+                                            max="20" oninput="if(this.value > 20) this.value = 20;"
+                                            wire:model.live="form.semana_lapso_uno_introductorio_calendario_academico"
+                                            class="w-full mt-1" placeholder="Ej: 18" required />
+                                        <x-input-error
+                                            :messages="$errors->first('form.semana_lapso_uno_introductorio_calendario_academico')"
+                                            class="mt-2" />
+                                    </div>
+                                    <div class="w-full">
+                                        <x-input-label for="semana_per_uno_calendario_academico" :value="__('Semanas del Per 1')" />
+                                        <x-text-input id="semana_per_uno_calendario_academico" type="number" autocomplete="off" min="0"
+                                            max="20" oninput="if(this.value > 20) this.value = 20;"
+                                            wire:model.live="form.semana_per_uno_calendario_academico"
+                                            class="w-full mt-1" placeholder="Ej: 18" required />
+                                        <x-input-error
+                                            :messages="$errors->first('form.semana_per_uno_calendario_academico')"
+                                            class="mt-2" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="w-full">
-                            <x-input-label for="semana_lapso_uno_calendario_academico" :value="__('Semanas del Lapso Académico 1')" />
-                            <x-text-input id="semana_lapso_uno_calendario_academico" type="number" autocomplete="off" min="1" max="20"
-                                oninput="if(this.value > 20) this.value = 20;"
-                                wire:model.live="form.semana_lapso_uno_calendario_academico" class="w-full mt-1"
-                                placeholder="Ej: 18" required />
-                            <x-input-error :messages="$errors->first('form.semana_lapso_uno_calendario_academico')"
-                                class="mt-2" />
+
+                        {{-- Sección 3: Intensivo --}}
+                        <div class="border-2 {{ $colorInt }} rounded-xl transition-all duration-300" :class="openSubSection === 'intensivo' ? 'overflow-visible' : 'overflow-hidden'">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSubSection = openSubSection === 'intensivo' ? '' : 'intensivo'">
+                                <h5 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-icons {{ str_contains($colorInt, 'red') ? 'text-red-500' : (str_contains($colorInt, 'yellow') ? 'text-yellow-500' : (str_contains($colorInt, 'green') ? 'text-green-500' : 'text-blue-500')) }}">wb_sunny</span>
+                                    Intensivo
+                                </h5>
+                                <span class="material-icons transition-transform duration-200" :class="openSubSection === 'intensivo' ? 'rotate-180' : ''">expand_more</span>
+                            </div>
+                            <div x-show="openSubSection === 'intensivo'" x-collapse class="p-4 bg-white dark:bg-gray-800 rounded-b-[10px]">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-2">
+                                    <div class="w-full">
+                                        <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Semanas del curso Intensivo')" />
+                                        <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" autocomplete="off" min="0"
+                                            max="20" oninput="if(this.value > 20) this.value = 20;"
+                                            wire:model.live="form.semana_intensibo_introductorio_calendario_academico"
+                                            class="w-full mt-1" placeholder="Ej: 18" required />
+                                        <x-input-error
+                                            :messages="$errors->first('form.semana_intensibo_introductorio_calendario_academico')"
+                                            class="mt-2" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="w-full">
-                            <x-input-label for="semana_lapso_uno_introductorio_calendario_academico" :value="__('Semanas del Lapso Académico Trayecto Inicial 1')" />
-                            <x-text-input id="semana_lapso_uno_introductorio_calendario_academico" type="number" autocomplete="off" min="0"
-                                max="20" oninput="if(this.value > 20) this.value = 20;"
-                                wire:model.live="form.semana_lapso_uno_introductorio_calendario_academico"
-                                class="w-full mt-1" placeholder="Ej: 18" required />
-                            <x-input-error
-                                :messages="$errors->first('form.semana_lapso_uno_introductorio_calendario_academico')"
-                                class="mt-2" />
-                        </div>
-                        <div class="w-full">
-                            <x-input-label for="semana_per_uno_calendario_academico" :value="__('Semanas del Per 1')" />
-                            <x-text-input id="semana_per_uno_calendario_academico" type="number" autocomplete="off" min="0"
-                                max="20" oninput="if(this.value > 20) this.value = 20;"
-                                wire:model.live="form.semana_per_uno_calendario_academico"
-                                class="w-full mt-1" placeholder="Ej: 18" required />
-                            <x-input-error
-                                :messages="$errors->first('form.semana_per_uno_calendario_academico')"
-                                class="mt-2" />
-                        </div>
-                        <div class="w-full">
-                            <x-input-label for="semana_intensibo_introductorio_calendario_academico" :value="__('Semanas del curso Intensivo')" />
-                            <x-text-input id="semana_intensibo_introductorio_calendario_academico" type="number" autocomplete="off" min="0"
-                                max="20" oninput="if(this.value > 20) this.value = 20;"
-                                wire:model.live="form.semana_intensibo_introductorio_calendario_academico"
-                                class="w-full mt-1" placeholder="Ej: 18" required />
-                            <x-input-error
-                                :messages="$errors->first('form.semana_intensibo_introductorio_calendario_academico')"
-                                class="mt-2" />
-                        </div>
-                        <div class="w-full">
-                            <x-input-label for="semana_lapso_dos_calendario_academico" :value="__('Semanas del Lapso Académico 2')" />
-                            <x-text-input id="semana_lapso_dos_calendario_academico" type="number" autocomplete="off" min="1" max="20"
-                                oninput="if(this.value > 20) this.value = 20;"
-                                wire:model.live="form.semana_lapso_dos_calendario_academico" class="w-full mt-1"
-                                placeholder="Ej: 18" required />
-                            <x-input-error :messages="$errors->first('form.semana_lapso_dos_calendario_academico')"
-                                class="mt-2" />
-                        </div>
-                        <div class="w-full">
-                            <x-input-label for="semana_lapso_dos_introductorio_calendario_academico" :value="__('Semanas del Lapso Académico Trayecto Inicial 2')" />
-                            <x-text-input id="semana_lapso_dos_introductorio_calendario_academico" type="number" autocomplete="off" min="0"
-                                max="20" oninput="if(this.value > 20) this.value = 20;"
-                                wire:model.live="form.semana_lapso_dos_introductorio_calendario_academico"
-                                class="w-full mt-1" placeholder="Ej: 18" required />
-                            <x-input-error
-                                :messages="$errors->first('form.semana_lapso_dos_introductorio_calendario_academico')"
-                                class="mt-2" />
-                        </div>
-                        <div class="w-full">
-                            <x-input-label for="semana_per_dos_calendario_academico" :value="__('Semanas del Per 2')" />
-                            <x-text-input id="semana_per_dos_calendario_academico" type="number" autocomplete="off" min="0"
-                                max="20" oninput="if(this.value > 20) this.value = 20;"
-                                wire:model.live="form.semana_per_dos_calendario_academico"
-                                class="w-full mt-1" placeholder="Ej: 18" required />
-                            <x-input-error
-                                :messages="$errors->first('form.semana_per_dos_calendario_academico')"
-                                class="mt-2" />
+
+                        {{-- Sección 4: Segundo Lapso --}}
+                        <div class="border-2 {{ $colorLapso2 }} rounded-xl transition-all duration-300" :class="openSubSection === 'segundo_lapso' ? 'overflow-visible' : 'overflow-hidden'">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-t-[10px]" @click="openSubSection = openSubSection === 'segundo_lapso' ? '' : 'segundo_lapso'">
+                                <h5 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-icons {{ str_contains($colorLapso2, 'red') ? 'text-red-500' : (str_contains($colorLapso2, 'yellow') ? 'text-yellow-500' : (str_contains($colorLapso2, 'green') ? 'text-green-500' : 'text-blue-500')) }}">school</span>
+                                    Segundo Lapso
+                                </h5>
+                                <span class="material-icons transition-transform duration-200" :class="openSubSection === 'segundo_lapso' ? 'rotate-180' : ''">expand_more</span>
+                            </div>
+                            <div x-show="openSubSection === 'segundo_lapso'" x-collapse class="p-4 bg-white dark:bg-gray-800 rounded-b-[10px]">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto mb-2">
+                                    <div class="w-full">
+                                        <x-input-label for="semana_lapso_dos_calendario_academico" :value="__('Semanas del Lapso Académico 2')" />
+                                        <x-text-input id="semana_lapso_dos_calendario_academico" type="number" autocomplete="off" min="1" max="20"
+                                            oninput="if(this.value > 20) this.value = 20;"
+                                            wire:model.live="form.semana_lapso_dos_calendario_academico" class="w-full mt-1"
+                                            placeholder="Ej: 18" required />
+                                        <x-input-error :messages="$errors->first('form.semana_lapso_dos_calendario_academico')"
+                                            class="mt-2" />
+                                    </div>
+                                    <div class="w-full">
+                                        <x-input-label for="semana_lapso_dos_introductorio_calendario_academico" :value="__('Semanas del Lapso Académico Trayecto Inicial 2')" />
+                                        <x-text-input id="semana_lapso_dos_introductorio_calendario_academico" type="number" autocomplete="off" min="0"
+                                            max="20" oninput="if(this.value > 20) this.value = 20;"
+                                            wire:model.live="form.semana_lapso_dos_introductorio_calendario_academico"
+                                            class="w-full mt-1" placeholder="Ej: 18" required />
+                                        <x-input-error
+                                            :messages="$errors->first('form.semana_lapso_dos_introductorio_calendario_academico')"
+                                            class="mt-2" />
+                                    </div>
+                                    <div class="w-full">
+                                        <x-input-label for="semana_per_dos_calendario_academico" :value="__('Semanas del Per 2')" />
+                                        <x-text-input id="semana_per_dos_calendario_academico" type="number" autocomplete="off" min="0"
+                                            max="20" oninput="if(this.value > 20) this.value = 20;"
+                                            wire:model.live="form.semana_per_dos_calendario_academico"
+                                            class="w-full mt-1" placeholder="Ej: 18" required />
+                                        <x-input-error
+                                            :messages="$errors->first('form.semana_per_dos_calendario_academico')"
+                                            class="mt-2" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div

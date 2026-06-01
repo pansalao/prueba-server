@@ -23,7 +23,7 @@ class EventoCreateRepo
             'dia_evento' => ($data['is_dia_evento'] ?? false) ? ($data['dia_evento'] ?? null) : null,
             'is_semana_evento' => $data['is_semana_evento'] ?? (!empty($data['semanas'])),
             'semana_evento' => (($data['is_semana_evento'] ?? !empty($data['semanas'])) && !empty($data['semanas']) && is_array($data['semanas'])) 
-                ? json_encode(array_values(array_filter($data['semanas'], fn($v) => is_array($v) && !empty($v['semana']) && $v['semana'] !== null && $v['semana'] !== ''))) 
+                ? array_values(array_filter($data['semanas'], fn($v) => is_array($v) && !empty($v['semana']) && $v['semana'] !== null && $v['semana'] !== '')) 
                 : null,
             'estatus'       => '1',
         ];
