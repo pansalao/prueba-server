@@ -254,7 +254,7 @@
 
             @php
                 $activeRole = session('active_role', auth()->user()->usu_cod_rol);
-                $isCoordinadorMenu = $activeRole == 5;
+                $isCoordinadorMenu = in_array($activeRole, [1, 5, 11, 30]);
             @endphp
             @if($isCoordinadorMenu)
                 <!-- Voceros -->

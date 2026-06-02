@@ -30,8 +30,8 @@ class PanelVocero extends Component
         
         $activeRole = session('active_role', $user->usu_cod_rol);
 
-        // Verificar si tiene el rol de Coordinador (rol 5)
-        if ($activeRole == 5) {
+        // Verificar si tiene el rol de Coordinador (rol 1, 5, 11, 30)
+        if (in_array($activeRole, [1, 5, 11, 30])) {
             $this->isCoordinador = true;
             $this->cargarSecciones();
         } else {
@@ -93,7 +93,8 @@ class PanelVocero extends Component
                     'sec_nombre' => $est->sec_nombre,
                     'trayecto_nombre' => $est->trayecto_nombre,
                     'vocero_actual' => $vocerosAsignados[$est->sec_codigo] ?? null,
-                    'estudiantes' => []
+                    'estudiantes' => [],
+                    'tipos_ocupados' => []
                 ];
             }
 
@@ -106,6 +107,10 @@ class PanelVocero extends Component
                 $esVocero = $voceroRecord !== null;
                 $tipoVocero = $esVocero ? $voceroRecord->tipo_vocero : null; // 1, 2 o 3
                 $fechaAsignacion = $esVocero ? $voceroRecord->updated_at->format('d/m/Y h:i A') : null;
+
+                if ($esVocero) {
+                    $agrupados[$est->sec_codigo]['tipos_ocupados'][] = $tipoVocero;
+                }
 
                 $agrupados[$est->sec_codigo]['estudiantes'][] = [
                     'per_cedula' => $est->per_cedula,
@@ -135,27 +140,27 @@ class PanelVocero extends Component
         
         // Filtrar por trayecto si está seleccionado
         if (!empty($this->trayectoSeleccionado)) {
-            $this->secciones = array_filter($this->secciones, function($s) {
+            $this->secciones = array_values(array_filter($this->secciones, function($s) {
                 return $s['trayecto_nombre'] === $this->trayectoSeleccionado;
-            });
-            $this->seccionesDisponibles = collect($this->secciones)
-                ->map(function($s) {
-                    return (object)[
-                        'codigo' => $s['sec_codigo'],
-                        'nombre' => $s['sec_nombre']
-                    ];
-                })
-                ->values()
-                ->toArray();
-        } else {
-            $this->seccionesDisponibles = [];
+            }));
         }
+
+        // Llenar seccionesDisponibles en base a las secciones actuales (todas, o las del trayecto filtrado)
+        $this->seccionesDisponibles = collect($this->secciones)
+            ->map(function($s) {
+                return (object)[
+                    'codigo' => $s['sec_codigo'],
+                    'nombre' => $s['sec_nombre']
+                ];
+            })
+            ->values()
+            ->toArray();
 
         // Filtrar por seccion si está seleccionada
         if (!empty($this->seccionSeleccionada)) {
-            $this->secciones = array_filter($this->secciones, function($s) {
+            $this->secciones = array_values(array_filter($this->secciones, function($s) {
                 return $s['sec_codigo'] == $this->seccionSeleccionada;
-            });
+            }));
         }
     }
 
@@ -208,12 +213,23 @@ class PanelVocero extends Component
 
         // Revisar si ya hay un registro de este TIPO de vocero para esta sección activo o inactivo
         $vocero = Vocero::where('id_seccion', $idSeccion)->where('tipo_vocero', $tipo)->first();
+        
+        // Backend Validation: If it's already occupied and active, block it.
+        if ($vocero && $vocero->estatus == 1) {
+            $this->dispatch('show-alert', [
+                'type' => 'error',
+                'title' => 'LÍMITE ALCANZADO',
+                'message' => 'Este puesto de vocero ya está ocupado por otro estudiante. Debe revocarlo primero para asignar a otro.',
+            ]);
+            return;
+        }
+
         if ($vocero) {
-            // Actualizar registro existente (reactivar y actualizar fecha por Eloquent automáticamente)
+            // Actualizar registro existente inactivo (reactivar)
             $vocero->id_estudiante = $cedula;
             $vocero->id_coordinador = Auth::id();
             $vocero->estatus = 1;
-            // Para forzar la actualización de updated_at si el estudiante es el mismo
+            $vocero->notificado = 0;
             $vocero->touch();
             $vocero->save();
         } else {
@@ -224,7 +240,8 @@ class PanelVocero extends Component
                 'id_pnf' => $pnfCoordinador,
                 'id_coordinador' => Auth::id(),
                 'estatus' => 1,
-                'tipo_vocero' => $tipo
+                'tipo_vocero' => $tipo,
+                'notificado' => 0
             ]);
         }
 

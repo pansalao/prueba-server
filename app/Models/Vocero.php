@@ -18,7 +18,8 @@ class Vocero extends Model
         'id_pnf',
         'id_coordinador',
         'estatus',
-        'tipo_vocero'
+        'tipo_vocero',
+        'notificado'
     ];
 
     /**

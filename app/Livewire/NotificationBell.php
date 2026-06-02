@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 class NotificationBell extends Component
 {
     public $planificacionesAceptadas = [];
+    public $voceroNotificaciones = [];
 
     public function mount()
     {
@@ -19,6 +20,7 @@ class NotificationBell extends Component
     {
         if (Auth::check()) {
             $userId = Auth::id(); // usu_codigo
+            $userCedula = Auth::user()->usu_cedula;
             
             $dbSogc = DB::connection('external_db')->getDatabaseName();
             
@@ -37,6 +39,19 @@ class NotificationBell extends Component
                 ->limit(5)
                 ->get()
                 ->toArray();
+                
+            $this->voceroNotificaciones = DB::table('vocero as v')
+                ->join("$dbSogc.seccion as s", 'v.id_seccion', '=', 's.sec_codigo')
+                ->where('v.id_estudiante', $userCedula)
+                ->where('v.estatus', 1)
+                ->where(function($q) {
+                    $q->whereNull('v.notificado')->orWhere('v.notificado', false)->orWhere('v.notificado', 0);
+                })
+                ->select('s.sec_nombre', 'v.tipo_vocero', 'v.id_vocero')
+                ->orderBy('v.id_vocero', 'desc')
+                ->limit(5)
+                ->get()
+                ->toArray();
         }
     }
 
@@ -44,6 +59,15 @@ class NotificationBell extends Component
     {
         DB::table('planificacion')
             ->where('id_planificacion', $id_planificacion)
+            ->update(['notificado' => 1]);
+            
+        $this->loadNotifications();
+    }
+    
+    public function markVoceroAsRead($id_vocero)
+    {
+        DB::table('vocero')
+            ->where('id_vocero', $id_vocero)
             ->update(['notificado' => 1]);
             
         $this->loadNotifications();

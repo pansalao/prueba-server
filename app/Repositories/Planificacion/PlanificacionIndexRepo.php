@@ -53,6 +53,21 @@ class PlanificacionIndexRepo
             $query->where('u.usu_codigo', $userId);
         }
 
+        if (Auth::check()) {
+            $user = Auth::user();
+            $activeRole = session('active_role', $user->usu_cod_rol);
+            
+            if ($activeRole == 3) {
+                // Es docente, solo ve sus propias planificaciones
+                $query->where('u.usu_cedula', $user->usu_cedula);
+            } elseif ($activeRole == 4) {
+                // Es estudiante (vocero), solo ve planificaciones de su sección
+                $query->join('vocero as v', 's.sec_codigo', '=', 'v.id_seccion')
+                      ->where('v.id_estudiante', $user->usu_cedula)
+                      ->where('v.estatus', 1);
+            }
+        }
+
         $query->orderByDesc('p.id_planificacion');
 
         if ($perPage > 0) {
@@ -169,7 +184,7 @@ class PlanificacionIndexRepo
      * Aprueba la planificación por parte del vocero.
      * Cambia estatus de 5 (Aprobado Coordinador) a 1 (Aprobado Final).
      */
-    public function aprobarPlanificacionVocero(int $planificacionId): bool
+    public function aprobarPlanificacionVocero(int $planificacionId, ?int $idFirmaVocero = null): bool
     {
         $planificacion = \App\Models\Planificacion::find($planificacionId);
         if (!$planificacion || $planificacion->estatus != 5) {
@@ -178,7 +193,10 @@ class PlanificacionIndexRepo
 
         DB::beginTransaction();
         try {
-            $planificacion->update(['estatus' => 1]);
+            $planificacion->update([
+                'estatus' => 1,
+                'id_firma_vocero' => $idFirmaVocero
+            ]);
 
             // Enviar correo de aprobación final
             try {
@@ -287,10 +305,10 @@ class PlanificacionIndexRepo
 
         if (!$planificacion) return false;
 
-        // Verificar si el usuario es un vocero activo (Principal=1 o Secundario=2) de esa sección
+        // Verificar si el usuario es un vocero activo (Principal=1, Secundario=2, Terciario=3) de esa sección
         return \App\Models\Vocero::where('id_estudiante', $user->usu_cedula)
             ->where('id_seccion', $planificacion->sec_codigo)
-            ->whereIn('tipo_vocero', [1, 2])
+            ->whereIn('tipo_vocero', [1, 2, 3])
             ->where('estatus', 1)
             ->exists();
     }
@@ -327,7 +345,7 @@ class PlanificacionIndexRepo
         }
     }
 
-    public function aprobarCorte(int $corteId): bool
+    public function aprobarCorte(int $corteId, ?int $idFirmaCoordinador = null): bool
     {
         try {
             $corte = \App\Models\UnidadCorte::find($corteId);
@@ -344,7 +362,11 @@ class PlanificacionIndexRepo
                     $planificacion = \App\Models\Planificacion::find($planificacionId);
                     if ($planificacion) {
                         // El coordinador aprobó todas las unidades -> pasa a estatus 5 (pendiente vocero)
-                        $planificacion->update(['estatus' => 5]);
+                        // y adjuntamos su firma
+                        $planificacion->update([
+                            'estatus' => 5,
+                            'id_firma_coordinador' => $idFirmaCoordinador
+                        ]);
 
                         // Enviar correo electrónico al profesor notificando que el coordinador aprobó
                         try {

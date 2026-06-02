@@ -47,7 +47,6 @@
                                     valueField="codigo" 
                                     textField="nombre" 
                                     placeholder="TODAS LAS SECCIONES" 
-                                    :disabled="empty($trayectoSeleccionado)"
                                 />
                             </div>
                         </div>
@@ -98,18 +97,28 @@
                                                             </td>
                                                         <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                                                             @if(!$est['es_vocero'])
-                                                                <div x-data="{ open: false }" class="relative inline-block text-left">
-                                                                    <button @click="open = !open" @click.away="open = false" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors flex items-center">
-                                                                        Asignar <span class="material-icons text-sm ml-1">arrow_drop_down</span>
-                                                                    </button>
-                                                                    <div x-show="open" style="display: none;" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
-                                                                        <div class="py-1" role="menu" aria-orientation="vertical">
-                                                                            <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 1)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Principal</button>
-                                                                            <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 2)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Secundario</button>
-                                                                            <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 3)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Terciario</button>
+                                                                @if(count($seccion['tipos_ocupados']) >= 3)
+                                                                    <span class="text-[11px] text-red-600 font-bold uppercase border border-red-200 bg-red-50 px-2 py-1 rounded" title="Debe revocar un vocero para asignar otro.">Límite (3/3)</span>
+                                                                @else
+                                                                    <div x-data="{ open: false }" class="relative inline-block text-left">
+                                                                        <button @click="open = !open" @click.away="open = false" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors flex items-center">
+                                                                            Asignar <span class="material-icons text-sm ml-1">arrow_drop_down</span>
+                                                                        </button>
+                                                                        <div x-show="open" style="display: none;" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
+                                                                            <div class="py-1" role="menu" aria-orientation="vertical">
+                                                                                @if(!in_array(1, $seccion['tipos_ocupados']))
+                                                                                    <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 1)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Principal</button>
+                                                                                @endif
+                                                                                @if(!in_array(2, $seccion['tipos_ocupados']))
+                                                                                    <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 2)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Secundario</button>
+                                                                                @endif
+                                                                                @if(!in_array(3, $seccion['tipos_ocupados']))
+                                                                                    <button wire:click="confirmarAsignar('{{ $est['per_cedula'] }}', {{ $seccion['sec_codigo'] }}, 3)" class="block w-full text-left px-4 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Como Terciario</button>
+                                                                                @endif
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
+                                                                @endif
                                                             @else
                                                                 <button wire:click="confirmarQuitar({{ $seccion['sec_codigo'] }}, {{ $est['tipo_vocero'] }})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-md text-xs font-bold uppercase transition-colors" title="Quitar rol de vocero">
                                                                     Revocar

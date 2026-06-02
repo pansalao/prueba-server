@@ -1,9 +1,9 @@
 <div x-data="{ open: false, visto: false }" class="relative" wire:poll.60s="loadNotifications" wire:ignore.self>
     <button wire:key="bell-button" @click="open = !open; visto = true" class="relative p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors focus:outline-none">
         <span class="material-icons">notifications</span>
-        @if(count($planificacionesAceptadas) > 0)
+        @if(count($planificacionesAceptadas) + count($voceroNotificaciones) > 0)
             <span x-show="!visto" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
-                {{ count($planificacionesAceptadas) }}
+                {{ count($planificacionesAceptadas) + count($voceroNotificaciones) }}
             </span>
         @endif
     </button>
@@ -13,7 +13,26 @@
             <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Notificaciones</h3>
         </div>
         <div class="max-h-60 overflow-y-auto">
-            @forelse($planificacionesAceptadas as $planificacion)
+            @foreach($voceroNotificaciones as $vocero)
+                <button type="button" wire:click="markVoceroAsRead({{ $vocero->id_vocero }})" class="w-full text-left px-4 py-3 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
+                    <p class="text-xs text-gray-800 dark:text-gray-200 font-medium">
+                        ¡Has sido asignado como <span class="text-blue-500 font-bold uppercase">
+                            @if($vocero->tipo_vocero == 1) Vocero Principal
+                            @elseif($vocero->tipo_vocero == 2) Vocero Secundario
+                            @else Vocero Terciario
+                            @endif
+                        </span>!
+                    </p>
+                    <div class="flex justify-between items-center mt-1">
+                        <p class="text-[10px] text-gray-500 dark:text-gray-400">
+                            Sección: {{ $vocero->sec_nombre }}
+                        </p>
+                        <span class="material-icons text-[14px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" title="Marcar como leída">check_circle</span>
+                    </div>
+                </button>
+            @endforeach
+
+            @foreach($planificacionesAceptadas as $planificacion)
                 <button type="button" wire:click="markAsRead({{ $planificacion->id_planificacion }})" class="w-full text-left px-4 py-3 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
                     <p class="text-xs text-gray-800 dark:text-gray-200 font-medium">
                         @if($planificacion->estatus == 1)
@@ -34,11 +53,13 @@
                         </p>
                     @endif
                 </button>
-            @empty
+            @endforeach
+            
+            @if(count($planificacionesAceptadas) == 0 && count($voceroNotificaciones) == 0)
                 <div class="px-4 py-6 text-center text-gray-500 dark:text-gray-400 text-xs">
                     No tienes notificaciones nuevas.
                 </div>
-            @endforelse
+            @endif
         </div>
     </div>
 </div>

@@ -46,22 +46,20 @@ class AccesoRepository
 
         $rolesToCheck = [$user->usu_cod_rol];
 
-        // Si el usuario es un estudiante (rol 3) y además es un vocero activo,
-        // heredará también todos los permisos asignados al rol 'VOCERO'.
-        if ($user->usu_cod_rol == 3) {
+        // Si el usuario es un estudiante (rol 4) y además es un vocero activo,
+        // le otorgamos permisos implícitos para listar, ver y aprobar planificaciones.
+        if ($user->usu_cod_rol == 4) {
             $isVocero = DB::table('vocero')
                 ->where('id_estudiante', $user->usu_cedula)
                 ->where('estatus', 1)
                 ->exists();
 
-            if ($isVocero) {
-                $voceroRol = DB::connection('external_db')
-                    ->table('rol')
-                    ->where('rol_nombre', 'VOCERO')
-                    ->first();
-                if ($voceroRol) {
-                    $rolesToCheck[] = $voceroRol->rol_codigo;
-                }
+            if ($isVocero && in_array($permissionName, [
+                'Listar de Planificacion',
+                'Ver Detalles de Planificacion',
+                'Aprobacion Vocero de Planificacion'
+            ])) {
+                return true;
             }
         }
 

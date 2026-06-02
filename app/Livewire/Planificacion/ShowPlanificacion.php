@@ -114,7 +114,18 @@ class ShowPlanificacion extends Component
             return;
         }
 
-        $success = $this->planificacionIndexRepo->aprobarPlanificacionVocero($this->planificacionId);
+        $user = Auth::user();
+        $firma = DB::table('firma')
+            ->where('id_usuario', $user->usu_codigo)
+            ->where('estatus', '1')
+            ->first();
+
+        if (!$firma) {
+            session()->flash('error', 'No puedes aprobar la planificación porque no has subido tu firma al sistema. Por favor, ve al módulo de firmas para registrarla antes de aprobar.');
+            return;
+        }
+
+        $success = $this->planificacionIndexRepo->aprobarPlanificacionVocero($this->planificacionId, $firma->id_firma);
 
         if ($success) {
             session()->flash('message', 'Has aprobado la planificación como vocero. La planificación ha sido aprobada completamente.');
@@ -256,7 +267,18 @@ class ShowPlanificacion extends Component
             return;
         }
 
-        $success = $this->planificacionIndexRepo->aprobarCorte($detalleId);
+        $user = Auth::user();
+        $firma = DB::table('firma')
+            ->where('id_usuario', $user->usu_codigo)
+            ->where('estatus', '1')
+            ->first();
+
+        if (!$firma) {
+            session()->flash('error', 'No puedes aprobar cortes porque no tienes una firma activa registrada en el sistema.');
+            return;
+        }
+
+        $success = $this->planificacionIndexRepo->aprobarCorte($detalleId, $firma->id_firma);
 
         if ($success) {
             session()->flash('message', 'Corte aprobado correctamente.');
