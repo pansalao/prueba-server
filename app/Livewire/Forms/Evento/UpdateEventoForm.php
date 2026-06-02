@@ -114,6 +114,9 @@ class UpdateEventoForm extends Form
                 'required',
                 'boolean',
                 function ($attribute, $value, $fail) {
+                    if ($value && !$this->is_repetible) {
+                        $fail('Si el evento no es repetible, no puede ocurrir en semanas específicas.');
+                    }
                     if ($value && $this->is_independiente) {
                         $fail('Un evento que ocurre en semanas específicas no puede registrarse fuera de un semestre (debe depender de un lapso).');
                     }

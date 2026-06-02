@@ -18,7 +18,7 @@
                         || ($form->is_especial && in_array($form->id_especial_evento, ['1', '2', '3', '7', '8', '9', '10', '11', '13', '14']));
                     $deshabilitarRangoDias = $form->is_especial;
                     $deshabilitarCantidadRango = ($form->is_especial && in_array($form->id_especial_evento, ['1', '2', '3', '4', '5', '7', '8', '9', '10', '11', '13', '14'])) || !$form->is_rango_dias;
-                    $deshabilitarSemanaEvento = in_array($form->tipo_evento, ['1', '2', '6'], true) || $form->is_especial || $form->is_independiente;
+                    $deshabilitarSemanaEvento = in_array($form->tipo_evento, ['1', '2', '6'], true) || $form->is_especial || $form->is_independiente || !$form->is_repetible;
                     $deshabilitarRepetible = in_array($form->tipo_evento, ['1', '2', '6'], true) || $form->is_especial;
                     $deshabilitarDiaEvento = !in_array($form->tipo_evento, ['1', '2', '6'], true) || in_array($form->id_especial_evento, ['4', '5'], true);
                 @endphp

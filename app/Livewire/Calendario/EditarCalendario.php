@@ -330,17 +330,6 @@ class EditarCalendario extends Component
                 return;
             }
 
-            // Verificar si hay un lapso de trayecto inicial o intensivo más reciente que el académico
-            $otrosLapsos = collect($this->eventosRegistrados)
-                ->filter(fn($ev) => in_array($ev['especial_evento'] ?? '', ['7', '9']))
-                ->sortByDesc('inicio');
-            $otroLapsoActual = $otrosLapsos->firstWhere('inicio', '<=', $inicio);
-
-            if ($otroLapsoActual && $otroLapsoActual['inicio'] >= $lapsoActual['inicio']) {
-                $this->showAlert('error', 'Este evento tiene semanas específicas y solo puede registrarse durante un Lapso Académico regular (no de Trayecto Inicial ni intensivo).');
-                return;
-            }
-
             $incluirVacaciones = true;
 
             $semanaInicio = \App\Support\CalendarioLapsoSemanas::contarSemanas($lapsoActual['inicio'], $inicio, $this->eventosRegistrados, $incluirVacaciones);
@@ -443,10 +432,19 @@ class EditarCalendario extends Component
                 $evRegLaborable = isset($evReg['is_laborable_evento']) ? (bool) $evReg['is_laborable_evento'] : true;
                 $evRegTipo = $evReg['tipo'] ?? '';
                 if (!$is_superponible && !$evRegLaborable && $evRegTipo !== '2') {
+                    // Si el inicio o fin del evento cae exactamente en el evento no laborable, lanzar alerta
+                    $sReg = \Carbon\Carbon::parse($evReg['inicio'])->startOfDay();
+                    $eReg = \Carbon\Carbon::parse($evReg['fin'])->startOfDay();
+                    $carbonInicio = \Carbon\Carbon::parse($inicio)->startOfDay();
+                    $carbonFin = \Carbon\Carbon::parse($fin)->startOfDay();
+
+                    if ($carbonInicio->between($sReg, $eReg) || $carbonFin->between($sReg, $eReg)) {
+                        $this->showAlert('error', "El evento '{$nombre}' no es superponible y no puede iniciar o finalizar exactamente en la misma fecha que un evento no laborable ('{$nombreChoca}').");
+                        return;
+                    }
+
                     continue; // Skip overlap error because this non-working day is ignored in the event duration
                 }
-
-                $nombreChoca = $evReg['nombre_evento'] ?? $evReg['nombre'] ?? 'Sin nombre';
 
                 $esFeriadoLocalOverlap = false;
                 if (!$is_superponible && ($evReg['tipo'] ?? '') === '2') {
@@ -456,30 +454,18 @@ class EditarCalendario extends Component
                     $esFeriadoLocalOverlap = true;
                 }
 
-                if (!$is_superponible || $evRegNoSuperponible) {
-                    if ($esFeriadoLocalOverlap) {
-                        if (!$confirmadoFeriadoLocal) {
-                            $this->tempEventoAgregar = func_get_args();
-                            $this->dispatch('show-alert', [
-                                'type' => 'warning',
-                                'message' => "¿Está seguro de asignar el evento '{$nombre}' el mismo día que el feriado local '{$nombreChoca}'?",
-                                'showCancelButton' => true,
-                                'cancelText' => 'Cancelar',
-                                'okText' => 'Continuar',
-                                'onOkEvent' => 'confirmar-agregar-evento-feriado-local'
-                            ]);
-                            return;
-                        }
-                    } else {
-                        if (!$is_superponible) {
-                            $this->showAlert('error', "El evento '{$nombre}' no es superponible y no puede registrarse en la misma fecha que el evento '{$nombreChoca}'.");
-                            return;
-                        }
-        
-                        if ($evRegNoSuperponible) {
-                            $this->showAlert('error', "No se puede registrar el evento '{$nombre}' en estas fechas porque choca con el evento '{$nombreChoca}', el cual no es superponible.");
-                            return;
-                        }
+                if ($esFeriadoLocalOverlap) {
+                    if (!$confirmadoFeriadoLocal) {
+                        $this->tempEventoAgregar = func_get_args();
+                        $this->dispatch('show-alert', [
+                            'type' => 'warning',
+                            'message' => "¿Está seguro de asignar el evento '{$nombre}' el mismo día que el feriado local '{$nombreChoca}'?",
+                            'showCancelButton' => true,
+                            'cancelText' => 'Cancelar',
+                            'okText' => 'Continuar',
+                            'onOkEvent' => 'confirmar-agregar-evento-feriado-local'
+                        ]);
+                        return;
                     }
                 }
             }
