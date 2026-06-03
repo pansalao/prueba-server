@@ -23,7 +23,7 @@ class CreateTemaForm extends Form
                 'min:3',
                 'max:255',
                 'not_regex:/^[0-9]+$/',
-                'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s0-9\.]+$/u',
+                'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s0-9\.,\-:\/\(\)\.]+$/u',
                 Rule::unique('tema_unidad', 'titulo_tema')
             ],
             'descripcion_tema' => 'nullable|string|max:500',

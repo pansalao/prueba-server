@@ -49,7 +49,10 @@ class PlanificacionViewRepo
                 'sem.sem_nombre as duracion_unidad_curricular',
                 's.sec_codigo as seccion_id',
                 'p.motivo_rechazo_vocero',
-                'p.archivo_contrato'
+                'p.archivo_contrato',
+                'p.id_firma_docente',
+                'p.id_firma_vocero',
+                'p.id_firma_coordinador'
             )
             ->where('p.id_planificacion', $planificacionId)
             ->first();
@@ -65,6 +68,27 @@ class PlanificacionViewRepo
         }
 
         $resultado = (array) $planificacion;
+
+        // Obtener fotos de firmas como base64
+        $resultado['firma_docente_b64'] = null;
+        $resultado['firma_vocero_b64'] = null;
+        $resultado['firma_coordinador_b64'] = null;
+
+        $firmasIds = [
+            'docente' => $planificacion->id_firma_docente,
+            'vocero' => $planificacion->id_firma_vocero,
+            'coordinador' => $planificacion->id_firma_coordinador,
+        ];
+
+        foreach ($firmasIds as $rol => $idFirma) {
+            if ($idFirma) {
+                $fotoFirma = DB::table('firma')->where('id_firma', $idFirma)->value('foto_firma');
+                if ($fotoFirma) {
+                    // Determinar mime type simple o asumir png
+                    $resultado["firma_{$rol}_b64"] = 'data:image/png;base64,' . base64_encode($fotoFirma);
+                }
+            }
+        }
 
         // 3. Unidades
         $resultado['unidades'] = DB::table('unidad_corte as c')

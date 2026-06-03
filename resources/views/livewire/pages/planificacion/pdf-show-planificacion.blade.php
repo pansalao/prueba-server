@@ -264,6 +264,38 @@
             @endforeach
         </tbody>
     </table>
+    <br><br>
+    <table width="100%" style="margin-top: 30px; text-align: center; border: none;">
+        <tr>
+            <td width="33%" style="border: none;">
+                @if(!empty($planificacion->firma_docente_b64))
+                    <img src="{{ $planificacion->firma_docente_b64 }}" style="max-height: 50px; max-width: 150px;"><br>
+                @else
+                    <br><br><br>
+                @endif
+                ________________________________<br>
+                <strong>Firma del Docente</strong>
+            </td>
+            <td width="33%" style="border: none;">
+                @if(!empty($planificacion->firma_vocero_b64))
+                    <img src="{{ $planificacion->firma_vocero_b64 }}" style="max-height: 50px; max-width: 150px;"><br>
+                @else
+                    <br><br><br>
+                @endif
+                ________________________________<br>
+                <strong>Firma del Vocero(a)</strong>
+            </td>
+            <td width="33%" style="border: none;">
+                @if(!empty($planificacion->firma_coordinador_b64))
+                    <img src="{{ $planificacion->firma_coordinador_b64 }}" style="max-height: 50px; max-width: 150px;"><br>
+                @else
+                    <br><br><br>
+                @endif
+                ________________________________<br>
+                <strong>Firma del Coordinador(a)</strong>
+            </td>
+        </tr>
+    </table>
 
 </body>
 

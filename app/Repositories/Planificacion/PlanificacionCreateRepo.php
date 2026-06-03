@@ -254,7 +254,7 @@ class PlanificacionCreateRepo
         return $this->saveNuevaBibliografia($nombre)->id_bibliografia;
     }
 
-    public function savePlanificacionTransaccion($idProfesorAsignado, $unidades, $tiposSeccion = [], $estatus = '2', $proposito_unidad = null)
+    public function savePlanificacionTransaccion($idProfesorAsignado, $unidades, $tiposSeccion = [], $estatus = '2', $proposito_unidad = null, $idFirmaDocente = null)
     {
         DB::beginTransaction();
 
@@ -264,6 +264,7 @@ class PlanificacionCreateRepo
                 'estatus' => $estatus,
                 'tipo_planificacion' => json_encode($tiposSeccion),
                 'proposito_unidad' => $proposito_unidad,
+                'id_firma_docente' => $idFirmaDocente,
             ];
 
             $planificacion = \App\Models\Planificacion::create($planificacionData);

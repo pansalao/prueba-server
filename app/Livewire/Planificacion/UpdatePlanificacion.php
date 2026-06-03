@@ -520,13 +520,30 @@ class UpdatePlanificacion extends Component
 
             $this->form->validate();
 
+            $user = \Illuminate\Support\Facades\Auth::user();
+            $firma = \Illuminate\Support\Facades\DB::table('firma')
+                ->where('id_usuario', $user->usu_codigo)
+                ->where('estatus', '1')
+                ->first();
+
+            if (!$firma) {
+                $this->autoSaveSection();
+                $this->showAlert('error', 'No puedes enviar la planificación porque no has subido tu firma al sistema. Por favor, regístrala antes de enviarla. Tu progreso actual se ha guardado como borrador.');
+                return;
+            }
+
             $success = $this->planificacionEditRepo->updatePlanificacion($this->planificacionId, [
                 'unidades' => $this->form->unidades,
                 'proposito_unidad' => $this->form->proposito_unidad,
                 'estatus' => '2'
             ]);
 
+            // Actualizar la firma directamente en el modelo ya que el repo no lo maneja por defecto en su array base
             if ($success) {
+                $draft = \App\Models\Planificacion::find($this->planificacionId);
+                if ($draft) {
+                    $draft->update(['id_firma_docente' => $firma->id_firma]);
+                }
                 $this->showAlert('success', '¡Guardado!, en espera que lo aprueben (puede verlo en la campana de notificaciones)', '/planificacion/list');
             } else {
                 $this->showAlert('error', 'Error al actualizar la planificación.');

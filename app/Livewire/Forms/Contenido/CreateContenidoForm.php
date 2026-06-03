@@ -23,7 +23,7 @@ class CreateContenidoForm extends Form
                 'min:3',
                 'max:255',
                 'not_regex:/^[0-9]+$/',
-                'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s0-9\.]+$/u', // Letras, números, espacios y puntos
+                'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s0-9\.,\-:\/\(\)\.]+$/u', // Letras, números, espacios y caracteres especiales
                 Rule::unique('contenido', 'titulo_contenido')
             ],
         ];

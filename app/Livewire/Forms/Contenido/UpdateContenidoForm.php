@@ -24,7 +24,7 @@ class UpdateContenidoForm extends Form
                 'min:3',
                 'max:255',
                 'not_regex:/^[0-9]+$/',
-                'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s0-9\.]+$/u',
+                'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s0-9\.,\-:\/\(\)\.]+$/u',
                 \Illuminate\Validation\Rule::unique('contenido', 'titulo_contenido')->ignore($this->id, 'id_contenido')
             ],
         ];

@@ -351,6 +351,10 @@ class PlanningDataSeeder extends Seeder
         } catch (\Exception $e) { /* Ignorar si ya existe */ }
 
         try {
+            DB::statement("ALTER TABLE planificacion ADD COLUMN id_firma_docente INT NULL");
+        } catch (\Exception $e) { /* Ignorar si ya existe */ }
+
+        try {
             DB::statement("ALTER TABLE vocero ADD COLUMN notificado TINYINT(1) DEFAULT 0 NULL");
         } catch (\Exception $e) { /* Ignorar si ya existe */ }
     }

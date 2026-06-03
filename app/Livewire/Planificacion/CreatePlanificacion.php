@@ -420,6 +420,18 @@ class CreatePlanificacion extends Component
         try {
             $this->form->validate();
 
+            $user = \Illuminate\Support\Facades\Auth::user();
+            $firma = \Illuminate\Support\Facades\DB::table('firma')
+                ->where('id_usuario', $user->usu_codigo)
+                ->where('estatus', '1')
+                ->first();
+
+            if (!$firma) {
+                $this->autoSaveSection();
+                $this->showAlert('error', 'No puedes enviar la planificación porque no has subido tu firma al sistema. Por favor, regístrala antes de enviarla. Tu progreso actual se ha guardado como borrador.');
+                return;
+            }
+
             if ($this->planificacionDraftId) {
                 // Actualizar borrador existente a estatus final
                 $repo = new \App\Repositories\Planificacion\PlanificacionEditRepo();
@@ -427,10 +439,10 @@ class CreatePlanificacion extends Component
                     'unidades' => $this->form->unidades,
                     'proposito_unidad' => $this->form->proposito_unidad
                 ]);
-                // Cambiar estatus a '2' (enviada para aprobación)
+                // Cambiar estatus a '2' (enviada para aprobación) y registrar firma
                 $draft = \App\Models\Planificacion::find($this->planificacionDraftId);
                 if ($draft) {
-                    $draft->update(['estatus' => '2']);
+                    $draft->update(['estatus' => '2', 'id_firma_docente' => $firma->id_firma]);
                 }
             } else {
                 $this->planificacionRepository->savePlanificacionTransaccion(
@@ -438,7 +450,8 @@ class CreatePlanificacion extends Component
                     $this->form->unidades,
                     $this->form->tipos_seccion,
                     '2',
-                    $this->form->proposito_unidad
+                    $this->form->proposito_unidad,
+                    $firma->id_firma
                 );
             }
 
