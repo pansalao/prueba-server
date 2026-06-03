@@ -651,10 +651,6 @@ class UpdateCalendarioForm extends Form
             ['Período 1', 'Período 2'],
             ['Período 1', 'Curso Intensivo'],
             ['Período 2', 'Curso Intensivo'],
-            ['Lapso 1 Académico Trayecto Inicial', 'Período 1'],
-            ['Lapso 1 Académico Trayecto Inicial', 'Período 2'],
-            ['Lapso 2 Académico Trayecto Inicial', 'Período 1'],
-            ['Lapso 2 Académico Trayecto Inicial', 'Período 2'],
         ];
 
         foreach ($paresNoSolapables as $par) {
