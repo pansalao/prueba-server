@@ -165,13 +165,13 @@ class CreateCalendarioForm extends Form
                     'nullable',
                     'integer',
                     'min:2',
-                    'max:5',
+                    'max:8',
                     function ($attribute, $value, $fail) {
                         if ($this->nuevoRepetible) {
                             if (empty($value) && $value !== '0' && $value !== 0) {
                                 $fail('La cantidad de repeticiones es obligatoria.');
-                            } elseif (!is_numeric($value) || $value < 2 || $value > 5) {
-                                $fail('La cantidad de repeticiones debe ser entre 2 y 5.');
+                            } elseif (!is_numeric($value) || $value < 2 || $value > 8) {
+                                $fail('La cantidad de repeticiones debe ser entre 2 y 8.');
                             }
                         } else {
                             if ($value !== null && $value !== '' && $value !== 0 && $value !== '0') {
@@ -275,7 +275,7 @@ class CreateCalendarioForm extends Form
             'nuevoRepetible.boolean' => 'El campo repetible debe ser un valor booleano.',
             'nuevoCantidadRepetible.integer' => 'La cantidad de repeticiones debe ser un número entero.',
             'nuevoCantidadRepetible.min' => 'La cantidad de repeticiones debe ser superior o igual a 2.',
-            'nuevoCantidadRepetible.max' => 'La cantidad de repeticiones debe ser inferior o igual a 5.',
+            'nuevoCantidadRepetible.max' => 'La cantidad de repeticiones debe ser inferior o igual a 8.',
             'nuevoIsRangoDias.required' => 'El campo rango de días es obligatorio.',
             'nuevoIsRangoDias.boolean' => 'El campo rango de días debe ser un valor booleano.',
             'nuevoIsIndependiente.required' => 'El campo independiente es obligatorio.',

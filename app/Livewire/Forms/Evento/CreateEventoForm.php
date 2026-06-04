@@ -199,13 +199,13 @@ class CreateEventoForm extends Form
                 'nullable',
                 'integer',
                 'min:2',
-                'max:5',
+                'max:8',
                 function ($attribute, $value, $fail) {
                     if ($this->is_repetible) {
                         if (empty($value) && $value !== '0' && $value !== 0) {
                             $fail('La cantidad de repeticiones es obligatoria.');
-                        } elseif (!is_numeric($value) || $value < 2 || $value > 5) {
-                            $fail('La cantidad de repeticiones debe ser entre 2 y 5.');
+                        } elseif (!is_numeric($value) || $value < 2 || $value > 8) {
+                            $fail('La cantidad de repeticiones debe ser entre 2 y 8.');
                         }
                     } else {
                         if ($value !== null && $value !== '' && $value !== 0 && $value !== '0') {
@@ -256,15 +256,16 @@ class CreateEventoForm extends Form
                         $fail('Si el evento no es repetible, solo puede seleccionar una (1) semana.');
                     }
                     
-                    // Validar que no haya más de 4 semanas por lapso
+                    // Validar que la cantidad de semanas coincida con el límite de repeticiones
                     $semanasLapso1 = array_filter($value, fn($s) => (is_array($s) ? ($s['lapso'] ?? 1) : 1) == 1);
                     $semanasLapso2 = array_filter($value, fn($s) => (is_array($s) ? ($s['lapso'] ?? 1) : 1) == 2);
                     
-                    if (count($semanasLapso1) > 4) {
-                        $fail('Un evento puede tener máximo 4 semanas en el Lapso 1.');
+                    $cuantas = max(1, (int) $this->cantidad_repetible_evento);
+                    if (count($semanasLapso1) !== $cuantas) {
+                        $fail("El Lapso 1 debe tener exactamente {$cuantas} semana(s) según el límite de repeticiones.");
                     }
-                    if (count($semanasLapso2) > 4) {
-                        $fail('Un evento puede tener máximo 4 semanas en el Lapso 2.');
+                    if (count($semanasLapso2) !== $cuantas) {
+                        $fail("El Lapso 2 debe tener exactamente {$cuantas} semana(s) según el límite de repeticiones.");
                     }
                     
                     // Validar semanas únicas dentro de cada lapso
@@ -357,7 +358,7 @@ class CreateEventoForm extends Form
             'is_repetible.required' => 'El campo repetible es obligatorio.',
             'cantidad_repetible_evento.integer' => 'La cantidad de repeticiones debe ser un número entero.',
             'cantidad_repetible_evento.min' => 'La cantidad de repeticiones debe ser superior o igual a 2.',
-            'cantidad_repetible_evento.max' => 'La cantidad de repeticiones debe ser inferior o igual a 5.',
+            'cantidad_repetible_evento.max' => 'La cantidad de repeticiones debe ser inferior o igual a 8.',
         ];
     }
 }

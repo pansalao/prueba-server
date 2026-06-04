@@ -102,6 +102,26 @@ class CreateEvento extends Component
             }
         }
 
+        // Si cambia cantidad_repetible_evento y is_semana_evento está activo, sincronizar semanas
+        if ($propertyName === 'form.cantidad_repetible_evento' && $this->form->is_semana_evento) {
+            $cuantas = max(1, (int) $this->form->cantidad_repetible_evento);
+            if ($cuantas > 8) $cuantas = 8;
+            
+            $nuevasSemanas = [];
+            // Mantener semanas existentes de Lapso 1 (recortar o extender)
+            $semanasLapso1 = array_values(array_filter($this->form->semanas ?? [], fn($s) => (is_array($s) ? ($s['lapso'] ?? 1) : 1) == 1));
+            for ($i = 0; $i < $cuantas; $i++) {
+                $nuevasSemanas[] = isset($semanasLapso1[$i]) ? $semanasLapso1[$i] : ['lapso' => 1, 'semana' => ''];
+            }
+            // Mantener semanas existentes de Lapso 2
+            $semanasLapso2 = array_values(array_filter($this->form->semanas ?? [], fn($s) => (is_array($s) ? ($s['lapso'] ?? 1) : 1) == 2));
+            for ($i = 0; $i < $cuantas; $i++) {
+                $nuevasSemanas[] = isset($semanasLapso2[$i]) ? $semanasLapso2[$i] : ['lapso' => 2, 'semana' => ''];
+            }
+            
+            $this->form->semanas = $nuevasSemanas;
+        }
+
         // Si cambia is_especial
         if ($propertyName === 'form.is_especial' && $this->form->is_especial) {
             $this->form->is_independiente = true;
@@ -162,21 +182,18 @@ class CreateEvento extends Component
             $this->form->semanas = $nuevoSemanas;
         }
 
-        // Si se activa is_semana_evento, asegurar que existen instancias para ambos lapsos
+        // Si se activa is_semana_evento, generar semanas según cantidad_repetible
         if ($propertyName === 'form.is_semana_evento' && $this->form->is_semana_evento) {
-            $hasLapso1 = false;
-            $hasLapso2 = false;
-            foreach ($this->form->semanas as $s) {
-                $lapso = is_array($s) ? ($s['lapso'] ?? 1) : 1;
-                if ($lapso == 1) $hasLapso1 = true;
-                if ($lapso == 2) $hasLapso2 = true;
+            $cuantas = max(1, (int) $this->form->cantidad_repetible_evento);
+            if ($cuantas > 8) $cuantas = 8;
+            $nuevasSemanas = [];
+            for ($i = 0; $i < $cuantas; $i++) {
+                $nuevasSemanas[] = ['lapso' => 1, 'semana' => ''];
             }
-            if (!$hasLapso1) {
-                $this->form->semanas[] = ['lapso' => 1, 'semana' => ''];
+            for ($i = 0; $i < $cuantas; $i++) {
+                $nuevasSemanas[] = ['lapso' => 2, 'semana' => ''];
             }
-            if (!$hasLapso2) {
-                $this->form->semanas[] = ['lapso' => 2, 'semana' => ''];
-            }
+            $this->form->semanas = $nuevasSemanas;
         }
 
         // Si se desactiva is_semana_evento, limpiar todas las semanas
