@@ -1286,6 +1286,7 @@
                             {{-- Modal Registro --}}
                             @include('livewire.pages.calendario.calendario-evento-modal', ['wireKey' => 'datalist-register'])
 
+
                             {{-- Modal Listado de Eventos --}}
                             @include('livewire.pages.calendario.calendario-list-modal')
 
@@ -1320,4 +1321,7 @@
             </div>
         </div>
     </div>
+
+    @include('livewire.pages.calendario.justificacion-modal')
+
 </div>

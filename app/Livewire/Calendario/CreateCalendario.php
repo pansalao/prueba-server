@@ -30,6 +30,10 @@ class CreateCalendario extends Component
     public $tempEventoAgregar = null;
     public $tempEventoCrear = null;
 
+    public $justificacionesRequeridas = [];
+    public $justificacionesGuardadas = [];
+    public $mostrarModalJustificacion = false;
+
     public function boot()
     {
         $this->calendarioRepository = new CalendarioCreateRepo();
@@ -127,6 +131,12 @@ class CreateCalendario extends Component
                 $this->form->semana_intensibo_introductorio_calendario_academico = $calendario->semana_intensibo_introductorio_calendario_academico;
                 $this->form->semana_per_uno_calendario_academico = $calendario->semana_per_uno_calendario_academico ?? 0;
                 $this->form->semana_per_dos_calendario_academico = $calendario->semana_per_dos_calendario_academico ?? 0;
+
+                if (!empty($calendario->justificativo_calendario_academico)) {
+                    $this->justificacionesGuardadas = is_string($calendario->justificativo_calendario_academico) 
+                        ? json_decode($calendario->justificativo_calendario_academico, true) 
+                        : $calendario->justificativo_calendario_academico;
+                }
 
                 // Cargar eventos registrados desde el repositorio
                 $eventos = $this->calendarioRepository->obtenerEventosDetalle($id);
@@ -1213,89 +1223,134 @@ class CreateCalendario extends Component
 
     public function validarSeccionFechas()
     {
+        \Illuminate\Support\Facades\Log::info('Iniciando validarSeccionFechas');
         $this->form->validarSeccionFechas();
+        \Illuminate\Support\Facades\Log::info('Validación de Formulario exitosa');
 
-        $mensajes = [];
+        $this->justificacionesRequeridas = [];
 
         $lapsoUno = (int) $this->form->semana_lapso_uno_calendario_academico;
-        if ($lapsoUno < 16) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 1 con una cantidad inferior a 16 semanas?";
-        } elseif ($lapsoUno > 18) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 1 con una cantidad superior a 18 semanas?";
+        if ($lapsoUno > 0 && ($lapsoUno < 16 || $lapsoUno > 18)) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '1',
+                'titulo' => 'Lapso Académico 1',
+                'mensaje' => "El Lapso Académico 1 tiene $lapsoUno semanas. Justifique por qué está fuera del rango (16-18 semanas).",
+                'texto' => '',
+                'lapso' => '1'
+            ];
         }
 
         $lapsoDos = (int) $this->form->semana_lapso_dos_calendario_academico;
-        if ($lapsoDos < 16) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 2 con una cantidad inferior a 16 semanas?";
-        } elseif ($lapsoDos > 18) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 2 con una cantidad superior a 18 semanas?";
+        if ($lapsoDos > 0 && ($lapsoDos < 16 || $lapsoDos > 18)) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '1',
+                'titulo' => 'Lapso Académico 2',
+                'mensaje' => "El Lapso Académico 2 tiene $lapsoDos semanas. Justifique por qué está fuera del rango (16-18 semanas).",
+                'texto' => '',
+                'lapso' => '2'
+            ];
         }
 
         $inicialUno = (int) $this->form->semana_lapso_uno_introductorio_calendario_academico;
-        if ($inicialUno < 12) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 1 con una cantidad inferior a 12 semanas?";
-        } elseif ($inicialUno > 12) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 1 con una cantidad superior a 12 semanas?";
+        if ($inicialUno > 0 && $inicialUno != 12) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '2',
+                'titulo' => 'Trayecto Inicial 1',
+                'mensaje' => "El Trayecto Inicial 1 tiene $inicialUno semanas. Justifique por qué es diferente a 12 semanas.",
+                'texto' => '',
+                'lapso' => '1'
+            ];
         }
 
         $inicialDos = (int) $this->form->semana_lapso_dos_introductorio_calendario_academico;
-        if ($inicialDos < 12) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 2 con una cantidad inferior a 12 semanas?";
-        } elseif ($inicialDos > 12) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 2 con una cantidad superior a 12 semanas?";
+        if ($inicialDos > 0 && $inicialDos != 12) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '2',
+                'titulo' => 'Trayecto Inicial 2',
+                'mensaje' => "El Trayecto Inicial 2 tiene $inicialDos semanas. Justifique por qué es diferente a 12 semanas.",
+                'texto' => '',
+                'lapso' => '2'
+            ];
         }
 
         $intensivo = (int) $this->form->semana_intensibo_introductorio_calendario_academico;
-        if ($intensivo < 6) {
-            $mensajes[] = "¿Está seguro de registrar las Semanas del curso Intensivo con una cantidad inferior a 6 semanas?";
-        } elseif ($intensivo > 6) {
-            $mensajes[] = "¿Está seguro de registrar las Semanas del curso Intensivo con una cantidad superior a 6 semanas?";
+        if ($intensivo > 0 && $intensivo < 5) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '3',
+                'titulo' => 'Intensivo',
+                'mensaje' => "El curso Intensivo tiene $intensivo semanas. Justifique por qué es menor a 5 semanas.",
+                'texto' => '',
+                'lapso' => ''
+            ];
         }
 
         $perUno = (int) $this->form->semana_per_uno_calendario_academico;
-        if ($perUno > 0) {
-            if ($perUno < 12) {
-                $mensajes[] = "¿Está seguro de registrar el P.E.R 1 con una cantidad inferior a 12 semanas?";
-            } elseif ($perUno > 12) {
-                $mensajes[] = "¿Está seguro de registrar el P.E.R 1 con una cantidad superior a 12 semanas?";
-            }
+        if ($perUno > 0 && $perUno != 12) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '4',
+                'titulo' => 'P.E.R 1',
+                'mensaje' => "El P.E.R 1 tiene configuradas {$perUno} semanas. Justifique por qué está fuera del límite de 12 semanas.",
+                'texto' => '',
+                'lapso' => '1'
+            ];
         }
 
         $perDos = (int) $this->form->semana_per_dos_calendario_academico;
-        if ($perDos > 0) {
-            if ($perDos < 12) {
-                $mensajes[] = "¿Está seguro de registrar el P.E.R 2 con una cantidad inferior a 12 semanas?";
-            } elseif ($perDos > 12) {
-                $mensajes[] = "¿Está seguro de registrar el P.E.R 2 con una cantidad superior a 12 semanas?";
+        if ($perDos > 0 && $perDos != 12) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '4',
+                'titulo' => 'P.E.R 2',
+                'mensaje' => "El P.E.R 2 tiene configuradas {$perDos} semanas. Justifique por qué está fuera del límite de 12 semanas.",
+                'texto' => '',
+                'lapso' => '2'
+            ];
+        }
+
+        // Precargar textos previamente guardados si el usuario ya los había escrito
+        foreach ($this->justificacionesRequeridas as &$req) {
+            foreach ($this->justificacionesGuardadas as $guardada) {
+                if (isset($guardada['periodo']) && isset($guardada['lapso'])) {
+                    if ($guardada['periodo'] === $req['titulo'] && $guardada['lapso'] === $req['lapso']) {
+                        $req['texto'] = $guardada['texto'] ?? '';
+                        break;
+                    }
+                }
             }
         }
 
-        if (!empty($mensajes)) {
-            $mensajeFinal = "";
-            if (count($mensajes) > 1) {
-                foreach ($mensajes as $i => $msg) {
-                    $mensajeFinal .= "• " . $msg;
-                    if ($i < count($mensajes) - 1) {
-                        $mensajeFinal .= "\n\n";
-                    }
-                }
-            } else {
-                $mensajeFinal = $mensajes[0];
-            }
-
+        if (count($this->justificacionesRequeridas) > 0) {
+            \Illuminate\Support\Facades\Log::info('Justificaciones requeridas encontradas: ' . count($this->justificacionesRequeridas));
             $this->guardarBorrador();
-
-            $this->dispatch('show-alert', [
-                'type' => 'warning',
-                'message' => $mensajeFinal,
-                'showCancelButton' => true,
-                'cancelText' => 'Cancelar',
-                'okText' => 'Continuar',
-                'onOkEvent' => 'seccion-fechas-validada'
-            ]);
+            $this->mostrarModalJustificacion = true;
             return;
         }
 
+        \Illuminate\Support\Facades\Log::info('No se encontraron justificaciones, despachando evento');
+        $this->guardarBorrador();
+        $this->dispatch('seccion-fechas-validada');
+    }
+
+    public function confirmarJustificaciones()
+    {
+        // Validate that all required justifications have text
+        foreach ($this->justificacionesRequeridas as $req) {
+            if (empty(trim($req['texto']))) {
+                $this->showAlert('error', 'Debe llenar todas las justificaciones requeridas para continuar.');
+                return;
+            }
+        }
+
+        // Store them to save later
+        $this->justificacionesGuardadas = array_map(function($req) {
+            return [
+                'texto' => $req['texto'],
+                'periodo' => $req['titulo'],
+                'lapso' => $req['lapso'],
+                'id_usuario' => auth()->id() ?? 1,
+            ];
+        }, $this->justificacionesRequeridas);
+        
+        $this->mostrarModalJustificacion = false;
         $this->guardarBorrador();
         $this->dispatch('seccion-fechas-validada');
     }
@@ -1407,6 +1462,7 @@ class CreateCalendario extends Component
                 'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
                 'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
                 'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
+                'justificativo_calendario_academico' => count($this->justificacionesGuardadas) > 0 ? $this->justificacionesGuardadas : null,
             ], $this->eventosRegistrados, $this->id_calendario_borrador);
 
             if ($id) {

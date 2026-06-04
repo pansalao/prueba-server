@@ -27,6 +27,7 @@ CREATE TABLE `bitacora_justificativo` (
   `id_bitacora_justificativo` integer PRIMARY KEY AUTO_INCREMENT,
   `id_usuario` integer NOT NULL,
   `concepto_bitacora_justificativo` varchar(255),
+  `periodo_bitacora_justificativo` enum(1,2,3,4)
   `id_evento` integer,
   `id_calendario_academico` integer,
   `estatus` enum(1,2,3)

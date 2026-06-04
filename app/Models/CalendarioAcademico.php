@@ -15,6 +15,7 @@ class CalendarioAcademico extends Model
 
     protected $casts = [
         'nota_calendario_academico' => 'array',
+        'justificativo_calendario_academico' => 'array',
     ];
 
     public static function inactivarVencidos()
