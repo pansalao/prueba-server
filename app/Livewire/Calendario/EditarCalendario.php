@@ -34,6 +34,9 @@ class EditarCalendario extends Component
     public $tempEventoAgregar = null;
     public $tempEventoCrear = null;
 
+    public $justificacionesRequeridas = [];
+    public $justificacionesGuardadas = [];
+
     public function boot()
     {
         $this->calendarioRepository = new CalendarioUpdateRepo();
@@ -57,6 +60,12 @@ class EditarCalendario extends Component
         $this->form->setCalendario($calendario);
 
         $this->currentYear = date('Y', strtotime($calendario->dia_inicio_calendario_academico));
+
+        if (!empty($calendario->justificativo_calendario_academico)) {
+            $this->justificacionesGuardadas = is_string($calendario->justificativo_calendario_academico) 
+                ? json_decode($calendario->justificativo_calendario_academico, true) 
+                : $calendario->justificativo_calendario_academico;
+        }
 
         // Cargar eventos registrados
         $eventos = $this->calendarioRepository->obtenerEventosDetalle($id);
@@ -96,6 +105,8 @@ class EditarCalendario extends Component
         unset($ev);
 
         $this->actualizarMapaEventos();
+
+        $this->evaluarJustificacionesRequeridas();
     }
 
     public function updated($propertyName)
@@ -118,6 +129,11 @@ class EditarCalendario extends Component
                 $this->form->nuevoIsDiaEvento = false;
                 $this->form->nuevoDiaEvento = null;
             }
+        }
+        
+        // No recalcular si el cambio proviene de un textarea de justificación
+        if (!str_starts_with($propertyName, 'justificacionesRequeridas')) {
+            $this->evaluarJustificacionesRequeridas();
         }
     }
 
@@ -1122,8 +1138,8 @@ class EditarCalendario extends Component
                 'semana_lapso_uno_introductorio_calendario_academico' => $this->form->semana_lapso_uno_introductorio_calendario_academico,
                 'semana_lapso_dos_introductorio_calendario_academico' => $this->form->semana_lapso_dos_introductorio_calendario_academico,
                 'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
-                'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
                 'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
+                'justificativo_calendario_academico' => $this->justificacionesGuardadas,
                 'estatus' => '2' // Sigue en revisión
             ], $this->eventosRegistrados, $this->id_calendario);
         } catch (Exception $e) {
@@ -1151,90 +1167,173 @@ class EditarCalendario extends Component
         }
     }
 
+    public function evaluarJustificacionesRequeridas()
+    {
+        $viejas = $this->justificacionesRequeridas; 
+        $this->justificacionesRequeridas = [];
+
+        $lapsoUno = (int) $this->form->semana_lapso_uno_calendario_academico;
+        if ($lapsoUno > 0 && ($lapsoUno < 16 || $lapsoUno > 18)) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '1',
+                'titulo' => 'Lapso Académico 1',
+                'nombre_campo' => 'Lapso Académico',
+                'mensaje' => "El Lapso Académico 1 tiene $lapsoUno semanas. Justifique por qué está fuera del rango (16-18 semanas).",
+                'texto' => '',
+                'lapso' => '1',
+                'dato_colocado' => $lapsoUno,
+                'dato_esperado' => '16-18'
+            ];
+        }
+
+        $lapsoDos = (int) $this->form->semana_lapso_dos_calendario_academico;
+        if ($lapsoDos > 0 && ($lapsoDos < 16 || $lapsoDos > 18)) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '1',
+                'titulo' => 'Lapso Académico 2',
+                'nombre_campo' => 'Lapso Académico',
+                'mensaje' => "El Lapso Académico 2 tiene $lapsoDos semanas. Justifique por qué está fuera del rango (16-18 semanas).",
+                'texto' => '',
+                'lapso' => '2',
+                'dato_colocado' => $lapsoDos,
+                'dato_esperado' => '16-18'
+            ];
+        }
+
+        $inicialUno = (int) $this->form->semana_lapso_uno_introductorio_calendario_academico;
+        if ($inicialUno > 0 && $inicialUno != 12) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '2',
+                'titulo' => 'Trayecto Inicial 1',
+                'nombre_campo' => 'Trayecto Inicial',
+                'mensaje' => "El Trayecto Inicial 1 tiene $inicialUno semanas. Justifique por qué es diferente a 12 semanas.",
+                'texto' => '',
+                'lapso' => '1',
+                'dato_colocado' => $inicialUno,
+                'dato_esperado' => '12'
+            ];
+        }
+
+        $inicialDos = (int) $this->form->semana_lapso_dos_introductorio_calendario_academico;
+        if ($inicialDos > 0 && $inicialDos != 12) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '2',
+                'titulo' => 'Trayecto Inicial 2',
+                'nombre_campo' => 'Trayecto Inicial',
+                'mensaje' => "El Trayecto Inicial 2 tiene $inicialDos semanas. Justifique por qué es diferente a 12 semanas.",
+                'texto' => '',
+                'lapso' => '2',
+                'dato_colocado' => $inicialDos,
+                'dato_esperado' => '12'
+            ];
+        }
+
+        $intensivo = (int) $this->form->semana_intensibo_introductorio_calendario_academico;
+        if ($intensivo > 0 && $intensivo < 5) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '3',
+                'titulo' => 'Intensivo',
+                'nombre_campo' => 'Curso Intensivo',
+                'mensaje' => "El curso Intensivo tiene $intensivo semanas. Justifique por qué es menor a 5 semanas.",
+                'texto' => '',
+                'lapso' => '',
+                'dato_colocado' => $intensivo,
+                'dato_esperado' => '5+'
+            ];
+        }
+
+        $perUno = (int) $this->form->semana_per_uno_calendario_academico;
+        if ($perUno > 0 && $perUno != 12) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '4',
+                'titulo' => 'P.E.R 1',
+                'nombre_campo' => 'P.E.R.',
+                'mensaje' => "El P.E.R 1 tiene configuradas {$perUno} semanas. Justifique por qué está fuera del límite de 12 semanas.",
+                'texto' => '',
+                'lapso' => '1',
+                'dato_colocado' => $perUno,
+                'dato_esperado' => '12'
+            ];
+        }
+
+        $perDos = (int) $this->form->semana_per_dos_calendario_academico;
+        if ($perDos > 0 && $perDos != 12) {
+            $this->justificacionesRequeridas[] = [
+                'periodo' => '4',
+                'titulo' => 'P.E.R 2',
+                'nombre_campo' => 'P.E.R.',
+                'mensaje' => "El P.E.R 2 tiene configuradas {$perDos} semanas. Justifique por qué está fuera del límite de 12 semanas.",
+                'texto' => '',
+                'lapso' => '2',
+                'dato_colocado' => $perDos,
+                'dato_esperado' => '12'
+            ];
+        }
+
+        foreach ($this->justificacionesRequeridas as &$req) {
+            $encontrado = false;
+            foreach ($viejas as $vieja) {
+                if (($vieja['titulo'] ?? '') === $req['titulo'] && ($vieja['lapso'] ?? '') === $req['lapso']) {
+                    $req['texto'] = $vieja['texto'] ?? '';
+                    $encontrado = true;
+                    break;
+                }
+            }
+            if (!$encontrado) {
+                foreach ($this->justificacionesGuardadas as $guardada) {
+                    if (($guardada['periodo'] ?? '') === $req['titulo'] && ($guardada['lapso'] ?? '') === $req['lapso']) {
+                        $req['texto'] = $guardada['texto'] ?? '';
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     public function validarSeccionFechas()
     {
         $this->form->validarSeccionFechas();
 
-        $mensajes = [];
-
-        $lapsoUno = (int) $this->form->semana_lapso_uno_calendario_academico;
-        if ($lapsoUno < 16) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 1 con una cantidad inferior a 16 semanas?";
-        } elseif ($lapsoUno > 18) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 1 con una cantidad superior a 18 semanas?";
+        // Preservar los textos que el usuario ya escribió ANTES de reconstruir
+        $textosPrevios = [];
+        foreach ($this->justificacionesRequeridas as $req) {
+            $key = ($req['titulo'] ?? '') . '|' . ($req['lapso'] ?? '');
+            $textosPrevios[$key] = $req['texto'] ?? '';
         }
 
-        $lapsoDos = (int) $this->form->semana_lapso_dos_calendario_academico;
-        if ($lapsoDos < 16) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 2 con una cantidad inferior a 16 semanas?";
-        } elseif ($lapsoDos > 18) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico 2 con una cantidad superior a 18 semanas?";
-        }
+        $this->evaluarJustificacionesRequeridas();
 
-        $inicialUno = (int) $this->form->semana_lapso_uno_introductorio_calendario_academico;
-        if ($inicialUno < 12) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 1 con una cantidad inferior a 12 semanas?";
-        } elseif ($inicialUno > 12) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 1 con una cantidad superior a 12 semanas?";
+        // Restaurar los textos que el usuario escribió
+        foreach ($this->justificacionesRequeridas as &$req) {
+            $key = ($req['titulo'] ?? '') . '|' . ($req['lapso'] ?? '');
+            if (isset($textosPrevios[$key]) && trim($textosPrevios[$key]) !== '') {
+                $req['texto'] = $textosPrevios[$key];
+            }
         }
+        unset($req);
 
-        $inicialDos = (int) $this->form->semana_lapso_dos_introductorio_calendario_academico;
-        if ($inicialDos < 12) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 2 con una cantidad inferior a 12 semanas?";
-        } elseif ($inicialDos > 12) {
-            $mensajes[] = "¿Está seguro de registrar el Lapso Académico Trayecto Inicial 2 con una cantidad superior a 12 semanas?";
-        }
-
-        $intensivo = (int) $this->form->semana_intensibo_introductorio_calendario_academico;
-        if ($intensivo < 6) {
-            $mensajes[] = "¿Está seguro de registrar las Semanas del curso Intensivo con una cantidad inferior a 6 semanas?";
-        } elseif ($intensivo > 6) {
-            $mensajes[] = "¿Está seguro de registrar las Semanas del curso Intensivo con una cantidad superior a 6 semanas?";
-        }
-
-        $perUno = (int) $this->form->semana_per_uno_calendario_academico;
-        if ($perUno > 0) {
-            if ($perUno < 12) {
-                $mensajes[] = "¿Está seguro de registrar el P.E.R 1 con una cantidad inferior a 12 semanas?";
-            } elseif ($perUno > 12) {
-                $mensajes[] = "¿Está seguro de registrar el P.E.R 1 con una cantidad superior a 12 semanas?";
+        foreach ($this->justificacionesRequeridas as $req) {
+            $texto = trim($req['texto']);
+            if (empty($texto)) {
+                $this->showAlert('error', 'Debe escribir una justificación para todas las reglas incumplidas mostradas al final de la página antes de continuar.');
+                return;
+            }
+            if (mb_strlen($texto) < 5) {
+                $this->showAlert('error', "La justificación para '{$req['titulo']}' debe tener al menos 5 caracteres.");
+                return;
             }
         }
 
-        $perDos = (int) $this->form->semana_per_dos_calendario_academico;
-        if ($perDos > 0) {
-            if ($perDos < 12) {
-                $mensajes[] = "¿Está seguro de registrar el P.E.R 2 con una cantidad inferior a 12 semanas?";
-            } elseif ($perDos > 12) {
-                $mensajes[] = "¿Está seguro de registrar el P.E.R 2 con una cantidad superior a 12 semanas?";
-            }
-        }
-
-        if (!empty($mensajes)) {
-            $mensajeFinal = "";
-            if (count($mensajes) > 1) {
-                foreach ($mensajes as $i => $msg) {
-                    $mensajeFinal .= "• " . $msg;
-                    if ($i < count($mensajes) - 1) {
-                        $mensajeFinal .= "\n\n";
-                    }
-                }
-            } else {
-                $mensajeFinal = $mensajes[0];
-            }
-
-            $this->guardarBorrador();
-
-            $this->dispatch('show-alert', [
-                'type' => 'warning',
-                'message' => $mensajeFinal,
-                'showCancelButton' => true,
-                'cancelText' => 'Cancelar',
-                'okText' => 'Continuar',
-                'onOkEvent' => 'seccion-fechas-validada'
-            ]);
-            return;
-        }
+        $this->justificacionesGuardadas = array_map(function($req) {
+            return [
+                'texto' => trim($req['texto']),
+                'periodo' => $req['titulo'],
+                'nombre_campo' => $req['nombre_campo'] ?? '',
+                'lapso' => $req['lapso'],
+                'dato_colocado' => $req['dato_colocado'] ?? '',
+                'dato_esperado' => $req['dato_esperado'] ?? '',
+            ];
+        }, $this->justificacionesRequeridas);
 
         $this->guardarBorrador();
         $this->dispatch('seccion-fechas-validada');
@@ -1346,6 +1445,7 @@ class EditarCalendario extends Component
                     'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
                     'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
                     'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
+                    'justificativo_calendario_academico' => $this->justificacionesGuardadas,
                 ]);
 
                 $this->calendarioRepository->sincronizarEventos($this->id_calendario, $this->eventosRegistrados);
@@ -1442,6 +1542,7 @@ class EditarCalendario extends Component
                     'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
                     'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
                     'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
+                    'justificativo_calendario_academico' => $this->justificacionesGuardadas,
                 ]);
 
                 $this->calendarioRepository->sincronizarEventos($this->id_calendario, $this->eventosRegistrados);

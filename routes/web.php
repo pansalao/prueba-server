@@ -62,6 +62,7 @@ use App\Livewire\Calendario\UpdateCalendario;
 use App\Livewire\Calendario\ShowCalendario;
 use App\Livewire\Calendario\ExcelCalendarioExport;
 use App\Livewire\Calendario\EditarCalendario;
+use App\Livewire\Calendario\JustificacionesCalendario;
 
 use App\Livewire\Bitacora\ListBitacora;
 
@@ -165,6 +166,7 @@ Route::middleware(['auth', /*'role:1'*/])->group(function () {
     Route::get('calendario/show/{id}', ShowCalendario::class)->middleware('can:ver-calendario')->name('calendario.show');
     Route::get('calendario/editar/{id}', EditarCalendario::class)->middleware('can:cambiar-estatus-calendario')->name('calendario.editar');
     Route::get('calendario/notas/{id}', \App\Livewire\Calendario\NotasCalendario::class)->middleware('can:cambiar-estatus-calendario')->name('calendario.notas');
+    Route::get('calendario/justificaciones/{id}', JustificacionesCalendario::class)->middleware('can:ver-calendario')->name('calendario.justificaciones');
 
     // Módulo de Permisos (DAECE)
     Route::get('permiso/list', \App\Livewire\Permiso\ListPermiso::class)->middleware('can:listar-permiso')->name('permiso/listar');

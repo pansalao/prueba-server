@@ -107,6 +107,13 @@
                                                     Continuar
                                                 </a>
                                             @endif
+
+                                            @if(!empty($calendario->justificativo_calendario_academico))
+                                                <a href="{{ route('calendario.justificaciones', $calendario->id_calendario_academico) }}"
+                                                    class="flex items-center gap-1 bg-orange-500 text-white text-xs font-medium px-2.5 py-1 rounded-md hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 shadow-sm transition-colors">
+                                                    Atenuantes
+                                                </a>
+                                            @endif
                                         </div>
                                     </td>
 

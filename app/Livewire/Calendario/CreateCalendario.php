@@ -61,6 +61,12 @@ class CreateCalendario extends Component
                 $this->form->nuevoDiaEvento = null;
             }
         }
+        
+        // No recalcular si el cambio proviene de un textarea de justificación
+        // (para no borrar el texto que el usuario está escribiendo)
+        if (!str_starts_with($propertyName, 'justificacionesRequeridas')) {
+            $this->evaluarJustificacionesRequeridas();
+        }
     }
 
     #[On('confirmar-agregar-evento-fin-semana')]
@@ -222,6 +228,8 @@ class CreateCalendario extends Component
         // Cargar la biblioteca de eventos (templates)
         $eventoRepo = new EventoIndexRepo();
         $this->bibliotecaEventos = $eventoRepo->obtenerBiblioteca();
+
+        $this->evaluarJustificacionesRequeridas();
     }
 
     public function agregarEvento($inicio, $fin, $id_evento, $nombre = null, $tipo = null, $color = null, $confirmadoIntensivo = false, $confirmadoIncorporacion = false, $confirmadoDuracion = false, $confirmadoIntroductorio = false, $confirmadoFeriadoLocal = false, $ignorarFeriadosLocales = false, $confirmadoFinSemana = null)
@@ -1214,6 +1222,7 @@ class CreateCalendario extends Component
                 'semana_intensibo_introductorio_calendario_academico' => $this->form->semana_intensibo_introductorio_calendario_academico,
                 'semana_per_uno_calendario_academico' => $this->form->semana_per_uno_calendario_academico,
                 'semana_per_dos_calendario_academico' => $this->form->semana_per_dos_calendario_academico,
+                'justificativo_calendario_academico' => $this->justificacionesGuardadas,
                 'estatus' => '4'
             ], $this->eventosRegistrados, $this->id_calendario_borrador);
         } catch (Exception $e) {
@@ -1221,12 +1230,9 @@ class CreateCalendario extends Component
         }
     }
 
-    public function validarSeccionFechas()
+    public function evaluarJustificacionesRequeridas()
     {
-        \Illuminate\Support\Facades\Log::info('Iniciando validarSeccionFechas');
-        $this->form->validarSeccionFechas();
-        \Illuminate\Support\Facades\Log::info('Validación de Formulario exitosa');
-
+        $viejas = $this->justificacionesRequeridas; // guardamos el estado anterior para conservar el texto tipeado si no ha sido guardado
         $this->justificacionesRequeridas = [];
 
         $lapsoUno = (int) $this->form->semana_lapso_uno_calendario_academico;
@@ -1234,9 +1240,12 @@ class CreateCalendario extends Component
             $this->justificacionesRequeridas[] = [
                 'periodo' => '1',
                 'titulo' => 'Lapso Académico 1',
+                'nombre_campo' => 'Lapso Académico',
                 'mensaje' => "El Lapso Académico 1 tiene $lapsoUno semanas. Justifique por qué está fuera del rango (16-18 semanas).",
                 'texto' => '',
-                'lapso' => '1'
+                'lapso' => '1',
+                'dato_colocado' => $lapsoUno,
+                'dato_esperado' => '16-18'
             ];
         }
 
@@ -1245,9 +1254,12 @@ class CreateCalendario extends Component
             $this->justificacionesRequeridas[] = [
                 'periodo' => '1',
                 'titulo' => 'Lapso Académico 2',
+                'nombre_campo' => 'Lapso Académico',
                 'mensaje' => "El Lapso Académico 2 tiene $lapsoDos semanas. Justifique por qué está fuera del rango (16-18 semanas).",
                 'texto' => '',
-                'lapso' => '2'
+                'lapso' => '2',
+                'dato_colocado' => $lapsoDos,
+                'dato_esperado' => '16-18'
             ];
         }
 
@@ -1256,9 +1268,12 @@ class CreateCalendario extends Component
             $this->justificacionesRequeridas[] = [
                 'periodo' => '2',
                 'titulo' => 'Trayecto Inicial 1',
+                'nombre_campo' => 'Trayecto Inicial',
                 'mensaje' => "El Trayecto Inicial 1 tiene $inicialUno semanas. Justifique por qué es diferente a 12 semanas.",
                 'texto' => '',
-                'lapso' => '1'
+                'lapso' => '1',
+                'dato_colocado' => $inicialUno,
+                'dato_esperado' => '12'
             ];
         }
 
@@ -1267,9 +1282,12 @@ class CreateCalendario extends Component
             $this->justificacionesRequeridas[] = [
                 'periodo' => '2',
                 'titulo' => 'Trayecto Inicial 2',
+                'nombre_campo' => 'Trayecto Inicial',
                 'mensaje' => "El Trayecto Inicial 2 tiene $inicialDos semanas. Justifique por qué es diferente a 12 semanas.",
                 'texto' => '',
-                'lapso' => '2'
+                'lapso' => '2',
+                'dato_colocado' => $inicialDos,
+                'dato_esperado' => '12'
             ];
         }
 
@@ -1278,9 +1296,12 @@ class CreateCalendario extends Component
             $this->justificacionesRequeridas[] = [
                 'periodo' => '3',
                 'titulo' => 'Intensivo',
+                'nombre_campo' => 'Curso Intensivo',
                 'mensaje' => "El curso Intensivo tiene $intensivo semanas. Justifique por qué es menor a 5 semanas.",
                 'texto' => '',
-                'lapso' => ''
+                'lapso' => '',
+                'dato_colocado' => $intensivo,
+                'dato_esperado' => '5+'
             ];
         }
 
@@ -1289,9 +1310,12 @@ class CreateCalendario extends Component
             $this->justificacionesRequeridas[] = [
                 'periodo' => '4',
                 'titulo' => 'P.E.R 1',
+                'nombre_campo' => 'P.E.R.',
                 'mensaje' => "El P.E.R 1 tiene configuradas {$perUno} semanas. Justifique por qué está fuera del límite de 12 semanas.",
                 'texto' => '',
-                'lapso' => '1'
+                'lapso' => '1',
+                'dato_colocado' => $perUno,
+                'dato_esperado' => '12'
             ];
         }
 
@@ -1300,74 +1324,82 @@ class CreateCalendario extends Component
             $this->justificacionesRequeridas[] = [
                 'periodo' => '4',
                 'titulo' => 'P.E.R 2',
+                'nombre_campo' => 'P.E.R.',
                 'mensaje' => "El P.E.R 2 tiene configuradas {$perDos} semanas. Justifique por qué está fuera del límite de 12 semanas.",
                 'texto' => '',
-                'lapso' => '2'
+                'lapso' => '2',
+                'dato_colocado' => $perDos,
+                'dato_esperado' => '12'
             ];
         }
 
-        // Precargar textos previamente guardados si el usuario ya los había escrito
+        // Recuperar textos (prioridad: lo que acaban de tipear ($viejas), fallback: la BD)
         foreach ($this->justificacionesRequeridas as &$req) {
-            foreach ($this->justificacionesGuardadas as $guardada) {
-                if (isset($guardada['periodo']) && isset($guardada['lapso'])) {
-                    if ($guardada['periodo'] === $req['titulo'] && $guardada['lapso'] === $req['lapso']) {
+            $encontrado = false;
+            foreach ($viejas as $vieja) {
+                if (($vieja['titulo'] ?? '') === $req['titulo'] && ($vieja['lapso'] ?? '') === $req['lapso']) {
+                    $req['texto'] = $vieja['texto'] ?? '';
+                    $encontrado = true;
+                    break;
+                }
+            }
+            if (!$encontrado) {
+                foreach ($this->justificacionesGuardadas as $guardada) {
+                    if (($guardada['periodo'] ?? '') === $req['titulo'] && ($guardada['lapso'] ?? '') === $req['lapso']) {
                         $req['texto'] = $guardada['texto'] ?? '';
                         break;
                     }
                 }
             }
         }
-
-        if (count($this->justificacionesRequeridas) > 0) {
-            \Illuminate\Support\Facades\Log::info('Justificaciones requeridas encontradas: ' . count($this->justificacionesRequeridas));
-            $this->guardarBorrador();
-            $this->mostrarModalJustificacion = true;
-            return;
-        }
-
-        \Illuminate\Support\Facades\Log::info('No se encontraron justificaciones, despachando evento');
-        $this->guardarBorrador();
-        $this->dispatch('seccion-fechas-validada');
     }
 
-    public function confirmarJustificaciones()
+    public function validarSeccionFechas()
     {
-        // Validate that all required justifications have text
+        $this->form->validarSeccionFechas();
+
+        // Preservar los textos que el usuario ya escribió ANTES de reconstruir
+        $textosPrevios = [];
         foreach ($this->justificacionesRequeridas as $req) {
-            if (empty(trim($req['texto']))) {
-                $this->showAlert('error', 'Debe llenar todas las justificaciones requeridas para continuar.');
+            $key = ($req['titulo'] ?? '') . '|' . ($req['lapso'] ?? '');
+            $textosPrevios[$key] = $req['texto'] ?? '';
+        }
+
+        $this->evaluarJustificacionesRequeridas();
+
+        // Restaurar los textos que el usuario escribió
+        foreach ($this->justificacionesRequeridas as &$req) {
+            $key = ($req['titulo'] ?? '') . '|' . ($req['lapso'] ?? '');
+            if (isset($textosPrevios[$key]) && trim($textosPrevios[$key]) !== '') {
+                $req['texto'] = $textosPrevios[$key];
+            }
+        }
+        unset($req);
+
+        // Validar justificaciones
+        foreach ($this->justificacionesRequeridas as $req) {
+            $texto = trim($req['texto'] ?? '');
+            if (empty($texto)) {
+                $this->showAlert('error', 'Debe escribir una justificación para todas las reglas incumplidas mostradas al final de la página antes de continuar.');
+                return;
+            }
+            if (mb_strlen($texto) < 5) {
+                $this->showAlert('error', "La justificación para '{$req['titulo']}' debe tener al menos 5 caracteres.");
                 return;
             }
         }
 
-        $viejasGuardadas = $this->justificacionesGuardadas;
-
-        // Store them to save later
-        $this->justificacionesGuardadas = array_map(function($req) use ($viejasGuardadas) {
-            $nuevoTexto = trim($req['texto']);
-            $idUsuario = auth()->id() ?? 1;
-
-            foreach ($viejasGuardadas as $vieja) {
-                if (isset($vieja['periodo']) && isset($vieja['lapso'])) {
-                    if ($vieja['periodo'] === $req['titulo'] && $vieja['lapso'] === $req['lapso']) {
-                        // Si el texto no cambió, conservamos el usuario original
-                        if (trim($vieja['texto'] ?? '') === $nuevoTexto) {
-                            $idUsuario = $vieja['id_usuario'] ?? $idUsuario;
-                        }
-                        break;
-                    }
-                }
-            }
-
+        $this->justificacionesGuardadas = array_map(function($req) {
             return [
-                'texto' => $nuevoTexto,
+                'texto' => trim($req['texto']),
                 'periodo' => $req['titulo'],
+                'nombre_campo' => $req['nombre_campo'] ?? '',
                 'lapso' => $req['lapso'],
-                'id_usuario' => $idUsuario,
+                'dato_colocado' => $req['dato_colocado'] ?? '',
+                'dato_esperado' => $req['dato_esperado'] ?? '',
             ];
         }, $this->justificacionesRequeridas);
-        
-        $this->mostrarModalJustificacion = false;
+
         $this->guardarBorrador();
         $this->dispatch('seccion-fechas-validada');
     }

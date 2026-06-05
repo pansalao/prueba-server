@@ -12,7 +12,7 @@ class CalendarioIndexRepo
         \App\Models\CalendarioAcademico::inactivarVencidos();
 
         $calendarios = DB::table('calendario_academico')
-            ->select('id_calendario_academico', 'semana_lapso_uno_calendario_academico', 'semana_lapso_dos_calendario_academico', 'dia_inicio_calendario_academico', 'dia_fin_calendario_academico', 'estatus')
+            ->select('id_calendario_academico', 'semana_lapso_uno_calendario_academico', 'semana_lapso_dos_calendario_academico', 'dia_inicio_calendario_academico', 'dia_fin_calendario_academico', 'estatus', 'justificativo_calendario_academico')
             ->when($busqueda, function ($consulta, $busqueda) {
                 $consulta->where('semana_lapso_uno_calendario_academico', 'LIKE', '%' . $busqueda . '%')
                          ->orWhere('semana_lapso_dos_calendario_academico', 'LIKE', '%' . $busqueda . '%');

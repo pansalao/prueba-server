@@ -241,6 +241,34 @@
                                             class="mt-2" />
                                     </div>
                                 </div>
+
+                                {{-- Justificaciones del Primer Lapso --}}
+                                @php
+                                    $justifsLapso1 = array_filter($justificacionesRequeridas, fn($j) => ($j['lapso'] ?? '') === '1');
+                                @endphp
+                                @if(count($justifsLapso1) > 0)
+                                    <div class="mt-4 space-y-4 border-t-2 border-orange-200 dark:border-orange-800 pt-4">
+                                        <h6 class="text-sm font-bold text-orange-700 dark:text-orange-400 flex items-center gap-2">
+                                            Justificaciones Requeridas
+                                        </h6>
+                                        @foreach($justifsLapso1 as $realIdx => $req)
+                                            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-orange-100 dark:border-orange-900 shadow-sm relative overflow-hidden">
+                                                <div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-400 dark:bg-orange-500"></div>
+                                                <div class="flex items-start justify-between mb-2 pl-2">
+                                                    <div>
+                                                        <h6 class="font-bold text-sm text-gray-800 dark:text-gray-200">{{ $req['titulo'] }}</h6>
+                                                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ $req['mensaje'] }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="pl-2">
+                                                    <textarea wire:model="justificacionesRequeridas.{{ $realIdx }}.texto"
+                                                        class="mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm min-h-[80px] resize-y text-sm"
+                                                        placeholder="Explique el motivo..." required></textarea>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -266,6 +294,34 @@
                                             class="mt-2" />
                                     </div>
                                 </div>
+
+                                {{-- Justificaciones del Intensivo --}}
+                                @php
+                                    $justifsIntensivo = array_filter($justificacionesRequeridas, fn($j) => ($j['titulo'] ?? '') === 'Intensivo');
+                                @endphp
+                                @if(count($justifsIntensivo) > 0)
+                                    <div class="mt-4 space-y-4 border-t-2 border-orange-200 dark:border-orange-800 pt-4">
+                                        <h6 class="text-sm font-bold text-orange-700 dark:text-orange-400 flex items-center gap-2">
+                                            Justificaciones Requeridas
+                                        </h6>
+                                        @foreach($justifsIntensivo as $realIdx => $req)
+                                            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-orange-100 dark:border-orange-900 shadow-sm relative overflow-hidden">
+                                                <div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-400 dark:bg-orange-500"></div>
+                                                <div class="flex items-start justify-between mb-2 pl-2">
+                                                    <div>
+                                                        <h6 class="font-bold text-sm text-gray-800 dark:text-gray-200">{{ $req['titulo'] }}</h6>
+                                                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ $req['mensaje'] }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="pl-2">
+                                                    <textarea wire:model="justificacionesRequeridas.{{ $realIdx }}.texto"
+                                                        class="mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm min-h-[80px] resize-y text-sm"
+                                                        placeholder="Explique el motivo..." required></textarea>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -310,9 +366,38 @@
                                             class="mt-2" />
                                     </div>
                                 </div>
+
+                                {{-- Justificaciones del Segundo Lapso --}}
+                                @php
+                                    $justifsLapso2 = array_filter($justificacionesRequeridas, fn($j) => ($j['lapso'] ?? '') === '2');
+                                @endphp
+                                @if(count($justifsLapso2) > 0)
+                                    <div class="mt-4 space-y-4 border-t-2 border-orange-200 dark:border-orange-800 pt-4">
+                                        <h6 class="text-sm font-bold text-orange-700 dark:text-orange-400 flex items-center gap-2">
+                                            Justificaciones Requeridas
+                                        </h6>
+                                        @foreach($justifsLapso2 as $realIdx => $req)
+                                            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-orange-100 dark:border-orange-900 shadow-sm relative overflow-hidden">
+                                                <div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-400 dark:bg-orange-500"></div>
+                                                <div class="flex items-start justify-between mb-2 pl-2">
+                                                    <div>
+                                                        <h6 class="font-bold text-sm text-gray-800 dark:text-gray-200">{{ $req['titulo'] }}</h6>
+                                                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ $req['mensaje'] }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="pl-2">
+                                                    <textarea wire:model="justificacionesRequeridas.{{ $realIdx }}.texto"
+                                                        class="mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm min-h-[80px] resize-y text-sm"
+                                                        placeholder="Explique el motivo..." required></textarea>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
+
                     <div
                         class="flex justify-end pt-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 mt-4 -mx-4 -mb-4 p-4">
                         <x-primary-button type="button" wire:click="validarSeccionFechas"

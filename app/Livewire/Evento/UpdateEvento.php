@@ -382,8 +382,13 @@ class UpdateEvento extends Component
 
             if (count($this->justificacionesRequeridas) > 0) {
                 foreach ($this->justificacionesRequeridas as $req) {
-                    if (empty(trim($req['texto'] ?? ''))) {
+                    $texto = trim($req['texto'] ?? '');
+                    if (empty($texto)) {
                         $this->showAlert('error', 'Debe llenar todas las justificaciones requeridas para continuar.');
+                        return;
+                    }
+                    if (mb_strlen($texto) < 5) {
+                        $this->showAlert('error', "La justificación para '{$req['titulo']}' debe tener al menos 5 caracteres.");
                         return;
                     }
                 }
