@@ -56,76 +56,182 @@
                                     <div>
                                         <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200">
                                             {{ $progreso['nombre'] }}</h4>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                                            @if($progreso['limite'] === null)
-                                                <span class="text-gray-600 dark:text-gray-400 font-medium">Ilimitado</span>
-                                            @elseif($progreso['completado'])
-                                                <span class="text-green-600 dark:text-green-400 font-medium">Completado</span>
-                                            @else
-                                                Faltan {{ $progreso['restantes'] }}
-                                                {{ ($progreso['is_dias'] ?? false) ? 'días' : 'instancias' }}
-                                            @endif
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="text-right flex items-center gap-4">
-                                    <div>
-                                        <div
-                                            class="text-sm font-bold {{ $progreso['completado'] ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400' }}">
-                                            @if($progreso['limite'] === null)
-                                                Asignados {{ $progreso['agregados'] }}
-                                                {{ ($progreso['is_dias'] ?? false) ? 'días' : 'instancias' }}
-                                            @else
-                                                Asignados {{ $progreso['agregados'] }} de {{ $progreso['limite'] }}
-                                                {{ ($progreso['is_dias'] ?? false) ? 'días' : 'instancias' }}
-                                            @endif
-                                        </div>
-                                        @if($progreso['limite'] !== null)
-                                            <div
-                                                class="w-24 h-2 mt-1 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden ml-auto">
-                                                <div class="h-full {{ $progreso['completado'] ? 'bg-green-500' : 'bg-blue-500' }}"
-                                                    style="width: {{ min(100, ($progreso['agregados'] / $progreso['limite']) * 100) }}%">
-                                                </div>
-                                            </div>
+                                        @if(!($progreso['is_por_lapso'] ?? false))
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                @if($progreso['limite'] === null)
+                                                    <span class="text-gray-600 dark:text-gray-400 font-medium">Ilimitado</span>
+                                                @elseif($progreso['completado'])
+                                                    <span class="text-green-600 dark:text-green-400 font-medium">Completado</span>
+                                                @else
+                                                    Faltan {{ $progreso['restantes'] }}
+                                                    {{ ($progreso['is_dias'] ?? false) ? 'días' : 'instancias' }}
+                                                @endif
+                                            </p>
                                         @endif
                                     </div>
-                                    <button type="button" @click="expanded[{{ $index }}] = !expanded[{{ $index }}]"
-                                        class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                                        <span class="material-icons transition-transform duration-200"
-                                            :class="{'rotate-180': expanded[{{ $index }}]}">expand_more</span>
-                                    </button>
                                 </div>
-                            </div>
 
-                            <!-- Panel de Fechas Asignadas -->
-                            <div x-show="expanded[{{ $index }}]" x-collapse
-                                class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                @if(count($progreso['fechas_asignadas']) > 0)
-                                    <ul class="space-y-1">
-                                        @foreach($progreso['fechas_asignadas'] as $fecha)
-                                            <li
-                                                class="text-xs text-gray-600 dark:text-gray-300 flex items-center justify-between bg-white dark:bg-gray-800 p-1.5 rounded">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="material-icons text-[14px] text-gray-400">event</span>
-                                                    <span>
-                                                        {{ \Carbon\Carbon::parse($fecha['inicio'])->format('d/m/Y') }}
-                                                        @if($fecha['inicio'] !== $fecha['fin'])
-                                                            - {{ \Carbon\Carbon::parse($fecha['fin'])->format('d/m/Y') }}
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                @if(isset($fecha['dias']))
-                                                    <span class="font-medium text-gray-500">{{ $fecha['dias'] }} días</span>
+                                @if(!($progreso['is_por_lapso'] ?? false))
+                                    <div class="text-right flex items-center gap-4">
+                                        <div>
+                                            <div
+                                                class="text-sm font-bold {{ $progreso['completado'] ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400' }}">
+                                                @if($progreso['limite'] === null)
+                                                    Asignados {{ $progreso['agregados'] }}
+                                                    {{ ($progreso['is_dias'] ?? false) ? 'días' : 'instancias' }}
+                                                @else
+                                                    Asignados {{ $progreso['agregados'] }} de {{ $progreso['limite'] }}
+                                                    {{ ($progreso['is_dias'] ?? false) ? 'días' : 'instancias' }}
                                                 @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @else
-                                    <p class="text-xs text-gray-500 italic">No hay fechas asignadas registradas en el
-                                        componente.</p>
+                                            </div>
+                                            @if($progreso['limite'] !== null)
+                                                <div
+                                                    class="w-24 h-2 mt-1 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden ml-auto">
+                                                    <div class="h-full {{ $progreso['completado'] ? 'bg-green-500' : 'bg-blue-500' }}"
+                                                        style="width: {{ min(100, ($progreso['agregados'] / $progreso['limite']) * 100) }}%">
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <button type="button" @click="expanded[{{ $index }}] = !expanded[{{ $index }}]"
+                                            class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                            <span class="material-icons transition-transform duration-200"
+                                                :class="{'rotate-180': expanded[{{ $index }}]}">expand_more</span>
+                                        </button>
+                                    </div>
                                 @endif
                             </div>
+
+                            @if($progreso['is_por_lapso'] ?? false)
+                                <div class="mt-3 space-y-2">
+                                    @foreach($progreso['progreso_por_lapso'] as $lapsoIndex => $lapso)
+                                        @php 
+                                            $lapsoCompletado = $lapso['agregados'] >= $progreso['limite_por_lapso'];
+                                            $lapsoKey = $index . '_lapso_' . $lapsoIndex;
+                                        @endphp
+                                        <div class="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 p-2">
+                                            <div class="flex items-center justify-between cursor-pointer" @click="expanded['{{ $lapsoKey }}'] = !expanded['{{ $lapsoKey }}']">
+                                                <div>
+                                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ $lapso['nombre'] }}</span>
+                                                    <p class="text-[11px] text-gray-500">
+                                                        @if($lapsoCompletado)
+                                                            <span class="text-green-600">Completado</span>
+                                                        @else
+                                                            Faltan {{ max(0, $progreso['limite_por_lapso'] - $lapso['agregados']) }} inst.
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                                <div class="flex items-center gap-3">
+                                                    <div class="text-right">
+                                                        <span class="text-xs font-bold {{ $lapsoCompletado ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400' }}">
+                                                            Asignados {{ $lapso['agregados'] }} de {{ $progreso['limite_por_lapso'] }}
+                                                        </span>
+                                                        <div class="w-20 h-1.5 mt-0.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden ml-auto">
+                                                            <div class="h-full {{ $lapsoCompletado ? 'bg-green-500' : 'bg-blue-500' }}" style="width: {{ min(100, ($lapso['agregados'] / $progreso['limite_por_lapso']) * 100) }}%"></div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                                        <span class="material-icons transition-transform duration-200 text-[18px]" :class="{'rotate-180': expanded['{{ $lapsoKey }}']}">expand_more</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Panel Fechas Lapso -->
+                                            <div x-show="expanded['{{ $lapsoKey }}']" x-collapse class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                                                @if(count($lapso['fechas_asignadas']) > 0)
+                                                    <ul class="space-y-1">
+                                                        @foreach($lapso['fechas_asignadas'] as $fecha)
+                                                            <li class="text-[11px] text-gray-600 dark:text-gray-400 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 p-1.5 rounded">
+                                                                <div class="flex items-center gap-1.5">
+                                                                    <span class="material-icons text-[12px] text-gray-400">event</span>
+                                                                    <span>
+                                                                        {{ \Carbon\Carbon::parse($fecha['inicio'])->format('d/m/Y') }}
+                                                                        @if($fecha['inicio'] !== $fecha['fin'])
+                                                                            - {{ \Carbon\Carbon::parse($fecha['fin'])->format('d/m/Y') }}
+                                                                        @endif
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <p class="text-[11px] text-gray-500 italic">No hay fechas asignadas registradas en el componente.</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    
+                                    {{-- Fuera de lapso --}}
+                                    @if(count($progreso['fechas_asignadas']) > 0)
+                                        <div class="bg-orange-50 dark:bg-orange-900/10 rounded border border-orange-200 dark:border-orange-800/30 p-2">
+                                            <div class="flex items-center justify-between cursor-pointer" @click="expanded['{{ $index }}_fuera'] = !expanded['{{ $index }}_fuera']">
+                                                <div>
+                                                    <span class="text-sm font-bold text-orange-700 dark:text-orange-400 flex items-center gap-1">
+                                                        <span class="material-icons text-[16px]">warning</span> Fuera de Lapso
+                                                    </span>
+                                                    <p class="text-[11px] text-orange-500">
+                                                        Fechas asignadas incorrectamente
+                                                    </p>
+                                                </div>
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-xs font-bold text-orange-600 dark:text-orange-400">
+                                                        {{ count($progreso['fechas_asignadas']) }} instancias
+                                                    </span>
+                                                    <button type="button" class="text-orange-400 hover:text-orange-600 focus:outline-none">
+                                                        <span class="material-icons transition-transform duration-200 text-[18px]" :class="{'rotate-180': expanded['{{ $index }}_fuera']}">expand_more</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div x-show="expanded['{{ $index }}_fuera']" x-collapse class="mt-2 pt-2 border-t border-orange-200 dark:border-orange-800/30">
+                                                <ul class="space-y-1">
+                                                    @foreach($progreso['fechas_asignadas'] as $fecha)
+                                                        <li class="text-[11px] text-orange-700 dark:text-orange-300 flex items-center justify-between bg-white dark:bg-gray-800 p-1.5 rounded">
+                                                            <div class="flex items-center gap-1.5">
+                                                                <span class="material-icons text-[12px] text-orange-400">event</span>
+                                                                <span>
+                                                                    {{ \Carbon\Carbon::parse($fecha['inicio'])->format('d/m/Y') }}
+                                                                    @if($fecha['inicio'] !== $fecha['fin'])
+                                                                        - {{ \Carbon\Carbon::parse($fecha['fin'])->format('d/m/Y') }}
+                                                                    @endif
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <!-- Panel de Fechas Asignadas (Original) -->
+                                <div x-show="expanded[{{ $index }}]" x-collapse
+                                    class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                    @if(count($progreso['fechas_asignadas']) > 0)
+                                        <ul class="space-y-1">
+                                            @foreach($progreso['fechas_asignadas'] as $fecha)
+                                                <li
+                                                    class="text-[11px] text-gray-600 dark:text-gray-300 flex items-center justify-between bg-white dark:bg-gray-800 p-1.5 rounded border border-gray-100 dark:border-gray-700">
+                                                    <div class="flex items-center gap-1.5">
+                                                        <span class="material-icons text-[12px] text-gray-400">event</span>
+                                                        <span>
+                                                            {{ \Carbon\Carbon::parse($fecha['inicio'])->format('d/m/Y') }}
+                                                            @if($fecha['inicio'] !== $fecha['fin'])
+                                                                - {{ \Carbon\Carbon::parse($fecha['fin'])->format('d/m/Y') }}
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                    @if(isset($fecha['dias']))
+                                                        <span class="font-medium text-[10px] text-gray-500">{{ $fecha['dias'] }} días</span>
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        <p class="text-[11px] text-gray-500 italic">No hay fechas asignadas registradas en el componente.</p>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     @endforeach
 

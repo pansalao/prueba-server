@@ -121,6 +121,56 @@ class EditarCalendario extends Component
     {
         $progreso = [];
 
+        // Precalcular todos los lapsos asignados en el calendario actual
+        $lapsosAsignados = [];
+        $tiposLapsos = [
+            ['inicio' => '2', 'fin' => '3', 'prefijo' => 'Lapso'],
+            ['inicio' => '7', 'fin' => '8', 'prefijo' => 'Intensivo']
+        ];
+        
+        foreach ($tiposLapsos as $tipo) {
+            $inicios = [];
+            $fines = [];
+            foreach ($this->eventosRegistrados as $ev) {
+                $idEsp = null;
+                foreach ($this->bibliotecaEventos as $bEv) {
+                    $bEvArr = (array) $bEv;
+                    if (($bEvArr['id_evento'] ?? null) == ($ev['id'] ?? null)) {
+                        $idEsp = (string) ($bEvArr['especial_evento'] ?? '');
+                        break;
+                    }
+                }
+                if ($idEsp === $tipo['inicio']) {
+                    $inicios[] = $ev;
+                } elseif ($idEsp === $tipo['fin']) {
+                    $fines[] = $ev;
+                }
+            }
+            
+            usort($inicios, fn($a, $b) => strtotime($a['inicio']) <=> strtotime($b['inicio']));
+            usort($fines, fn($a, $b) => strtotime($a['inicio']) <=> strtotime($b['inicio']));
+            
+            foreach ($inicios as $idx => $inicioEv) {
+                $finEv = $fines[$idx] ?? null;
+                $timestampInicio = strtotime($inicioEv['inicio']);
+                $timestampFin = $finEv ? strtotime($finEv['inicio']) : $timestampInicio; 
+                
+                $lapsosAsignados[] = [
+                    'nombre' => $tipo['prefijo'] . ' ' . ($idx + 1),
+                    'timestamp_inicio' => $timestampInicio,
+                    'timestamp_fin' => $timestampFin,
+                    'agregados' => 0,
+                    'fechas_asignadas' => []
+                ];
+            }
+        }
+        
+        // Ordenar lapsos cronológicamente
+        usort($lapsosAsignados, function($a, $b) {
+            return $a['timestamp_inicio'] <=> $b['timestamp_inicio'];
+        });
+
+
         foreach ($this->bibliotecaEventos as $evento) {
             $eventoArr = (array) $evento;
             $especial = (string) ($eventoArr['especial_evento'] ?? '');
@@ -175,6 +225,8 @@ class EditarCalendario extends Component
             // Determinar el límite teórico
             $limite = 0;
             
+            $isPorLapso = false;
+
             // Reglas especiales para Lapsos Académicos
             if (in_array($especial, ['2', '3', '7', '8'])) {
                 $limite = 2; // Por calendario
@@ -197,39 +249,85 @@ class EditarCalendario extends Component
                             $limite = $cantidadRepetible; // Default
                         }
                     } else {
-                        // Límite por lapso. Hay 2 lapsos fijos en esta configuración.
-                        $limite = $cantidadRepetible * 2;
+                        // Límite por lapso. Contamos cuántos lapsos hay.
+                        $totalLapsos = max(1, count($lapsosAsignados));
+                        $limite = $cantidadRepetible * $totalLapsos;
+                        $isPorLapso = true;
                     }
                 }
             }
 
             // Calcular cuántos hemos agregado al calendario
             $agregados = 0;
-            $fechasAsignadas = [];
+            $fechasAsignadas = []; // Almacena fechas fuera de lapso o fechas de eventos independientes
+            $progresoPorLapso = $lapsosAsignados; // Copiamos la estructura vacía precalculada
+            
             foreach ($this->eventosRegistrados as $ev) {
                 if (($ev['id'] ?? null) == $eventoArr['id_evento']) {
                     $agregados++;
-                    $fechasAsignadas[] = [
-                        'inicio' => $ev['inicio'],
-                        'fin' => $ev['fin']
-                    ];
+                    $timestampEv = strtotime($ev['inicio']);
+                    $asignadoALapso = false;
+
+                    if ($isPorLapso) {
+                        // Buscar a qué lapso pertenece según la fecha de inicio
+                        foreach ($progresoPorLapso as &$lapso) {
+                            if ($timestampEv >= $lapso['timestamp_inicio'] && $timestampEv <= $lapso['timestamp_fin']) {
+                                $lapso['agregados']++;
+                                $lapso['fechas_asignadas'][] = [
+                                    'inicio' => $ev['inicio'],
+                                    'fin' => $ev['fin']
+                                ];
+                                $asignadoALapso = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Si no es por lapso o si cayó fuera de todos los lapsos
+                    if (!$asignadoALapso) {
+                        $fechasAsignadas[] = [
+                            'inicio' => $ev['inicio'],
+                            'fin' => $ev['fin']
+                        ];
+                    }
                 }
             }
 
-            // Omitir si no tiene un límite definido y no se ha agregado
-            if ($limite == 0 && $agregados == 0) continue;
+            if ($isPorLapso) {
+                // Agregar el evento original pero con la estructura anidada de lapsos
+                $progreso[] = [
+                    'id_evento' => $eventoArr['id_evento'],
+                    'nombre' => $eventoArr['nombre_evento'],
+                    'color' => $eventoArr['codigo_color_evento'] ?? '#3b82f6',
+                    'limite' => $limite > 0 ? $limite : null,
+                    'agregados' => $agregados,
+                    'restantes' => $limite > 0 ? max(0, $limite - $agregados) : null,
+                    'completado' => $limite > 0 ? ($agregados >= $limite) : true,
+                    'is_dias' => false,
+                    'fechas_asignadas' => $fechasAsignadas, // Fechas fuera de lapso
+                    'is_por_lapso' => true,
+                    'limite_por_lapso' => $cantidadRepetible,
+                    'progreso_por_lapso' => $progresoPorLapso
+                ];
+            } else {
+                // Omitir si no tiene un límite definido y no se ha agregado
+                if ($limite == 0 && $agregados == 0) continue;
 
-            $progreso[] = [
-                'id_evento' => $eventoArr['id_evento'],
-                'nombre' => $eventoArr['nombre_evento'],
-                'color' => $eventoArr['codigo_color_evento'] ?? '#3b82f6',
-                'limite' => $limite > 0 ? $limite : null,
-                'agregados' => $agregados,
-                'restantes' => $limite > 0 ? max(0, $limite - $agregados) : null,
-                'completado' => $limite > 0 ? ($agregados >= $limite) : true,
-                'is_dias' => false,
-                'fechas_asignadas' => $fechasAsignadas
-            ];
+                $progreso[] = [
+                    'id_evento' => $eventoArr['id_evento'],
+                    'nombre' => $eventoArr['nombre_evento'],
+                    'color' => $eventoArr['codigo_color_evento'] ?? '#3b82f6',
+                    'limite' => $limite > 0 ? $limite : null,
+                    'agregados' => $agregados,
+                    'restantes' => $limite > 0 ? max(0, $limite - $agregados) : null,
+                    'completado' => $limite > 0 ? ($agregados >= $limite) : true,
+                    'is_dias' => false,
+                    'fechas_asignadas' => $fechasAsignadas,
+                    'is_por_lapso' => false,
+                    'limite_por_lapso' => 0,
+                    'progreso_por_lapso' => []
+                ];
+            }
         }
 
         // Ordenar: primero los no completados, luego alfabéticamente
