@@ -48,7 +48,8 @@ class EventoIndexRepo
             ->select('id_evento', 'nombre_evento', 'tipo_evento', 
                      'is_laborable_evento', 'is_repetible_evento', 
                      'is_cantidad_dias_evento', 'cantidad_dias_evento', 
-                     'codigo_color_evento')
+                     'codigo_color_evento', 'id_especial_evento as especial_evento',
+                     'is_independiente_evento', 'cantidad_repetible_evento')
             ->get();
     }
 

@@ -43,6 +43,206 @@ class EditarCalendario extends Component
         $this->viewRepository = new CalendarioViewRepo();
     }
 
+    public function autocompletarFeriadosFijos()
+    {
+        $calInicio = $this->form->dia_inicio_calendario_academico;
+        $calFin = $this->form->dia_fin_calendario_academico;
+
+        if (!$calInicio || !$calFin) {
+            $this->showAlert('error', 'Debe seleccionar una fecha de inicio y fin para el calendario antes de autocompletar los feriados.');
+            return;
+        }
+
+        $feriadosFijos = \App\Models\Evento::where('estatus', '1')
+            ->where('is_dia_evento', true)
+            ->whereNotNull('dia_evento')
+            ->get();
+
+        if ($feriadosFijos->isEmpty()) {
+            $this->showAlert('info', 'No se encontraron feriados fijos registrados en el sistema.');
+            return;
+        }
+
+        $startYear = (int) date('Y', strtotime($calInicio));
+        $endYear = (int) date('Y', strtotime($calFin));
+        $agregados = 0;
+
+        foreach ($feriadosFijos as $feriado) {
+            $diaMes = date('m-d', strtotime($feriado->dia_evento));
+
+            for ($year = $startYear; $year <= $endYear; $year++) {
+                $fechaCandidata = "$year-$diaMes";
+
+                if ($fechaCandidata >= $calInicio && $fechaCandidata <= $calFin) {
+                    // Check if already added
+                    $yaExiste = collect($this->eventosRegistrados)->contains(function ($ev) use ($feriado, $fechaCandidata) {
+                        return ($ev['id'] ?? null) == $feriado->id_evento && ($ev['inicio'] ?? null) == $fechaCandidata;
+                    });
+
+                    if (!$yaExiste) {
+                        $this->eventosRegistrados[] = [
+                            'identificador' => uniqid(),
+                            'id' => (int) $feriado->id_evento,
+                            'inicio' => (string) $fechaCandidata,
+                            'fin' => (string) $fechaCandidata,
+                            'nombre' => (string) $feriado->nombre_evento,
+                            'nombre_evento' => (string) $feriado->nombre_evento,
+                            'tipo' => (string) $feriado->tipo_evento,
+                            'color' => (string) $feriado->color,
+                            'is_cantidad_dias_evento' => (bool) $feriado->is_cantidad_dias_evento,
+                            'cantidad_dias_evento' => $feriado->cantidad_dias_evento,
+                            'especial_evento' => (string) $feriado->especial_evento,
+                            'is_superponible_evento' => (bool) $feriado->is_superponible_evento,
+                            'is_laborable_evento' => (bool) $feriado->is_laborable_evento,
+                            'is_repetible_evento' => (bool) $feriado->is_repetible_evento,
+                            'cantidad_repetible_evento' => $feriado->cantidad_repetible_evento ?? null,
+                            'is_independiente_evento' => (bool) ($feriado->is_independiente ?? $feriado->is_independiente_evento ?? false),
+                            'ignorar_feriados_locales' => false,
+                            'ignorar_fines_semana' => false,
+                            'semanas' => null
+                        ];
+                        $agregados++;
+                    }
+                }
+            }
+        }
+
+        if ($agregados > 0) {
+            $this->actualizarMapaEventos();
+            $this->evaluarJustificacionesRequeridas();
+            $this->showAlert('success', "Se han añadido $agregados feriados fijos automáticamente al calendario.");
+        } else {
+            $this->showAlert('info', 'No se encontraron feriados fijos nuevos para añadir en el rango seleccionado.');
+        }
+    }
+
+    #[Computed]
+    public function progresoEventos()
+    {
+        $progreso = [];
+
+        foreach ($this->bibliotecaEventos as $evento) {
+            $eventoArr = (array) $evento;
+            $especial = (string) ($eventoArr['especial_evento'] ?? '');
+            $isCantidadDias = (bool) ($eventoArr['is_cantidad_dias_evento'] ?? false);
+
+            // Solo contar por días para Vacaciones Colectivas (especial_evento == '1')
+            if ($isCantidadDias && $especial === '1') {
+                $limiteDias = (int) ($eventoArr['cantidad_dias_evento'] ?? 0);
+                if ($limiteDias > 0) {
+                    $startYear = date('Y');
+                    $endYear = date('Y');
+                    if ($this->form->dia_inicio_calendario_academico && $this->form->dia_fin_calendario_academico) {
+                        $startYear = (int) date('Y', strtotime($this->form->dia_inicio_calendario_academico));
+                        $endYear = (int) date('Y', strtotime($this->form->dia_fin_calendario_academico));
+                    }
+
+                    for ($y = $startYear; $y <= $endYear; $y++) {
+                        $diasAgregados = 0;
+                        $fechasAsignadas = [];
+                        foreach ($this->eventosRegistrados as $ev) {
+                            if (($ev['id'] ?? null) == $eventoArr['id_evento'] && date('Y', strtotime($ev['inicio'])) == $y) {
+                                $start = strtotime($ev['inicio']);
+                                $end = strtotime($ev['fin']);
+                                $days = round(($end - $start) / (60 * 60 * 24)) + 1;
+                                $diasAgregados += max(1, $days);
+                                $fechasAsignadas[] = [
+                                    'inicio' => $ev['inicio'],
+                                    'fin' => $ev['fin'],
+                                    'dias' => max(1, $days)
+                                ];
+                            }
+                        }
+
+                        if ($limiteDias == 0 && $diasAgregados == 0) continue;
+
+                        $progreso[] = [
+                            'id_evento' => $eventoArr['id_evento'] . '_' . $y,
+                            'nombre' => trim($eventoArr['nombre_evento']) . ' ' . $y,
+                            'color' => $eventoArr['codigo_color_evento'] ?? '#3b82f6',
+                            'limite' => $limiteDias > 0 ? $limiteDias : null,
+                            'agregados' => $diasAgregados,
+                            'restantes' => $limiteDias > 0 ? max(0, $limiteDias - $diasAgregados) : null,
+                            'completado' => $limiteDias > 0 ? ($diasAgregados >= $limiteDias) : true,
+                            'is_dias' => true,
+                            'fechas_asignadas' => $fechasAsignadas
+                        ];
+                    }
+                }
+                continue;
+            }
+            
+            // Determinar el límite teórico
+            $limite = 0;
+            
+            // Reglas especiales para Lapsos Académicos
+            if (in_array($especial, ['2', '3', '7', '8'])) {
+                $limite = 2; // Por calendario
+            } else {
+                $esRepetible = (bool) ($eventoArr['is_repetible_evento'] ?? false);
+                $cantidadRepetible = (int) ($eventoArr['cantidad_repetible_evento'] ?? 0);
+                
+                if (!$esRepetible) {
+                    $limite = 1;
+                } elseif ($cantidadRepetible > 0) {
+                    $esIndependiente = (bool) ($eventoArr['is_independiente'] ?? $eventoArr['is_independiente_evento'] ?? false);
+                    if ($esIndependiente) {
+                        // Límite anual. Calculamos basado en los años del calendario
+                        if ($this->form->dia_inicio_calendario_academico && $this->form->dia_fin_calendario_academico) {
+                            $startYear = (int) date('Y', strtotime($this->form->dia_inicio_calendario_academico));
+                            $endYear = (int) date('Y', strtotime($this->form->dia_fin_calendario_academico));
+                            $years = max(1, $endYear - $startYear + 1);
+                            $limite = $cantidadRepetible * $years;
+                        } else {
+                            $limite = $cantidadRepetible; // Default
+                        }
+                    } else {
+                        // Límite por lapso. Hay 2 lapsos fijos en esta configuración.
+                        $limite = $cantidadRepetible * 2;
+                    }
+                }
+            }
+
+            // Calcular cuántos hemos agregado al calendario
+            $agregados = 0;
+            $fechasAsignadas = [];
+            foreach ($this->eventosRegistrados as $ev) {
+                if (($ev['id'] ?? null) == $eventoArr['id_evento']) {
+                    $agregados++;
+                    $fechasAsignadas[] = [
+                        'inicio' => $ev['inicio'],
+                        'fin' => $ev['fin']
+                    ];
+                }
+            }
+
+            // Omitir si no tiene un límite definido y no se ha agregado
+            if ($limite == 0 && $agregados == 0) continue;
+
+            $progreso[] = [
+                'id_evento' => $eventoArr['id_evento'],
+                'nombre' => $eventoArr['nombre_evento'],
+                'color' => $eventoArr['codigo_color_evento'] ?? '#3b82f6',
+                'limite' => $limite > 0 ? $limite : null,
+                'agregados' => $agregados,
+                'restantes' => $limite > 0 ? max(0, $limite - $agregados) : null,
+                'completado' => $limite > 0 ? ($agregados >= $limite) : true,
+                'is_dias' => false,
+                'fechas_asignadas' => $fechasAsignadas
+            ];
+        }
+
+        // Ordenar: primero los no completados, luego alfabéticamente
+        usort($progreso, function($a, $b) {
+            if ($a['completado'] !== $b['completado']) {
+                return $a['completado'] ? 1 : -1;
+            }
+            return strcmp($a['nombre'], $b['nombre']);
+        });
+
+        return $progreso;
+    }
+
     public function mount($id)
     {
         if (!Gate::allows('ver-calendario')) {
