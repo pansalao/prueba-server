@@ -30,6 +30,7 @@ class Evento extends Model
         'id_especial_evento' => 'integer',
         'cantidad_dias_evento' => 'integer',
         'cantidad_repetible_evento' => 'integer',
+        'justificativo_evento' => 'array',
     ];
 
     public function detalles()

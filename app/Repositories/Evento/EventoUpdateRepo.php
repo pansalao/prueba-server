@@ -34,6 +34,7 @@ class EventoUpdateRepo
                 'semana_evento' => (($data['is_semana_evento'] ?? !empty($data['semanas'])) && !empty($data['semanas']) && is_array($data['semanas'])) 
                 ? array_values(array_filter($data['semanas'], fn($v) => is_array($v) && !empty($v['semana']) && $v['semana'] !== null && $v['semana'] !== '')) 
                 : null,
+                'justificativo_evento' => $data['justificativo_evento'] ?? null,
             ];
 
             // Guardar is_independiente de forma dinámica según la columna que exista en la BD

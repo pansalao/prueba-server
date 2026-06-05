@@ -13,6 +13,8 @@ class UpdateEvento extends Component
 {
     public UpdateEventoForm $form;
     public $eventosExistentes = [];
+    public $justificacionesRequeridas = [];
+    public $justificacionesGuardadas = [];
     protected $eventoRepository;
     protected $viewRepository;
 
@@ -30,6 +32,9 @@ class UpdateEvento extends Component
         }
 
         $this->form->setEvento($evento);
+        if (!empty($this->form->justificativo_evento)) {
+            $this->justificacionesGuardadas = $this->form->justificativo_evento;
+        }
         $this->refreshEventos();
         if (empty($this->form->semanas)) {
             $this->form->semanas = [
@@ -37,6 +42,8 @@ class UpdateEvento extends Component
                 ['lapso' => 2, 'semana' => ''],
             ];
         }
+
+        $this->evaluarJustificacionesRequeridas();
     }
 
     public function refreshEventos()
@@ -62,7 +69,39 @@ class UpdateEvento extends Component
                 $this->form->is_independiente = true;
                 $this->form->is_superponible = false;
                 $this->form->cantidad_dias_evento = 0;
-            } elseif (in_array($this->form->id_especial_evento, ['7', '8', '13', '14'])) {
+            } elseif ($this->form->id_especial_evento == '13') {
+                $this->form->is_laborable = true;
+                $this->form->is_repetible = true;
+                $this->form->cantidad_repetible_evento = '1';
+                $this->form->tipo_evento = '4';
+                $this->form->codigo_color_evento = '#007bff';
+                $this->form->is_rango_dias = true;
+                $this->form->rango_dias = '1';
+                $this->form->is_independiente = false;
+                $this->form->is_superponible = false;
+                $this->form->cantidad_dias_evento = 0;
+                $this->form->is_semana_evento = true;
+                $this->form->semanas = [
+                    ['lapso' => 1, 'semana' => '6'],
+                    ['lapso' => 2, 'semana' => '6'],
+                ];
+            } elseif ($this->form->id_especial_evento == '7') {
+                $this->form->is_laborable = true;
+                $this->form->is_repetible = true;
+                $this->form->cantidad_repetible_evento = '1';
+                $this->form->tipo_evento = '4';
+                $this->form->codigo_color_evento = '#007bff';
+                $this->form->is_rango_dias = true;
+                $this->form->rango_dias = '1';
+                $this->form->is_independiente = false;
+                $this->form->is_superponible = false;
+                $this->form->cantidad_dias_evento = 0;
+                $this->form->is_semana_evento = true;
+                $this->form->semanas = [
+                    ['lapso' => 1, 'semana' => '4'],
+                    ['lapso' => 2, 'semana' => '4'],
+                ];
+            } elseif (in_array($this->form->id_especial_evento, ['8', '14'])) {
                 $this->form->is_laborable = true;
                 $this->form->is_repetible = true;
                 $this->form->cantidad_repetible_evento = '1';
@@ -251,6 +290,84 @@ class UpdateEvento extends Component
 
         // 2. FINALMENTE VALIDAMOS EL CAMPO
         $this->form->validateOnly($field);
+
+        $this->evaluarJustificacionesRequeridas();
+    }
+
+    public function evaluarJustificacionesRequeridas()
+    {
+        $viejas = $this->justificacionesRequeridas;
+        $this->justificacionesRequeridas = [];
+
+        if ($this->form->id_especial_evento == '13' && $this->form->is_semana_evento) {
+            foreach ($this->form->semanas as $semana) {
+                if (isset($semana['semana']) && $semana['semana'] != '' && $semana['semana'] != '6') {
+                    $lapsoText = "Lapso " . ($semana['lapso'] ?? 1);
+                    $titulo = $lapsoText;
+
+                    $encontrado = false;
+                    $textoPrevio = '';
+                    foreach($viejas as $v) {
+                        if ($v['titulo'] == $titulo && $v['lapso'] == ($semana['lapso'] ?? 1)) {
+                            $textoPrevio = $v['texto'] ?? '';
+                            $encontrado = true;
+                            break;
+                        }
+                    }
+                    if (!$encontrado) {
+                        foreach ($this->justificacionesGuardadas as $guardada) {
+                            if (($guardada['periodo'] == $titulo || str_contains($guardada['periodo'], $titulo)) && $guardada['lapso'] == ($semana['lapso'] ?? 1)) {
+                                $textoPrevio = $guardada['texto'] ?? '';
+                                break;
+                            }
+                        }
+                    }
+
+                    $this->justificacionesRequeridas[] = [
+                        'titulo' => $titulo,
+                        'lapso' => $semana['lapso'] ?? 1,
+                        'mensaje' => "El Inicio del P.E.R. tiene configurada la semana {$semana['semana']}. Justifique por qué es diferente a la semana 6.",
+                        'texto' => $textoPrevio,
+                        'dato_colocado' => $semana['semana'],
+                        'dato_esperado' => '6'
+                    ];
+                }
+            }
+        } elseif ($this->form->id_especial_evento == '7' && $this->form->is_semana_evento) {
+            foreach ($this->form->semanas as $semana) {
+                if (isset($semana['semana']) && $semana['semana'] != '' && $semana['semana'] != '4') {
+                    $lapsoText = "Lapso " . ($semana['lapso'] ?? 1);
+                    $titulo = $lapsoText;
+
+                    $encontrado = false;
+                    $textoPrevio = '';
+                    foreach($viejas as $v) {
+                        if ($v['titulo'] == $titulo && $v['lapso'] == ($semana['lapso'] ?? 1)) {
+                            $textoPrevio = $v['texto'] ?? '';
+                            $encontrado = true;
+                            break;
+                        }
+                    }
+                    if (!$encontrado) {
+                        foreach ($this->justificacionesGuardadas as $guardada) {
+                            if (($guardada['periodo'] == $titulo || str_contains($guardada['periodo'], $titulo)) && $guardada['lapso'] == ($semana['lapso'] ?? 1)) {
+                                $textoPrevio = $guardada['texto'] ?? '';
+                                break;
+                            }
+                        }
+                    }
+
+                    $this->justificacionesRequeridas[] = [
+                        'titulo' => $titulo,
+                        'lapso' => $semana['lapso'] ?? 1,
+                        'mensaje' => "El Inicio del Trayecto Inicial tiene configurada la semana {$semana['semana']}. Justifique por qué es diferente a la semana 4.",
+                        'texto' => $textoPrevio,
+                        'dato_colocado' => $semana['semana'],
+                        'dato_esperado' => '4'
+                    ];
+                }
+            }
+        }
     }
 
     public function guardar()
@@ -260,13 +377,49 @@ class UpdateEvento extends Component
                 $this->form->semanas = [];
             }
             $this->form->validate();
-            $this->eventoRepository->actualizar($this->form->id_evento, $this->form->all());
-            $this->showAlert('success', 'Evento actualizado correctamente.', '/evento/list');
+
+            $this->evaluarJustificacionesRequeridas();
+
+            if (count($this->justificacionesRequeridas) > 0) {
+                foreach ($this->justificacionesRequeridas as $req) {
+                    if (empty(trim($req['texto'] ?? ''))) {
+                        $this->showAlert('error', 'Debe llenar todas las justificaciones requeridas para continuar.');
+                        return;
+                    }
+                }
+
+                $this->justificacionesGuardadas = array_map(function($req) {
+                    return [
+                        'texto' => trim($req['texto']),
+                        'periodo' => $req['titulo'],
+                        'lapso' => $req['lapso'],
+                        'dato_colocado' => $req['dato_colocado'] ?? null,
+                        'dato_esperado' => $req['dato_esperado'] ?? null,
+                    ];
+                }, $this->justificacionesRequeridas);
+            } else {
+                $this->justificacionesGuardadas = [];
+            }
+
+            $this->ejecutarGuardar();
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             $errors = $e->validator->errors()->all();
             $msg = "Hay errores en el formulario:\n\n• " . implode("\n• ", $errors);
             $this->showAlert('error', $msg);
             throw $e;
+        } catch (Exception $e) {
+            $this->showAlert('error', 'Error al actualizar evento: ' . $e->getMessage());
+        }
+    }
+
+    public function ejecutarGuardar()
+    {
+        try {
+            $this->form->justificativo_evento = !empty($this->justificacionesGuardadas) ? $this->justificacionesGuardadas : null;
+
+            $this->eventoRepository->actualizar($this->form->id_evento, $this->form->all());
+            $this->showAlert('success', 'Evento actualizado correctamente.', '/evento/list');
         } catch (Exception $e) {
             $this->showAlert('error', 'Error al actualizar evento: ' . $e->getMessage());
         }

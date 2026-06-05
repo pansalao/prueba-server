@@ -28,6 +28,7 @@ class UpdateEventoForm extends Form
     public $dia_evento = null;
     public $cantidad_dias_evento = 0;
     public $semanas = [];
+    public $justificativo_evento = null;
 
     public function setEvento($evento)
     {
@@ -80,6 +81,12 @@ class UpdateEventoForm extends Form
                 // Formato antiguo: asignar al lapso 1 por defecto
                 $this->semanas[] = ['lapso' => 1, 'semana' => (string) $raw];
             }
+        }
+        
+        if (!empty($evento->justificativo_evento)) {
+            $this->justificativo_evento = is_string($evento->justificativo_evento) 
+                ? json_decode($evento->justificativo_evento, true) 
+                : $evento->justificativo_evento;
         }
     }
 

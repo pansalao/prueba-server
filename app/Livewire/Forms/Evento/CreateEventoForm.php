@@ -23,6 +23,7 @@ class CreateEventoForm extends Form
     public $dia_evento = null;
     public $cantidad_dias_evento = 0;
     public $semanas = [];
+    public $justificativo_evento = null;
 
     protected function rules()
     {

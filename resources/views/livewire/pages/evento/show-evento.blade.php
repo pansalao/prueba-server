@@ -48,7 +48,7 @@
                         <div>
                             <x-input-label value="Evento Especial:" />
                             <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
-                                {{ $evento->especialEvento ? $evento->especialEvento->especial_evento_name : 'Ninguno' }}
+                                {{ $evento->especialEvento()->first() ? $evento->especialEvento()->first()->especial_evento_name : 'Ninguno' }}
                             </p>
                         </div>
 
@@ -73,51 +73,41 @@
                         {{-- Independiente --}}
                         <div>
                             <x-input-label value="¿Es Independiente?:" />
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="material-icons {{ $evento->is_independiente_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
-                                    {{ $evento->is_independiente_evento ? 'check' : 'close' }}
-                                </span>
-                            </div>
+                            <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                {{ $evento->is_independiente_evento ? 'Sí' : 'No' }}
+                            </p>
                         </div>
 
                         {{-- Laborable --}}
                         <div>
                             <x-input-label value="Laborable:" />
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="material-icons {{ $evento->is_laborable_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
-                                    {{ $evento->is_laborable_evento ? 'check' : 'close' }}
-                                </span>
-                            </div>
+                            <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                {{ $evento->is_laborable_evento ? 'Sí' : 'No' }}
+                            </p>
                         </div>
 
                         {{-- Repetible --}}
                         <div>
                             <x-input-label value="Repetible:" />
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="material-icons {{ $evento->is_repetible_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
-                                    {{ $evento->is_repetible_evento ? 'check' : 'close' }}
-                                </span>
-                            </div>
+                            <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                {{ $evento->is_repetible_evento ? 'Sí' : 'No' }}
+                            </p>
                         </div>
 
                         {{-- Superponible --}}
                         <div>
                             <x-input-label value="Superponible a vacaciones:" />
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="material-icons {{ $evento->is_superponible_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
-                                    {{ $evento->is_superponible_evento ? 'check' : 'close' }}
-                                </span>
-                            </div>
+                            <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                {{ $evento->is_superponible_evento ? 'Sí' : 'No' }}
+                            </p>
                         </div>
 
                         {{-- Día Específico --}}
                         <div>
                             <x-input-label value="Ocurre en un Día Específico:" />
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="material-icons {{ $evento->is_dia_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
-                                    {{ $evento->is_dia_evento ? 'check' : 'close' }}
-                                </span>
-                            </div>
+                            <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                {{ $evento->is_dia_evento ? 'Sí' : 'No' }}
+                            </p>
                         </div>
 
                         @if($evento->is_dia_evento && $evento->dia_evento)
@@ -132,11 +122,9 @@
                         {{-- Semana Específica --}}
                         <div>
                             <x-input-label value="Ocurre en Semanas Específicas:" />
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="material-icons {{ $evento->is_semana_evento ? 'text-green-500' : 'text-red-500' }} text-3xl">
-                                    {{ $evento->is_semana_evento ? 'check' : 'close' }}
-                                </span>
-                            </div>
+                            <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+                                {{ $evento->is_semana_evento ? 'Sí' : 'No' }}
+                            </p>
                         </div>
 
                         @if($evento->is_semana_evento && $evento->semana_evento)
@@ -175,6 +163,47 @@
                     </div>
                 @else
                     <p class="text-gray-500 dark:text-gray-400">No se ha encontrado el Evento...</p>
+                @endif
+
+                {{-- Sección de Atenuantes --}}
+                @if($evento && !empty($evento->justificativo_evento))
+                    <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-300 mb-4 flex items-center gap-2">
+                            Atenuantes Registrados
+                        </h3>
+                        
+                        @php
+                            $justificativos = is_string($evento->justificativo_evento) 
+                                ? json_decode($evento->justificativo_evento, true) 
+                                : $evento->justificativo_evento;
+                            if (!is_array($justificativos)) $justificativos = [];
+                            
+                            $lapsos = collect($justificativos)->pluck('lapso')->unique()->sort();
+                        @endphp
+
+                        @foreach($lapsos as $lapso)
+                            <div class="mt-4 mb-6">
+                                <h4 class="text-md font-bold text-gray-700 dark:text-gray-300 mb-3 border-b pb-1">Lapso {{ $lapso ?? 1 }}</h4>
+                                <div class="space-y-4">
+                                    @foreach($justificativos as $j)
+                                        @if(($j['lapso'] ?? 1) == $lapso)
+                                            <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50 p-4 rounded-md shadow-sm">
+                                                <p class="text-sm text-orange-700 dark:text-orange-400 mb-2 font-bold">{{ $j['periodo'] ?? 'N/A' }}</p>
+                                                
+                                                <div class="bg-white dark:bg-gray-900 border border-orange-300 dark:border-orange-700 rounded-md p-3 shadow-sm mb-3">
+                                                    <p class="text-gray-800 dark:text-gray-200 text-sm italic">
+                                                        "{{ $j['texto'] ?? 'Sin texto registrado.' }}"
+                                                    </p>
+                                                </div>
+
+
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 @endif
 
                 <div class="flex justify-end mt-6">

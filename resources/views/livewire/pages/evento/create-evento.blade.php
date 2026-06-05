@@ -169,8 +169,28 @@
                                 </div>
                             @endforeach
                         </div>
-                        @else
                             <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">{{ __('Establezca un límite de repeticiones para generar las semanas.') }}</p>
+                        @endif
+
+                        @php
+                            $reqsLapso1 = array_filter($justificacionesRequeridas ?? [], fn($req) => ($req['lapso'] ?? 1) == 1);
+                        @endphp
+                        @if(count($reqsLapso1) > 0)
+                            <div class="mt-4 space-y-4">
+                                @foreach($justificacionesRequeridas as $index => $req)
+                                    @if(($req['lapso'] ?? 1) == 1)
+                                        <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50 p-4 rounded-md shadow-sm">
+                                            <p class="text-sm text-orange-700 dark:text-orange-400 mb-2 font-bold">{{ $req['mensaje'] }}</p>
+                                            <textarea wire:model.defer="justificacionesRequeridas.{{ $index }}.texto" rows="2" 
+                                                class="w-full border-orange-300 dark:border-orange-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm"
+                                                placeholder="Escribe el motivo del cambio..."></textarea>
+                                            @error('justificacionesRequeridas.'.$index.'.texto')
+                                                <span class="text-sm text-red-600 dark:text-red-400 mt-1 block">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
                         @endif
                     </div>
 
@@ -197,16 +217,36 @@
                             <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">{{ __('Establezca un límite de repeticiones para generar las semanas.') }}</p>
                         @endif
                         <x-input-error :messages="$errors->first('form.semanas')" class="mt-2" />
+
+                        @php
+                            $reqsLapso2 = array_filter($justificacionesRequeridas ?? [], fn($req) => ($req['lapso'] ?? 1) == 2);
+                        @endphp
+                        @if(count($reqsLapso2) > 0)
+                            <div class="mt-4 space-y-4">
+                                @foreach($justificacionesRequeridas as $index => $req)
+                                    @if(($req['lapso'] ?? 1) == 2)
+                                        <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50 p-4 rounded-md shadow-sm">
+                                            <p class="text-sm text-orange-700 dark:text-orange-400 mb-2 font-bold">{{ $req['mensaje'] }}</p>
+                                            <textarea wire:model.defer="justificacionesRequeridas.{{ $index }}.texto" rows="2" 
+                                                class="w-full border-orange-300 dark:border-orange-700 dark:bg-gray-900 dark:text-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm"
+                                                placeholder="Escribe el motivo del cambio..."></textarea>
+                                            @error('justificacionesRequeridas.'.$index.'.texto')
+                                                <span class="text-sm text-red-600 dark:text-red-400 mt-1 block">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 @endif
             </div>
 
-            <div class="flex items-center justify-end gap-4">
+            <div class="flex items-center justify-end gap-4 mt-6">
                 <x-primary-button type="submit" wire:loading.attr="disabled">
                     {{ __('Guardar Evento') }}
                 </x-primary-button>
             </div>
         </form>
     </div>
-
 </div>
