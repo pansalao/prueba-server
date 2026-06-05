@@ -118,8 +118,8 @@ class UsuarioRepository
             }
 
 
-            // 2. Estudiante (ID: 4) - Pertenece a Informática si está inscrito en programa 1 o 4
-            if ($rolId == 4) {
+            // 2. Estudiante (ID: 3) - Pertenece a Informática si está inscrito en programa 1 o 4
+            if ($rolId == 3) {
                 $esEstudianteInf = DB::connection('external_db')
                     ->table('estudiante')
                     ->where('est_cedula', $cedula)
@@ -132,8 +132,8 @@ class UsuarioRepository
             }
 
 
-            // 3. Docente (ID: 3) - Verifica si da clases en PNF Informática
-            if ($rolId == 3) {
+            // 3. Docente (ID: 2) - Verifica si da clases en PNF Informática
+            if ($rolId == 2) {
                 $esDocenteInf = DB::connection('external_db')
                     ->table('seccion_unidad_docente as sud')
                     ->join('unidad_curricular as uc', 'sud.sud_cod_unidad', '=', 'uc.ucu_codigo')

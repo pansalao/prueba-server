@@ -185,3 +185,86 @@
         @apply w-full my-4 border-none shadow-sm;
     }
 }
+
+/* --- ESTILOS DE ESTATUS SÓLIDOS (SIN TRANSPARENCIA) --- */
+span[class*="bg-green-100"][class*="text-green-"],
+span[class*="bg-green-800"],
+span[class*="bg-green-700"],
+span.bg-green-100,
+span.bg-green-900,
+.dark span.dark\:bg-green-900,
+.dark span.dark\:bg-green-600 {
+    background-color: #1e7e34 !important; /* Verde sólido oscuro */
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+span[class*="bg-red-100"][class*="text-red-"],
+span[class*="bg-red-800"],
+span[class*="bg-red-700"],
+span.bg-red-100,
+span.bg-red-900,
+.dark span.dark\:bg-red-900,
+.dark span.dark\:bg-red-600 {
+    background-color: #bd2130 !important; /* Rojo sólido oscuro */
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+span[class*="bg-blue-100"][class*="text-blue-"],
+span.bg-blue-100,
+span.bg-blue-900,
+.dark span.dark\:bg-blue-900 {
+    background-color: #007bff !important; /* Azul sólido */
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+span[class*="bg-amber-100"][class*="text-amber-"],
+span.bg-amber-100,
+span.bg-amber-900,
+.dark span.dark\:bg-amber-900 {
+    background-color: #d39e00 !important; /* Ámbar sólido */
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+span[class*="bg-purple-100"][class*="text-purple-"],
+span.bg-purple-100,
+span.bg-purple-900,
+.dark span.dark\:bg-purple-900 {
+    background-color: #6f42c1 !important; /* Púrpura sólido */
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+span[class*="bg-gray-100"][class*="text-gray-"],
+span.bg-gray-100,
+span.bg-gray-900,
+.dark span.dark\:bg-gray-900 {
+    background-color: #6c757d !important; /* Gris sólido */
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* --- ELIMINAR TRANSPARENCIAS GLOBALES EN TODO EL SISTEMA (LISTAR, CREAR, EDITAR, ETC.) --- */
+/* Forzar opacidad al 100% en fondos, bordes y textos generados por Tailwind */
+* {
+    --tw-bg-opacity: 1 !important;
+    --tw-border-opacity: 1 !important;
+    --tw-text-opacity: 1 !important;
+}
+
+/* Exceptuar fondos de modales/pantallas de carga (overlays) para que sigan siendo traslúcidos */
+.fixed.inset-0.bg-gray-500,
+.fixed.inset-0.bg-gray-950,
+.fixed.inset-0.bg-black,
+.bg-gray-950\/80,
+.bg-black\/10,
+.bg-black\/50,
+.bg-opacity-50,
+.bg-opacity-75,
+[class*="backdrop-blur"] {
+    --tw-bg-opacity: 0.75 !important;
+    background-color: rgba(0, 0, 0, 0.75) !important;
+}
