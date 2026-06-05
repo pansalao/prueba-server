@@ -57,7 +57,7 @@
                                         <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200">
                                             {{ $progreso['nombre'] }}</h4>
                                         @if(!($progreso['is_por_lapso'] ?? false))
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">
                                                 @if($progreso['limite'] === null)
                                                     <span class="text-gray-600 dark:text-gray-400 font-medium">Ilimitado</span>
                                                 @elseif($progreso['completado'])
@@ -113,17 +113,13 @@
                                             <div class="flex items-center justify-between cursor-pointer" @click="expanded['{{ $lapsoKey }}'] = !expanded['{{ $lapsoKey }}']">
                                                 <div>
                                                     <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ $lapso['nombre'] }}</span>
-                                                    <p class="text-[11px] text-gray-500">
-                                                        @if($lapsoCompletado)
-                                                            <span class="text-green-600">Completado</span>
-                                                        @else
-                                                            Faltan {{ max(0, $progreso['limite_por_lapso'] - $lapso['agregados']) }} inst.
-                                                        @endif
+                                                    <p class="text-sm text-gray-500 mt-0.5">
+                                                        fechas asignadas para el evento
                                                     </p>
                                                 </div>
                                                 <div class="flex items-center gap-3">
                                                     <div class="text-right">
-                                                        <span class="text-xs font-bold {{ $lapsoCompletado ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400' }}">
+                                                        <span class="text-sm font-bold {{ $lapsoCompletado ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400' }}">
                                                             Asignados {{ $lapso['agregados'] }} de {{ $progreso['limite_por_lapso'] }}
                                                         </span>
                                                         <div class="w-20 h-1.5 mt-0.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden ml-auto">
@@ -141,7 +137,7 @@
                                                 @if(count($lapso['fechas_asignadas']) > 0)
                                                     <ul class="space-y-1">
                                                         @foreach($lapso['fechas_asignadas'] as $fecha)
-                                                            <li class="text-[11px] text-gray-600 dark:text-gray-400 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 p-1.5 rounded">
+                                                            <li class="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 p-1.5 rounded">
                                                                 <div class="flex items-center gap-1.5">
                                                                     <span class="material-icons text-[12px] text-gray-400">event</span>
                                                                     <span>
@@ -155,7 +151,7 @@
                                                         @endforeach
                                                     </ul>
                                                 @else
-                                                    <p class="text-[11px] text-gray-500 italic">No hay fechas asignadas registradas en el componente.</p>
+                                                    <p class="text-sm text-gray-500 italic">No hay fechas asignadas registradas en el componente.</p>
                                                 @endif
                                             </div>
                                         </div>
@@ -169,12 +165,12 @@
                                                     <span class="text-sm font-bold text-orange-700 dark:text-orange-400 flex items-center gap-1">
                                                         <span class="material-icons text-[16px]">warning</span> Fuera de Lapso
                                                     </span>
-                                                    <p class="text-[11px] text-orange-500">
+                                                    <p class="text-sm text-orange-500">
                                                         Fechas asignadas incorrectamente
                                                     </p>
                                                 </div>
                                                 <div class="flex items-center gap-3">
-                                                    <span class="text-xs font-bold text-orange-600 dark:text-orange-400">
+                                                    <span class="text-sm font-bold text-orange-600 dark:text-orange-400">
                                                         {{ count($progreso['fechas_asignadas']) }} instancias
                                                     </span>
                                                     <button type="button" class="text-orange-400 hover:text-orange-600 focus:outline-none">
@@ -186,7 +182,7 @@
                                             <div x-show="expanded['{{ $index }}_fuera']" x-collapse class="mt-2 pt-2 border-t border-orange-200 dark:border-orange-800/30">
                                                 <ul class="space-y-1">
                                                     @foreach($progreso['fechas_asignadas'] as $fecha)
-                                                        <li class="text-[11px] text-orange-700 dark:text-orange-300 flex items-center justify-between bg-white dark:bg-gray-800 p-1.5 rounded">
+                                                        <li class="text-sm text-orange-700 dark:text-orange-300 flex items-center justify-between bg-white dark:bg-gray-800 p-1.5 rounded">
                                                             <div class="flex items-center gap-1.5">
                                                                 <span class="material-icons text-[12px] text-orange-400">event</span>
                                                                 <span>
@@ -211,7 +207,7 @@
                                         <ul class="space-y-1">
                                             @foreach($progreso['fechas_asignadas'] as $fecha)
                                                 <li
-                                                    class="text-[11px] text-gray-600 dark:text-gray-300 flex items-center justify-between bg-white dark:bg-gray-800 p-1.5 rounded border border-gray-100 dark:border-gray-700">
+                                                    class="text-sm text-gray-600 dark:text-gray-300 flex items-center justify-between bg-white dark:bg-gray-800 p-1.5 rounded border border-gray-100 dark:border-gray-700">
                                                     <div class="flex items-center gap-1.5">
                                                         <span class="material-icons text-[12px] text-gray-400">event</span>
                                                         <span>
@@ -222,13 +218,13 @@
                                                         </span>
                                                     </div>
                                                     @if(isset($fecha['dias']))
-                                                        <span class="font-medium text-[10px] text-gray-500">{{ $fecha['dias'] }} días</span>
+                                                        <span class="font-medium text-sm text-gray-500">{{ $fecha['dias'] }} días</span>
                                                     @endif
                                                 </li>
                                             @endforeach
                                         </ul>
                                     @else
-                                        <p class="text-[11px] text-gray-500 italic">No hay fechas asignadas registradas en el componente.</p>
+                                        <p class="text-sm text-gray-500 italic">No hay fechas asignadas registradas en el componente.</p>
                                     @endif
                                 </div>
                             @endif
